@@ -184,7 +184,7 @@ T Playground::getRandom(T min, T max)
 
 void Playground::updateFrame()
 {
-	// get new snake head
+	// get new snake head position
 	auto [head_x, head_y] = snake_body[snake_head];
 	forwardIndex(snake_head);
 	if (input_key != Direction::None)
