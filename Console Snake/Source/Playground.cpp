@@ -192,13 +192,17 @@ void Playground::updateFrame()
 	switch (snake_direct)
 	{
 		case Direction::Up:
-			head_y--; break;
+			head_y == 0 ? head_y = GameSetting::get().height - 1 : head_y--;
+			break;
 		case Direction::Down:
-			head_y++; break;
+			head_y == GameSetting::get().height - 1 ? head_y = 0 : head_y++;
+			break;
 		case Direction::Left:
-			head_x--; break;
+			head_x == 0 ? head_x = GameSetting::get().width - 1 : head_x--;
+			break;
 		case Direction::Right:
-			head_x++; break;
+			head_x == GameSetting::get().width - 1 ? head_x = 0 : head_x++;
+			break;
 	}
 
 	// check is dashing againest barrier or body
