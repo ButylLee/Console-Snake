@@ -1,0 +1,113 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="源文件">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="头文件">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="资源文件">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="头文件\Utility">
+      <UniqueIdentifier>{e176600d-3329-41b1-aee5-e01dee2bd617}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\Resource">
+      <UniqueIdentifier>{83834f95-1f58-42d9-8bb9-b225bb3ded8d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\Import">
+      <UniqueIdentifier>{07a1b2f2-09f4-43af-a069-ae1d8f39119d}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Source\Main.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Pages.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Playground.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GameSaving.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Include\Canvas.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Console.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Main.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Pages.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\DataSet.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Playground.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\KeyMap.h">
+      <Filter>头文件\Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Resource.h">
+      <Filter>头文件\Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\DynArray.h">
+      <Filter>头文件\Import</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\EncryptedString.h">
+      <Filter>头文件\Import</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ScopeGuard.h">
+      <Filter>头文件\Import</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\LocalizedStrings.h">
+      <Filter>头文件\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Singleton.h">
+      <Filter>头文件\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\wideIO.h">
+      <Filter>头文件\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\WinMacro.h">
+      <Filter>头文件\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Enum.h">
+      <Filter>头文件\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ErrorHandling.h">
+      <Filter>头文件\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Rank.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\GameSaving.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Include\LangENG.inl">
+      <Filter>头文件\Resource</Filter>
+    </None>
+    <None Include="Include\LangCHS.inl">
+      <Filter>头文件\Resource</Filter>
+    </None>
+    <None Include="Include\LangCHT.inl">
+      <Filter>头文件\Resource</Filter>
+    </None>
+    <None Include="Include\LangJPN.inl">
+      <Filter>头文件\Resource</Filter>
+    </None>
+  </ItemGroup>
+</Project>
