@@ -292,6 +292,8 @@ void Playground::endGame()
 		if (iswprint(ch))
 			name += ch;
 	}
+	if (name.find_first_not_of(L' ') == std::string::npos)
+		name.clear(); // clear if only has spaces
 	if (name.length() > Rank::name_max_length)
 		name.resize(Rank::name_max_length);
 	Rank::get().newResult(name, GameData::get().score, is_win);
