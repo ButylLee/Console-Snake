@@ -56,7 +56,7 @@ public:
 		done = std::async(std::launch::async,
 						  [this]
 						  {
-							  auto previous_user = std::find_if(rank_table.begin(), rank_table.end() - 1,
+							  auto previous_user = std::find_if(rank_table.begin(), rank_table.end(),
 																[this](const RankItem& lhs) noexcept
 																{
 																	return lhs.name == rank_table.back().name;
