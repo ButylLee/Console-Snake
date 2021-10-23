@@ -106,6 +106,13 @@ public:
 		return rank_table;
 	}
 
+	void clearRank() noexcept
+	{
+		while (!finished());
+		rank_table.clear();
+		rank_table = std::vector<RankItem>{ rank_count };
+	}
+
 private:
 	std::vector<RankItem> rank_table{ rank_count };
 	std::future<void> done;

@@ -41,7 +41,7 @@ L"(anonymous)"_crypt,
 L" WIN"_crypt,
 L"Setting: "_crypt,
 L"N o   R a n k   D a t a"_crypt,
-L"Ctrl+C)  Clear All Records"_crypt,
+L"Ctrl+D)  Clear All Records"_crypt,
 
 L"  Author: James Taylor\n  Thanks for your playing!"_crypt,
 L"About"_crypt,

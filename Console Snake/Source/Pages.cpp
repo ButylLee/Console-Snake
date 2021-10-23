@@ -366,6 +366,10 @@ void RankPage::run()
 	{
 		switch (getwch())
 		{
+			case K_Ctrl_Dd:
+				Rank::get().clearRank();
+				GameSaving::get().save();
+				[[fallthrough]];
 			case K_Enter:
 			case K_Esc:
 				GameData::get().seletion = PageSel::MenuPage;
@@ -391,7 +395,7 @@ void RankPage::paintInterface()
 	}
 	else
 	{
-		int number = 1;
+		int number = 0;
 		std::wstring buffer, name, score, speed;
 		for (const auto& item : Rank::get().getRank())
 		{
@@ -407,17 +411,22 @@ void RankPage::paintInterface()
 			buffer += ~token::rank_setting;
 			buffer += L"%-*ls "_crypt; // arg:speed setting width, speed setting
 			buffer += L"%2d X %2d"_crypt; // arg:size setting
-			canvas.setCursor(baseX, baseY++);
+			canvas.setCursor(baseX, baseY + number);
 			name = item.name.empty() ? ~token::rank_anonymous : item.name;
 			score = item.is_win ? ~token::rank_win : std::to_wstring(item.score);
 			speed = ~FindSpeedName(item.speed);
 
-			print(buffer, number++,
+			print(buffer, ++number,
 				  Rank::name_max_length - StrFullWidthCount(name), name.c_str(),
 				  score.c_str(),
 				  6 - StrFullWidthCount(speed), speed.c_str(),
 				  item.width, item.height);
 		}
+
+		std::this_thread::sleep_for(50ms);
+		canvas.setColor(Color::DefaultColor);
+		canvas.setCursor(baseX / 2, baseY + 12);
+		print(~token::rank_clear_all_records);
 	}
 	std::this_thread::sleep_for(500ms);
 }

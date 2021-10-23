@@ -41,7 +41,7 @@ L"(匿名)"_crypt,
 L" WIN"_crypt,
 L"設定: "_crypt,
 L"N o   R a n k   D a t a"_crypt,
-L"Ctrl+C)  すべての記録をクリアする"_crypt,
+L"Ctrl+D)  記録を削除する"_crypt,
 
 L"  作者: James Taylor\n  ご遊びありがとうございました!"_crypt,
 L"関する"_crypt,
