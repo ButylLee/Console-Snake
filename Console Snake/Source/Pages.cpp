@@ -253,6 +253,10 @@ void SettingPage::run()
 			case K_Esc:
 			{
 				GameData::get().seletion = PageSel::MenuPage;
+				// restore
+				GameSetting::get() = setting_backup;
+				LocalizedStrings::setLang(setting_backup.lang);
+				Console::get().setTitle(~token::console_title);
 			}
 			return;
 		}

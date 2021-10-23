@@ -3,6 +3,7 @@
 #define SNAKE_PAGES_HEADER_
 
 #include "Canvas.h"
+#include "DataSet.h"
 #include <memory>
 
 class Page
@@ -60,6 +61,7 @@ public:
 private:
 	void paintInterface();
 	void paintCurOptions();
+	GameSettingMember setting_backup = GameSetting::get();
 };
 
 class BeginPage :public MainPage
