@@ -62,6 +62,7 @@ TOKEN_DEF(
 	rank_win,
 	rank_setting,
 	rank_no_data,
+	rank_clear_all_records,
 
 	about_text,
 	about_caption,

@@ -41,6 +41,7 @@ L"(匿名)"_crypt,
 L"通關"_crypt,
 L"設定: "_crypt,
 L"暫  無  記  錄"_crypt,
+L"Ctrl+C)  清除所有記錄"_crypt,
 
 L"  作者: James Taylor\n  感謝你的遊玩!"_crypt,
 L"關於"_crypt,
