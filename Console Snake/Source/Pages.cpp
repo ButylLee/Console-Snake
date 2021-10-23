@@ -244,9 +244,17 @@ void SettingPage::run()
 			break;
 
 			case K_Enter:
+			{
 				GameData::get().seletion = PageSel::MenuPage;
 				GameSaving::get().save();
-				return;
+			}
+			return;
+
+			case K_Esc:
+			{
+				GameData::get().seletion = PageSel::MenuPage;
+			}
+			return;
 		}
 	}
 }
@@ -269,6 +277,8 @@ void SettingPage::paintInterface()
 	canvas.setCursor(baseX, baseY + 6);
 	print(~token::setting_language);
 	canvas.setCursor(baseX - 2, baseY + 8);
+	print(~token::setting_save);
+	canvas.setCursor(baseX - 1, baseY + 10);
 	print(~token::setting_return);
 }
 

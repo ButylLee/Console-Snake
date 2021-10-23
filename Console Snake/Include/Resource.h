@@ -40,6 +40,7 @@ TOKEN_DEF(
 	setting_map_size,
 	setting_show_frame,
 	setting_language,
+	setting_save,
 	setting_return,
 	setting_speed_fast,
 	setting_speed_normal,
