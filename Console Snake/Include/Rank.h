@@ -66,10 +66,8 @@ public:
 							  {
 								  // only store named gamer's best score
 								  if (rank_table.back().score >= previous_user->score)
-								  {
 									  *previous_user = std::move(rank_table.back());
-									  --end;
-								  }
+								  --end;
 							  }
 							  std::stable_sort(rank_table.begin(), end,
 											   [](const RankItem& lhs, const RankItem& rhs) noexcept
