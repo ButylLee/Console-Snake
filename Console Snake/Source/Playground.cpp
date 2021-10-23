@@ -97,14 +97,14 @@ void Playground::createSnake()
 	auto begin_head_y = getRandom(0, y_range);
 
 	// select direction
-	if (bool use_x = getRandom(0, 1))
+	if (getRandom<bool>(0, 1)) // snake extend in x
 	{
 		if (begin_head_x < x_range / 2)
 			snake_direct = Direction::Right;
 		else
 			snake_direct = Direction::Left;
 	}
-	else
+	else // snake extend in y
 	{
 		if (begin_head_y < y_range / 2)
 			snake_direct = Direction::Down;
