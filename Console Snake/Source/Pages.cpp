@@ -106,8 +106,8 @@ void GamePage::run()
 							  input_key,
 							  snake_direct,
 							  game_status);
-		cond_ready.notify_one();
 		lk.unlock();
+		cond_ready.notify_one();
 
 		playground.play();
 	}
