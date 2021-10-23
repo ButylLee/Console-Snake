@@ -61,20 +61,21 @@ public:
 																{
 																	return lhs.name == rank_table.back().name;
 																});
+							  auto end = rank_table.end();
 							  if (previous_user != rank_table.cend() - 1 && !rank_table.back().name.empty())
 							  {
-								  // only store gamer's best score
+								  // only store named gamer's best score
 								  if (rank_table.back().score >= previous_user->score)
+								  {
 									  *previous_user = std::move(rank_table.back());
+									  --end;
+								  }
 							  }
-							  else
-							  {
-								  std::stable_sort(rank_table.begin(), rank_table.end(),
-												   [](const RankItem& lhs, const RankItem& rhs) noexcept
-												   {
-													   return lhs.score > rhs.score;
-												   });
-							  }
+							  std::stable_sort(rank_table.begin(), end,
+											   [](const RankItem& lhs, const RankItem& rhs) noexcept
+											   {
+												   return lhs.score > rhs.score;
+											   });
 							  rank_table.pop_back();
 							  rank_lock = false;
 						  });
