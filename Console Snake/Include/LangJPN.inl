@@ -43,7 +43,7 @@ L"設定: "_crypt,
 L"N o   R a n k   D a t a"_crypt,
 L"Ctrl+D)  記録を削除する"_crypt,
 
-L"  作者: James Taylor\n  ご遊びありがとうございました!"_crypt,
+L"  作者: James Taylor\n  特別な感謝: Darack\n  ご遊びありがとうございました!"_crypt,
 L"関する"_crypt,
 
 L"コンソールハンドルの取得に失敗しました "_crypt,

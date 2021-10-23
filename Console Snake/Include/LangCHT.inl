@@ -43,7 +43,7 @@ L"設定: "_crypt,
 L"暫  無  記  錄"_crypt,
 L"Ctrl+D)  清除所有記錄"_crypt,
 
-L"  作者: James Taylor\n  感謝你的遊玩!"_crypt,
+L"  作者: James Taylor\n  特別感謝: Darack\n  感謝你的遊玩!"_crypt,
 L"關於"_crypt,
 
 L"獲取 Console Handle 失敗 "_crypt,
