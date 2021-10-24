@@ -41,11 +41,11 @@ void Playground::play()
 	}
 }
 
-template<GameElementTag Which>
+template<Element Which>
 constexpr void Playground::paintElement() noexcept
 {
-	canvas.setColor(GameElement<Which>::appearance.color);
-	print(GameElement<Which>::appearance.facade);
+	canvas.setColor(PlaygroundElement<Which>::appearance.color);
+	print(PlaygroundElement<Which>::appearance.facade);
 }
 
 size_t Playground::getSnakeBodySize() noexcept
@@ -63,20 +63,20 @@ void Playground::setupInvariantAndPaint() noexcept
 			if (row == 0 || row == GameSetting::get().height - 1 ||
 				column == 0 || column == GameSetting::get().width - 1)
 			{
-				map[column][row].type = GameElementTag::barrier;
+				map[column][row].type = Element::barrier;
 				map[column][row].snake_index = -1;
 				if (!(GameSetting::get().old_console_host == true &&
 					  row == GameSetting::get().height - 1 &&
 					  column == GameSetting::get().width - 1))
-					paintElement<GameElementTag::barrier>();
+					paintElement<Element::barrier>();
 			}
 			else
 			{
-				map[column][row].type = GameElementTag::blank;
+				map[column][row].type = Element::blank;
 				map[column][row].snake_index = index;
 				snake_body[index].x = column;
 				snake_body[index].y = row;
-				paintElement<GameElementTag::blank>();
+				paintElement<Element::blank>();
 				index++;
 			}
 		}
@@ -118,9 +118,9 @@ void Playground::createSnake()
 	snake_tail = snake_head = map[begin_head_x][begin_head_y].snake_index;
 	for (size_t i = 0; i < snake_begin_length; i++)
 	{
-		map[begin_head_x][begin_head_y].type = GameElementTag::snake;
+		map[begin_head_x][begin_head_y].type = Element::snake;
 		canvas.setCursor(begin_head_x, begin_head_y);
-		paintElement<GameElementTag::snake>();
+		paintElement<Element::snake>();
 		rebindData(snake_tail, begin_head_x, begin_head_y);
 
 		if (i == snake_begin_length - 1)
@@ -162,9 +162,9 @@ void Playground::createFood()
 
 	// generate food on the map
 	auto [x, y] = snake_body[random_index];
-	map[x][y].type = GameElementTag::food;
+	map[x][y].type = Element::food;
 	canvas.setCursor(x, y);
-	paintElement<GameElementTag::food>();
+	paintElement<Element::food>();
 }
 
 auto& Playground::getRandomEngine()
@@ -207,20 +207,20 @@ void Playground::updateFrame()
 
 	// check is dashing againest barrier or body
 	auto previous_type = map[head_x][head_y].type;
-	if (previous_type == GameElementTag::barrier || previous_type == GameElementTag::snake)
+	if (previous_type == Element::barrier || previous_type == Element::snake)
 	{
 		game_over = true;
 		return;
 	}
 
 	// process snake head and rebind data
-	map[head_x][head_y].type = GameElementTag::snake;
+	map[head_x][head_y].type = Element::snake;
 	canvas.setCursor(head_x, head_y);
-	paintElement<GameElementTag::snake>();
+	paintElement<Element::snake>();
 	rebindData(snake_head, head_x, head_y);
 
 	// process snake tail
-	if (previous_type == GameElementTag::food)
+	if (previous_type == Element::food)
 	{
 		createFood();
 		GameData::get().score++;
@@ -229,9 +229,9 @@ void Playground::updateFrame()
 	{
 		auto [tail_x, tail_y] = snake_body[snake_tail];
 		forwardIndex(snake_tail);
-		map[tail_x][tail_y].type = GameElementTag::blank;
+		map[tail_x][tail_y].type = Element::blank;
 		canvas.setCursor(tail_x, tail_y);
-		paintElement<GameElementTag::blank>();
+		paintElement<Element::blank>();
 	}
 }
 

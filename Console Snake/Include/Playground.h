@@ -22,7 +22,7 @@ enum struct GameStatus
 struct MapNode
 {
 	int16_t snake_index;
-	GameElementTag type;
+	Element type;
 };
 
 struct SnakeNode
@@ -53,7 +53,7 @@ public:
 	void play();
 
 private:
-	template<GameElementTag Which>
+	template<Element Which>
 	constexpr void paintElement() noexcept;
 	size_t getSnakeBodySize() noexcept;
 	void setupInvariantAndPaint() noexcept;

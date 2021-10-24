@@ -37,8 +37,14 @@ struct GameSettingMember
 };
 using GameSetting = Singleton<GameSettingMember>;
 
+struct GameCustomDataMember
+{
 
-enum struct GameElementTag
+};
+using GameCustomData = Singleton<GameCustomDataMember>;
+
+
+enum struct Element
 {
 	blank = 1,
 	food,
@@ -52,15 +58,15 @@ struct Appearance
 	Color color;
 };
 
-template<GameElementTag Level>
-struct GameElement
+template<Element Which>
+struct PlaygroundElement
 {
 	static Appearance appearance;
 };
 
-inline Appearance GameElement<GameElementTag::blank>::appearance = { L'□', Color::Blue };
-inline Appearance GameElement<GameElementTag::food>::appearance = { L'★', Color::Red };
-inline Appearance GameElement<GameElementTag::snake>::appearance = { L'●', Color::Yellow };
-inline Appearance GameElement<GameElementTag::barrier>::appearance = { L'■', Color::Green };
+inline Appearance PlaygroundElement<Element::blank>::appearance = { L'□', Color::Blue };
+inline Appearance PlaygroundElement<Element::food>::appearance = { L'★', Color::Red };
+inline Appearance PlaygroundElement<Element::snake>::appearance = { L'●', Color::Yellow };
+inline Appearance PlaygroundElement<Element::barrier>::appearance = { L'■', Color::Green };
 
 #endif // SNAKE_DATASET_HEADER_
