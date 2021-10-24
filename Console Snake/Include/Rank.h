@@ -38,9 +38,9 @@ protected:
 public:
 	void newResult(std::wstring new_name, int new_score, bool winning)
 	{
-		if (done.valid())
+		if (done.valid()) // wait for last time sorting
 			done.get();
-		rank_lock = true;
+		this->lock();
 
 		rank_table.push_back(
 			{
@@ -75,7 +75,7 @@ public:
 												   return lhs.score > rhs.score;
 											   });
 							  rank_table.pop_back();
-							  rank_lock = false;
+							  this->unlock();
 						  });
 	}
 
@@ -101,7 +101,13 @@ public:
 		return rank_table;
 	}
 
-	auto& getRankPrior() noexcept
+	auto& getRank() noexcept
+	{
+		while (!finished());
+		return rank_table;
+	}
+
+	auto& getRank_NoLock() noexcept
 	{
 		return rank_table;
 	}

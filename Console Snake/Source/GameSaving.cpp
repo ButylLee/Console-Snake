@@ -128,7 +128,7 @@ void GameSavingBase::convertFromBinaryData() noexcept
 	for (int i = 0; i < Rank::rank_count; i++)
 	{
 		auto& save_item = bin_data.rank_list[i];
-		auto& rank_item = Rank::get().getRankPrior()[i];
+		auto& rank_item = Rank::get().getRank()[i];
 		rank_item.score = Convert{ save_item.score };
 		rank_item.width = Convert{ save_item.width };
 		rank_item.height = Convert{ save_item.height };
@@ -155,7 +155,7 @@ void GameSavingBase::convertToBinaryData() noexcept
 	for (int i = 0; i < Rank::rank_count; i++)
 	{
 		auto& save_item = bin_data.rank_list[i];
-		auto& rank_item = Rank::get().getRankPrior()[i];
+		auto& rank_item = Rank::get().getRank_NoLock()[i];
 		save_item.score = Convert{ rank_item.score };
 		save_item.width = Convert{ rank_item.width };
 		save_item.height = Convert{ rank_item.height };
@@ -168,7 +168,7 @@ void GameSavingBase::convertToBinaryData() noexcept
 // write save file from memory
 void GameSavingBase::save()
 {
-	if (done.valid())
+	if (done.valid()) // wait for last time saving
 		done.get();
 	Rank::get().lock();
 	convertToBinaryData();
