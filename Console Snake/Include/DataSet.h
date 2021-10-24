@@ -37,10 +37,4 @@ struct GameSettingMember
 };
 using GameSetting = Singleton<GameSettingMember>;
 
-struct GameCustomDataMember
-{
-
-};
-using GameCustomData = Singleton<GameCustomDataMember>;
-
 #endif // SNAKE_DATASET_HEADER_
