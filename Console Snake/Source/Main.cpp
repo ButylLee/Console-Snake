@@ -62,8 +62,8 @@ void InitConsole()
 int main(int argc, char* argv[])
 {
 	GameSaving::get().convertFromBinaryData();
-	InitConsole();
 	ParseCmdAndSet(argc, argv);
+	InitConsole();
 
 	try {
 		while (true)
