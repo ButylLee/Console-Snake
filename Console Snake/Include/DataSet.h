@@ -43,30 +43,4 @@ struct GameCustomDataMember
 };
 using GameCustomData = Singleton<GameCustomDataMember>;
 
-
-enum struct Element
-{
-	blank = 1,
-	food,
-	snake,
-	barrier
-};
-
-struct Appearance
-{
-	wchar_t facade;
-	Color color;
-};
-
-template<Element Which>
-struct PlaygroundElement
-{
-	static Appearance appearance;
-};
-
-inline Appearance PlaygroundElement<Element::blank>::appearance = { L'□', Color::Blue };
-inline Appearance PlaygroundElement<Element::food>::appearance = { L'★', Color::Red };
-inline Appearance PlaygroundElement<Element::snake>::appearance = { L'●', Color::Yellow };
-inline Appearance PlaygroundElement<Element::barrier>::appearance = { L'■', Color::Green };
-
 #endif // SNAKE_DATASET_HEADER_

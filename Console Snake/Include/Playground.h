@@ -4,6 +4,7 @@
 
 #include "Canvas.h"
 #include "DataSet.h"
+#include "Singleton.h"
 #include "DynArray.h"
 #include <atomic>
 #include <cstdint>
@@ -19,6 +20,50 @@ enum struct GameStatus
 	Running, Pausing, Ending
 };
 
+// ------------ class Playground Elements ------------
+struct Appearance
+{
+	wchar_t facade;
+	Color color;
+};
+
+struct PlaygroundElementsBase
+{
+	enum Element :size_t
+	{
+		blank = 0,
+		food,
+		snake,
+		barrier,
+
+		Mask
+	};
+protected:
+	PlaygroundElementsBase() noexcept {}
+
+public:
+	const auto& operator[](Element Which) const noexcept
+	{
+		return appearance[static_cast<size_t>(Which)];
+	}
+	auto& operator[](Element Which) noexcept
+	{
+		return appearance[static_cast<size_t>(Which)];
+	}
+
+private:
+	Appearance appearance[static_cast<size_t>(Element::Mask)] = {
+		{ L'□', Color::Blue },
+		{ L'★', Color::Red },
+		{ L'●', Color::Yellow },
+		{ L'■', Color::Green }
+	};
+};
+using PlaygroundElements = Singleton<PlaygroundElementsBase>;
+using Element = PlaygroundElements::Element;
+// ---------------------------------------------------
+
+// ------------- class Playground --------------------
 struct MapNode
 {
 	int16_t snake_index;
@@ -53,8 +98,7 @@ public:
 	void play();
 
 private:
-	template<Element Which>
-	constexpr void paintElement() noexcept;
+	void paintElement(Element Which) noexcept;
 	size_t getSnakeBodySize() noexcept;
 	void setupInvariantAndPaint() noexcept;
 	void createSnake();

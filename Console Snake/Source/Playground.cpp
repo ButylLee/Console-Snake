@@ -6,6 +6,7 @@
 #include <thread>
 #include <chrono>
 #include <utility>
+#include <type_traits>
 #include <string>
 #include <cwctype>
 #include "WinMacro.h"
@@ -41,11 +42,10 @@ void Playground::play()
 	}
 }
 
-template<Element Which>
-constexpr void Playground::paintElement() noexcept
+void Playground::paintElement(Element Which) noexcept
 {
-	canvas.setColor(PlaygroundElement<Which>::appearance.color);
-	print(PlaygroundElement<Which>::appearance.facade);
+	canvas.setColor(PlaygroundElements::get()[Which].color);
+	print(PlaygroundElements::get()[Which].facade);
 }
 
 size_t Playground::getSnakeBodySize() noexcept
@@ -68,7 +68,7 @@ void Playground::setupInvariantAndPaint() noexcept
 				if (!(GameSetting::get().old_console_host == true &&
 					  row == GameSetting::get().height - 1 &&
 					  column == GameSetting::get().width - 1))
-					paintElement<Element::barrier>();
+					paintElement(Element::barrier);
 			}
 			else
 			{
@@ -76,7 +76,7 @@ void Playground::setupInvariantAndPaint() noexcept
 				map[column][row].snake_index = index;
 				snake_body[index].x = column;
 				snake_body[index].y = row;
-				paintElement<Element::blank>();
+				paintElement(Element::blank);
 				index++;
 			}
 		}
@@ -120,7 +120,7 @@ void Playground::createSnake()
 	{
 		map[begin_head_x][begin_head_y].type = Element::snake;
 		canvas.setCursor(begin_head_x, begin_head_y);
-		paintElement<Element::snake>();
+		paintElement(Element::snake);
 		rebindData(snake_tail, begin_head_x, begin_head_y);
 
 		if (i == snake_begin_length - 1)
@@ -164,7 +164,7 @@ void Playground::createFood()
 	auto [x, y] = snake_body[random_index];
 	map[x][y].type = Element::food;
 	canvas.setCursor(x, y);
-	paintElement<Element::food>();
+	paintElement(Element::food);
 }
 
 auto& Playground::getRandomEngine()
@@ -177,6 +177,7 @@ auto& Playground::getRandomEngine()
 template<typename T>
 T Playground::getRandom(T min, T max)
 {
+	static_assert(std::is_integral_v<T>, "getRandom(min,max) expects integral arguments.");
 	static std::uniform_int_distribution<T> dis;
 	using param_type = typename decltype(dis)::param_type;
 	return dis(getRandomEngine(), param_type{ min,max });
@@ -216,7 +217,7 @@ void Playground::updateFrame()
 	// process snake head and rebind data
 	map[head_x][head_y].type = Element::snake;
 	canvas.setCursor(head_x, head_y);
-	paintElement<Element::snake>();
+	paintElement(Element::snake);
 	rebindData(snake_head, head_x, head_y);
 
 	// process snake tail
@@ -231,7 +232,7 @@ void Playground::updateFrame()
 		forwardIndex(snake_tail);
 		map[tail_x][tail_y].type = Element::blank;
 		canvas.setCursor(tail_x, tail_y);
-		paintElement<Element::blank>();
+		paintElement(Element::blank);
 	}
 }
 
