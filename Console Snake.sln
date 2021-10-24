@@ -7,6 +7,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Console Snake", "Console Sn
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cryptlib", "..\cryptopp\cryptopp\cryptlib.vcxproj", "{C39F4B46-6E89-4074-902E-CA57073044D2}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Theme Pick-up", "Theme Pick-up\Theme Pick-up.vcxproj", "{58ED521B-8177-47C7-A165-0289E15FBB21}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -31,6 +33,14 @@ Global
 		{C39F4B46-6E89-4074-902E-CA57073044D2}.Release|x64.Build.0 = Release|x64
 		{C39F4B46-6E89-4074-902E-CA57073044D2}.Release|x86.ActiveCfg = Release|Win32
 		{C39F4B46-6E89-4074-902E-CA57073044D2}.Release|x86.Build.0 = Release|Win32
+		{58ED521B-8177-47C7-A165-0289E15FBB21}.Debug|x64.ActiveCfg = Debug|x64
+		{58ED521B-8177-47C7-A165-0289E15FBB21}.Debug|x64.Build.0 = Debug|x64
+		{58ED521B-8177-47C7-A165-0289E15FBB21}.Debug|x86.ActiveCfg = Debug|Win32
+		{58ED521B-8177-47C7-A165-0289E15FBB21}.Debug|x86.Build.0 = Debug|Win32
+		{58ED521B-8177-47C7-A165-0289E15FBB21}.Release|x64.ActiveCfg = Release|x64
+		{58ED521B-8177-47C7-A165-0289E15FBB21}.Release|x64.Build.0 = Release|x64
+		{58ED521B-8177-47C7-A165-0289E15FBB21}.Release|x86.ActiveCfg = Release|Win32
+		{58ED521B-8177-47C7-A165-0289E15FBB21}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
