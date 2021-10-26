@@ -24,17 +24,17 @@ enum Color :WORD
 
 Color color_arr[] = { Gray, Blue ,LightBlue ,Green ,LightGreen,Aqua ,LightAqua ,Red ,LightRed,Purple,LightPurple,Yellow ,LightYellow,White ,LightWhite };
 const char* color_name[] = { "Gray", "Blue" ,"LightBlue","Green" ,"LightGreen","Aqua" ,"LightAqua" ,"Red" ,"LightRed","Purple","LightPurple","Yellow","LightYellow","White" ,"LightWhite" };
-wchar_t facade_arr[] = { L'□' ,L'★' , L'●' ,L'■' ,L'◆',L'◇',L'○' };
+wchar_t facade_arr[] = { L'★',L'●',L'■',L'◆',L'☆',L'○',L'□',L'◇' }; // ▲△▼▽ 
 
 size_t blank_color_shift = 1;
 size_t food_color_shift = 7;
 size_t snake_color_shift = 12;
 size_t barrier_color_shift = 3;
 
-size_t blank_facade_shift = 0;
-size_t food_facade_shift = 1;
-size_t snake_facade_shift = 2;
-size_t barrier_facade_shift = 3;
+size_t blank_facade_shift = 6;
+size_t food_facade_shift = 0;
+size_t snake_facade_shift = 1;
+size_t barrier_facade_shift = 2;
 
 void setColor(Color color)
 {
