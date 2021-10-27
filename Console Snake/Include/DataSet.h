@@ -2,7 +2,6 @@
 #ifndef SNAKE_DATASET_HEADER_
 #define SNAKE_DATASET_HEADER_
 
-#include "Canvas.h"
 #include "Resource.h"
 #include "Singleton.h"
 
