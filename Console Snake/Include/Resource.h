@@ -6,7 +6,7 @@
 #include "LocalizedStrings.h"
 #include "EncryptedString.h"
 
-#define GAME_VERSION "pre-2.18"
+#define GAME_VERSION "pre-2.20"
 inline const auto save_file_name = "SnakeSaved.bin"_crypt;
 inline constexpr const unsigned char crypto_key[] = {
 	0x54, 0xDE, 0x3B, 0xF2, 0xD8, 0x5D, 0x4E, 0x04,
@@ -107,64 +107,48 @@ MAKE_LOCALIZED_STRS
 
 
 ENUM_DEL(Lang)
+{
 	ENG, CHS, CHT, JPN
+}
 ENUM_DEF(Lang, Locale::Lang)
-	{ L"English"_crypt,Locale::en_US },
-	{ L"简体中文"_crypt,Locale::zh_CN },
-	{ L"繁體中文"_crypt,Locale::zh_TW },
-	{ L"日本語"_crypt,Locale::ja_JP }
-ENUM_END
-ENUM_DEFAULT(Lang, ENG)
+{
+	{ L"English"_crypt, Locale::en_US },
+	{ L"简体中文"_crypt, Locale::zh_CN },
+	{ L"繁體中文"_crypt, Locale::zh_TW },
+	{ L"日本語"_crypt, Locale::ja_JP }
+};
+ENUM_CUSTOM(Lang, L"", {});
+ENUM_DEFAULT(Lang, ENG);
 
 
 ENUM_DEL(Size)
-	XS, S, M, L, XL
-ENUM_DEF(Size, short)
-	{ L"(XS)"_crypt,13 },
-	{ L"(S) "_crypt,17 },
-	{ L"(M) "_crypt,21 },
-	{ L"(L) "_crypt,24 },
-	{ L"(XL)"_crypt,27 }
-ENUM_END
-ENUM_DEFAULT(Size, S)
-
-
-// Workaround
-template<typename TBase = int>
-struct LocalStrAndValue
 {
-	using value_type = TBase;
-	token::StringName tok;
-	TBase value;
-	friend constexpr bool operator==(const LocalStrAndValue& l, const LocalStrAndValue& r) noexcept
-	{
-		return l.tok == r.tok && l.value == r.value;
-	}
+	XS, S, M, L, XL
+}
+ENUM_DEF(Size, short)
+{
+	{ L"(XS)"_crypt, 13 },
+	{ L"(S) "_crypt, 17 },
+	{ L"(M) "_crypt, 21 },
+	{ L"(L) "_crypt, 24 },
+	{ L"(XL)"_crypt, 27 }
 };
+ENUM_CUSTOM(Size, L"(Custom)"_crypt, {});
+ENUM_DEFAULT(Size, S);
+
 
 ENUM_DEL(Speed)
-	FAST, NORMAL, SLOW
-ENUM_DEF(Speed, LocalStrAndValue<>)
-	{ L"",LocalStrAndValue<>{token::setting_speed_fast, 8} },
-	{ L"",LocalStrAndValue<>{token::setting_speed_normal, 5} },
-	{ L"",LocalStrAndValue<>{token::setting_speed_slow, 1} }
-ENUM_END
-ENUM_DEFAULT(Speed, NORMAL)
-
-inline auto FindSpeedName(Speed::value_type::value_type speed) noexcept
 {
-	switch (speed)
-	{
-		case 8:
-			return token::setting_speed_fast;
-		case 5:
-			return token::setting_speed_normal;
-		case 1:
-			return token::setting_speed_slow;
-		default:
-			return token::setting_speed_custom;
-	}
+	FAST, NORMAL, SLOW
 }
+ENUM_DEF(Speed, int, token::StringName)
+{
+	{ token::setting_speed_fast, 8 },
+	{ token::setting_speed_normal, 5 },
+	{ token::setting_speed_slow, 1 }
+};
+ENUM_CUSTOM(Speed, token::setting_speed_custom, {});
+ENUM_DEFAULT(Speed, NORMAL);
 
 
 inline const auto game_title = LR"title(

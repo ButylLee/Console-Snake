@@ -31,7 +31,7 @@ void Playground::play()
 				else
 				{
 					std::this_thread::sleep_for(30ms + // 30ms - 210ms, level 1-10
-												20ms * (10 - GameSetting::get().speed.Value().value));
+												20ms * (10 - GameSetting::get().speed.Value()));
 				}
 				break;
 			case GameStatus::Pausing:

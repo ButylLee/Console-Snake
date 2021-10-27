@@ -115,7 +115,7 @@ void GameSavingBase::convertFromBinaryData() noexcept
 	// setting data
 	{
 		auto& gs = GameSetting::get();
-		gs.speed.convertFrom({ FindSpeedName(bin_data.setting.speed),bin_data.setting.speed });
+		gs.speed.convertFrom(bin_data.setting.speed);
 		gs.width.convertFrom(bin_data.setting.width);
 		gs.height.convertFrom(bin_data.setting.height);
 		LocalizedStrings::setLang(
@@ -145,7 +145,7 @@ void GameSavingBase::convertToBinaryData() noexcept
 	// setting data
 	{
 		auto& gs = GameSetting::get();
-		bin_data.setting.speed = Convert{ gs.speed.Value().value };
+		bin_data.setting.speed = Convert{ gs.speed.Value() };
 		bin_data.setting.width = Convert{ gs.width.Value() };
 		bin_data.setting.height = Convert{ gs.height.Value() };
 		bin_data.setting.lang = Convert{ gs.lang.Value() };
