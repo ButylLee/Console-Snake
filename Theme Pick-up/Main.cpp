@@ -5,21 +5,14 @@
 
 enum Color :WORD
 {
-	Gray = 8,
-	Blue = 0x01,
-	LightBlue = 0x09,
-	Green = 0x02,
-	LightGreen = 10,
-	Aqua = 0x03,
-	LightAqua = 0x0B,
-	Red = 0x04,
-	LightRed = 0x0C,
-	LightPurple = 0x0D,
-	Purple = 5,
-	Yellow = 6,
-	LightYellow = 0x0E,
-	LightWhite = 0x0F,
-	White = 0x07
+	Gray   = 0x08,
+	Blue   = 0x01, LightBlue   = 0x09,
+	Green  = 0x02, LightGreen  = 0x0A,
+	Aqua   = 0x03, LightAqua   = 0x0B,
+	Red    = 0x04, LightRed    = 0x0C,
+	Purple = 0x05, LightPurple = 0x0D,
+	Yellow = 0x06, LightYellow = 0x0E,
+	White  = 0x07, LightWhite  = 0x0F,
 };
 
 Color color_arr[] = { Gray, Blue ,LightBlue ,Green ,LightGreen,Aqua ,LightAqua ,Red ,LightRed,Purple,LightPurple,Yellow ,LightYellow,White ,LightWhite };

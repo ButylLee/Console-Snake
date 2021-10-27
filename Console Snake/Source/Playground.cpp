@@ -272,7 +272,7 @@ void Playground::endGame()
 	}
 	else
 	{
-		canvas.setColor(Color::White);
+		canvas.setColor(Color::LightWhite);
 
 		canvas.setCenteredCursor(~token::game_you_died, baseY);
 		print(~token::game_you_died);
@@ -304,7 +304,7 @@ void Playground::endGame()
 	Rank::get().newResult(name, GameData::get().score, is_win);
 
 	// show Retry Or Return info
-	canvas.setColor(Color::White);
+	canvas.setColor(Color::LightWhite);
 	canvas.setCenteredCursor(~token::game_Space_to_retry, baseY + 6);
 	print(~token::game_Space_to_retry);
 

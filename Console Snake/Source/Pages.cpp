@@ -188,7 +188,7 @@ void MenuPage::paintInterface()
 	auto [baseX, baseY] = canvas.getClientSize();
 	baseX = baseX / 3 + 4;
 	baseY = baseY / 2 + 2;
-	canvas.setColor(Color::White);
+	canvas.setColor(Color::LightWhite);
 
 	canvas.setCursor(baseX, baseY);
 	print(~token::menu_start_game);
@@ -270,7 +270,7 @@ void SettingPage::paintInterface()
 	auto [baseX, baseY] = canvas.getClientSize();
 	baseX = baseX / 3 + 1;
 	baseY = baseY / 2 + 1;
-	canvas.setColor(Color::DefaultColor);
+	canvas.setColor(Color::White);
 
 	canvas.setCursor(baseX, baseY);
 	print(~token::setting_speed);
@@ -291,7 +291,7 @@ void SettingPage::paintCurOptions()
 	auto [baseX, baseY] = canvas.getClientSize();
 	baseX = baseX / 2 + 3;
 	baseY = baseY / 2 + 1;
-	canvas.setColor(Color::DefaultColor);
+	canvas.setColor(Color::White);
 
 	canvas.setCursor(baseX, baseY);
 	print(~GameSetting::get().speed.Value().tok);
@@ -331,7 +331,7 @@ void BeginPage::run()
 void BeginPage::paintInterface()
 {
 	auto [baseX, baseY] = canvas.getClientSize();
-	canvas.setColor(Color::White);
+	canvas.setColor(Color::LightWhite);
 	canvas.setCenteredCursor(~token::press_any_key, baseY / 2 + 4);
 	print(~token::press_any_key);
 
@@ -386,7 +386,7 @@ void RankPage::paintInterface()
 	auto [baseX, baseY] = canvas.getClientSize();
 	baseX = baseX / 4 - 1;
 	baseY = baseY / 2 + 1;
-	canvas.setColor(Color::Yellow);
+	canvas.setColor(Color::LightYellow);
 
 	if (Rank::get().getRank()[0].score == 0)
 	{
@@ -424,7 +424,7 @@ void RankPage::paintInterface()
 		}
 
 		std::this_thread::sleep_for(50ms);
-		canvas.setColor(Color::DefaultColor);
+		canvas.setColor(Color::White);
 		canvas.setCursor(baseX / 2, baseY + 12);
 		print(~token::rank_clear_all_records);
 	}

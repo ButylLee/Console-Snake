@@ -55,7 +55,7 @@ private:
 	Appearance appearance[static_cast<size_t>(Element::Mask)] = {
 		{ L'□', Color::Blue },
 		{ L'★', Color::Red },
-		{ L'●', Color::Yellow },
+		{ L'●', Color::LightYellow },
 		{ L'■', Color::Green }
 	};
 };

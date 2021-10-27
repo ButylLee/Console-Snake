@@ -14,15 +14,14 @@
 
 enum struct Color :WORD
 {
-	Blue         = 0x01,
-	LightBlue    = 0x09,
-	Green        = 0x02,
-	Aqua         = 0x03,
-	LightAqua    = 0x0B,
-	Red          = 0x04,
-	Yellow       = 0x0E,
-	White        = 0x0F,
-	DefaultColor = 0x07
+	Gray   = 0x08,
+	Blue   = 0x01, LightBlue   = 0x09,
+	Green  = 0x02, LightGreen  = 0x0A,
+	Aqua   = 0x03, LightAqua   = 0x0B,
+	Red    = 0x04, LightRed    = 0x0C,
+	Purple = 0x05, LightPurple = 0x0D,
+	Yellow = 0x06, LightYellow = 0x0E,
+	White  = 0x07, LightWhite  = 0x0F,
 };
 
 class Cursor
@@ -130,7 +129,7 @@ private:
 	}
 
 private:
-	Color color = Color::DefaultColor;
+	Color color = Color::White;
 	Cursor cursor;
 	ClientSize size = { 60, 30 };
 };
