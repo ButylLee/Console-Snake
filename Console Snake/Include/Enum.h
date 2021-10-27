@@ -19,13 +19,19 @@
  *             ||
  *             vv
  *     ENUM_DEL(Size)
+ *     {
  *         S, M, L
- *     ENUM_DEF(Size, short) // type "short" is optional, default type is int
- *        { L"S",10 },
- *        { L"M",20 },
- *        { L"L",30 }
- *     ENUM_END
- *     ENUM_DEFAULT(Size, M)
+ *     }
+ *     ENUM_DEF(Size, short, std::wstring) // last two args are optional
+ *     {
+ *        { 10, L"S" },
+ *        { 20, L"M" },
+ *        { 30, L"L" }
+ *     };
+ *     ENUM_CUSTOM(Size, {}, L"Custom");
+ *     ENUM_DEFAULT(Size, M);
+ *
+ * Note: ALL four macros must be used.
  *
  * To use a Enum:
  *     Size s = Size::L;
@@ -41,10 +47,12 @@
 #include <type_traits>
 #include <string>
 
-template<typename Base, typename = std::void_t<typename Base::Tag>>
+template<typename Base,
+		 typename = std::void_t<typename Base::Tag>,
+		 typename = std::void_t<typename Base::CustomTag>>
 constexpr bool CheckCorrectEnumName = false;
 template<typename Base>
-constexpr bool CheckCorrectEnumName<Base, void> = true;
+constexpr bool CheckCorrectEnumName<Base, void, void> = true;
 
 template<typename EnumName, typename ValueType = int, typename NameType = std::wstring>
 class Enum :public EnumName
@@ -52,15 +60,15 @@ class Enum :public EnumName
 	static_assert(CheckCorrectEnumName<EnumName>, "Incorrect EnumName type");
 
 	using base_type = std::remove_cv_t<ValueType>;
-	using pair_type = std::pair<std::add_const_t<NameType>, base_type>;
-	using custom_pair_type = std::pair<std::add_const_t<NameType>, std::optional<base_type>>;
-	using list_type = std::vector<pair_type>;//std::array?
+	using pair_type = std::pair<base_type, std::add_const_t<NameType>>;
+	using custom_pair_type = std::pair<std::optional<base_type>, std::add_const_t<NameType>>;
+	using list_type = std::vector<pair_type>;
 
 	using Tag = typename EnumName::Tag;
 	using CustomTag = typename EnumName::CustomTag;
 
 public:
-	using value_type = base_type;//remove?
+	using value_type = base_type;
 	Enum() = default;
 	// Tag literals could implicitly cast to Enum
 	constexpr Enum(Tag tag) noexcept
@@ -76,13 +84,13 @@ public:
 	constexpr const Enum& nextValue() noexcept
 	{
 		// back to default value when clearCustomValue() called and happens to be custom value
-		if (cur_val == CustomTag::Custom && !enum_custom.second)
+		if (cur_val == CustomTag::Custom && !enum_custom.first)
 		{
 			defaultValue();
 		}
 		else if (cur_val == enum_list.size() - 1)
 		{
-			if (enum_custom.second)
+			if (enum_custom.first)
 				cur_val = CustomTag::Custom;
 			else
 				cur_val = 0;
@@ -100,28 +108,28 @@ public:
 	}
 	constexpr std::add_const_t<NameType> Name() const noexcept
 	{
-		return cur_val == CustomTag::Custom ? enum_custom.first : enum_list[cur_val].first;
+		return cur_val == CustomTag::Custom ? enum_custom.second : enum_list[cur_val].second;
 	}
-	constexpr base_type Value() const noexcept//value_type?
+	constexpr value_type Value() const noexcept
 	{
-		return static_cast<base_type>(*this);
+		return static_cast<value_type>(*this);
 	}
-	constexpr operator base_type() const noexcept//value_type?
+	constexpr operator value_type() const noexcept
 	{
 		// back to default value when clearCustomValue() called and happens to be custom value
 		if (cur_val == CustomTag::Custom)
 		{
-			if (!enum_custom.second)
+			if (!enum_custom.first)
 				defaultValue();
-			return *enum_custom.second;
+			return *enum_custom.first;
 		}
-		return enum_list[cur_val].second;
+		return enum_list[cur_val].first;
 	}
-	constexpr base_type convertFrom(base_type val) noexcept//value_type?
+	constexpr value_type convertFrom(value_type val) noexcept
 	{
 		for (size_t i = 0; i < enum_list.size(); i++)
 		{
-			if (val == enum_list[i].second)
+			if (val == enum_list[i].first)
 			{
 				cur_val = i;
 				return val;
@@ -131,22 +139,22 @@ public:
 		cur_val = CustomTag::Custom;
 		return val;
 	}
-	static std::add_const_t<NameType> getNameFrom(base_type val) noexcept//value_type?
+	constexpr static std::add_const_t<NameType> getNameFrom(value_type val) noexcept
 	{
 		for (size_t i = 0; i < enum_list.size(); i++)
 		{
-			if (val == enum_list[i].second)
-				return enum_list[i].first;
+			if (val == enum_list[i].first)
+				return enum_list[i].second;
 		}
-		return enum_custom.first;
+		return enum_custom.second;
 	}
-	constexpr static void setCustomValue(base_type custom)//value_type?
+	constexpr static void setCustomValue(value_type custom)
 	{
-		enum_custom.second = std::move(custom);
+		enum_custom.first = std::move(custom);
 	}
 	constexpr static void clearCustomValue() noexcept
 	{
-		enum_custom.second = std::nullopt;
+		enum_custom.first = std::nullopt;
 	}
 
 private:

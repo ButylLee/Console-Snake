@@ -6,7 +6,7 @@
 #include "LocalizedStrings.h"
 #include "EncryptedString.h"
 
-#define GAME_VERSION "pre-2.20"
+#define GAME_VERSION "pre-2.21"
 inline const auto save_file_name = "SnakeSaved.bin"_crypt;
 inline constexpr const unsigned char crypto_key[] = {
 	0x54, 0xDE, 0x3B, 0xF2, 0xD8, 0x5D, 0x4E, 0x04,
@@ -112,12 +112,12 @@ ENUM_DEL(Lang)
 }
 ENUM_DEF(Lang, Locale::Lang)
 {
-	{ L"English"_crypt, Locale::en_US },
-	{ L"简体中文"_crypt, Locale::zh_CN },
-	{ L"繁體中文"_crypt, Locale::zh_TW },
-	{ L"日本語"_crypt, Locale::ja_JP }
+	{ Locale::en_US, L"English"_crypt },
+	{ Locale::zh_CN, L"简体中文"_crypt },
+	{ Locale::zh_TW, L"繁體中文"_crypt },
+	{ Locale::ja_JP, L"日本語"_crypt }
 };
-ENUM_CUSTOM(Lang, L"", {});
+ENUM_CUSTOM(Lang, {}, L"");
 ENUM_DEFAULT(Lang, ENG);
 
 
@@ -127,13 +127,13 @@ ENUM_DEL(Size)
 }
 ENUM_DEF(Size, short)
 {
-	{ L"(XS)"_crypt, 13 },
-	{ L"(S) "_crypt, 17 },
-	{ L"(M) "_crypt, 21 },
-	{ L"(L) "_crypt, 24 },
-	{ L"(XL)"_crypt, 27 }
+	{ 13, L"(XS)"_crypt },
+	{ 17, L"(S) "_crypt },
+	{ 21, L"(M) "_crypt },
+	{ 24, L"(L) "_crypt },
+	{ 27, L"(XL)"_crypt }
 };
-ENUM_CUSTOM(Size, L"(Custom)"_crypt, {});
+ENUM_CUSTOM(Size, {}, L"(Custom)"_crypt);
 ENUM_DEFAULT(Size, S);
 
 
@@ -143,11 +143,11 @@ ENUM_DEL(Speed)
 }
 ENUM_DEF(Speed, int, token::StringName)
 {
-	{ token::setting_speed_fast, 8 },
-	{ token::setting_speed_normal, 5 },
-	{ token::setting_speed_slow, 1 }
+	{ 8, token::setting_speed_fast },
+	{ 5, token::setting_speed_normal },
+	{ 1, token::setting_speed_slow }
 };
-ENUM_CUSTOM(Speed, token::setting_speed_custom, {});
+ENUM_CUSTOM(Speed, {}, token::setting_speed_custom);
 ENUM_DEFAULT(Speed, NORMAL);
 
 
