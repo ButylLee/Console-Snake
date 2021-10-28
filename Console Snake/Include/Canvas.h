@@ -6,23 +6,37 @@
 #include "ErrorHandling.h"
 #include "EncryptedString.h"
 #include "wideIO.h"
+#include "Enum.h"
 #include "WinMacro.h"
 #include <Windows.h>
 #include <cstdio>
 #include <cstdlib>
 #include <string_view>
 
-enum struct Color :WORD
+ENUM_DEL(Color)
 {
-	Gray   = 0x08,
-	Blue   = 0x01, LightBlue   = 0x09,
-	Green  = 0x02, LightGreen  = 0x0A,
-	Aqua   = 0x03, LightAqua   = 0x0B,
-	Red    = 0x04, LightRed    = 0x0C,
-	Purple = 0x05, LightPurple = 0x0D,
-	Yellow = 0x06, LightYellow = 0x0E,
-	White  = 0x07, LightWhite  = 0x0F,
+	Gray,
+	Blue,   LightBlue,
+	Green,  LightGreen,
+	Aqua,   LightAqua,
+	Red,    LightRed,
+	Purple, LightPurple,
+	Yellow, LightYellow,
+	White,  LightWhite
+}
+ENUM_DEF(Color, WORD)
+{
+	{ 0x08, L"Gray" },
+	{ 0x01, L"Blue" },   { 0x09, L"LightBlue" },
+	{ 0x02, L"Green" },  { 0x0A, L"LightGreen" },
+	{ 0x03, L"Aqua" },   { 0x0B, L"LightAqua" },
+	{ 0x04, L"Red" },    { 0x0C, L"LightRed" },
+	{ 0x05, L"Purple" }, { 0x0D, L"LightPurple" },
+	{ 0x06, L"Yellow" }, { 0x0E, L"LightYellow" },
+	{ 0x07, L"White" },  { 0x0F, L"LightWhite" },
 };
+ENUM_CUSTOM(Color, {}, L"");
+ENUM_DEFAULT(Color, White);
 
 class Cursor
 {

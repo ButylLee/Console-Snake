@@ -339,17 +339,29 @@ void BeginPage::paintInterface()
 		[this]
 		{
 			using namespace std::chrono_literals;
-			for (bool color_flag = false;;)
-			{
-				if (is_press)
-					return;
-				canvas.setCursor(0, 0);
-				canvas.setColor(color_flag ? Color::Aqua : Color::LightBlue);
-				print(game_title);
-				print(~token::game_version);
-				color_flag = !color_flag;
-				std::this_thread::sleep_for(900ms);
-			}
+			if (GameData::get().colorful_title)
+				for (Color color;;)
+				{
+					if (is_press)
+						return;
+					canvas.setCursor(0, 0);
+					canvas.setColor(color.nextValue());
+					print(game_title);
+					print(~token::game_version);
+					std::this_thread::sleep_for(100ms);
+				}
+			else
+				for (bool color_flag = false;;)
+				{
+					if (is_press)
+						return;
+					canvas.setCursor(0, 0);
+					canvas.setColor(color_flag ? Color::Aqua : Color::LightBlue);
+					print(game_title);
+					print(~token::game_version);
+					color_flag = !color_flag;
+					std::this_thread::sleep_for(900ms);
+				}
 		});
 	th_paint.detach();
 }

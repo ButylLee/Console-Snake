@@ -24,6 +24,10 @@ void ParseCmdAndSet(int count, char* Cmd[])
 		{
 			GameSetting::get().old_console_host = true;
 		}
+		else if (cmd == "-awesome"_crypt)
+		{
+			GameData::get().colorful_title = true;
+		}
 		else if (cmd == "-size"_crypt)
 		{
 			cmd = Cmd[++i];

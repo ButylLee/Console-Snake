@@ -136,6 +136,9 @@ void GameSavingBase::convertFromBinaryData() noexcept
 		rank_item.is_win = Convert{ save_item.is_win };
 		std::copy_n(save_item.name, Rank::name_max_length, buffer);
 		rank_item.name = buffer;
+
+		if (rank_item.is_win)
+			GameData::get().colorful_title = true;
 	}
 }
 

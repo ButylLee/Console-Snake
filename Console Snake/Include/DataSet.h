@@ -20,6 +20,7 @@ struct GameDataMember
 	PageSel seletion = PageSel::BeginPage;
 	int score = 0;
 	bool retry_game = false;
+	bool colorful_title = false;
 };
 using GameData = Singleton<GameDataMember>;
 
