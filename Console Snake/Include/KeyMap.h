@@ -78,6 +78,20 @@ enum Key :decltype(getwch())
 	K_Ctrl_Yy,
 	K_Ctrl_Zz,
 
+	K_Ctrl_Insert = DOUBLE_KEY(224, 146),
+	K_Ctrl_Delete = DOUBLE_KEY(224, 147),
+	K_Ctrl_Home = DOUBLE_KEY(224, 119),
+	K_Ctrl_End = DOUBLE_KEY(224, 117),
+	K_Ctrl_PageUp = DOUBLE_KEY(224, 134),
+	K_Ctrl_PageDown = DOUBLE_KEY(224, 118),
+
+	K_Alt_Insert = DOUBLE_KEY(0, 162),
+	K_Alt_Delete = DOUBLE_KEY(0, 163),
+	K_Alt_Home = DOUBLE_KEY(0, 151),
+	K_Alt_End = DOUBLE_KEY(0, 159),
+	K_Alt_PageUp = DOUBLE_KEY(0, 153),
+	K_Alt_PageDown = DOUBLE_KEY(0, 161),
+
 	K_F1 = DOUBLE_KEY(0, 59),
 	K_F2 = DOUBLE_KEY(0, 60),
 	K_F3 = DOUBLE_KEY(0, 61),
