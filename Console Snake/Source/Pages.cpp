@@ -294,7 +294,7 @@ void SettingPage::paintCurOptions()
 	canvas.setColor(Color::White);
 
 	canvas.setCursor(baseX, baseY);
-	print(~GameSetting::get().speed.Value().tok);
+	print(~GameSetting::get().speed.Name());
 
 	canvas.setCursor(baseX, baseY + 2);
 	print(L"%hd X %hd"_crypt, GameSetting::get().width.Value(), GameSetting::get().height.Value());
@@ -414,7 +414,7 @@ void RankPage::paintInterface()
 			canvas.setCursor(baseX, baseY + number);
 			name = item.name.empty() ? ~token::rank_anonymous : item.name;
 			score = item.is_win ? ~token::rank_win : std::to_wstring(item.score);
-			speed = ~FindSpeedName(item.speed);
+			speed = ~Speed::getNameFrom(item.speed);
 
 			print(buffer, ++number,
 				  Rank::name_max_length - StrFullWidthCount(name), name.c_str(),

@@ -17,7 +17,7 @@ public:
 	struct RankItem {
 		std::wstring name;
 		int score = 0;
-		Speed::value_type::value_type speed = {};
+		Speed::value_type speed = {};
 		Size::value_type width = {};
 		Size::value_type height = {};
 		bool is_win = false;
@@ -46,7 +46,7 @@ public:
 			{
 				std::move(new_name),
 				new_score,
-				GameSetting::get().speed.Value().value,
+				GameSetting::get().speed.Value(),
 				GameSetting::get().width,
 				GameSetting::get().height,
 				winning
