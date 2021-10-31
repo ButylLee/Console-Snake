@@ -106,7 +106,7 @@ MAKE_LOCALIZED_STRS
 };
 
 
-ENUM_DEL(Lang)
+ENUM_DECL(Lang)
 {
 	ENG, CHS, CHT, JPN
 }
@@ -121,7 +121,7 @@ ENUM_CUSTOM(Lang, {}, L"");
 ENUM_DEFAULT(Lang, ENG);
 
 
-ENUM_DEL(Size)
+ENUM_DECL(Size)
 {
 	XS, S, M, L, XL
 }
@@ -137,7 +137,7 @@ ENUM_CUSTOM(Size, {}, L"(Custom)"_crypt);
 ENUM_DEFAULT(Size, S);
 
 
-ENUM_DEL(Speed)
+ENUM_DECL(Speed)
 {
 	FAST, NORMAL, SLOW
 }

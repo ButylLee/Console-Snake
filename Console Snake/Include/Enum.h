@@ -18,7 +18,7 @@
  *     };
  *             ||
  *             vv
- *     ENUM_DEL(Size)
+ *     ENUM_DECL(Size)
  *     {
  *         S, M, L
  *     }
@@ -164,7 +164,7 @@ private:
 	mutable size_t cur_val = default_shift;
 };
 
-#define ENUM_DEL(name) \
+#define ENUM_DECL(name) \
 struct name##_tag { \
 	enum Tag :int
 

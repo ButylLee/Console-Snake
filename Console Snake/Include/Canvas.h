@@ -13,7 +13,7 @@
 #include <cstdlib>
 #include <string_view>
 
-ENUM_DEL(Color)
+ENUM_DECL(Color)
 {
 	Gray,
 	Blue,   LightBlue,
