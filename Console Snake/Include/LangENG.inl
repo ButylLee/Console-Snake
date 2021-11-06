@@ -43,7 +43,7 @@ L"Setting: "_crypt,
 L"N o   R a n k   D a t a"_crypt,
 L"Ctrl+D)  Clear All Records"_crypt,
 
-L"  Author: James Taylor\n  Special Thanks: Darack\n  Thanks for your playing!"_crypt,
+L"  Author: James Taylor\n  Special Thanks: Darack\n\n  Thanks for your playing!"_crypt,
 L"About"_crypt,
 
 L"failed to obtain Console Handle "_crypt,
