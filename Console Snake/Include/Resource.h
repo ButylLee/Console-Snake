@@ -5,6 +5,8 @@
 #include "Enum.h"
 #include "LocalizedStrings.h"
 #include "EncryptedString.h"
+#include "WinMacro.h"
+#include <Windows.h>
 
 #define GAME_VERSION "pre-2.23"
 inline const auto save_file_name = "SnakeSaved.bin"_crypt;
@@ -149,6 +151,107 @@ ENUM_DEF(Speed, int, token::StringName)
 };
 ENUM_CUSTOM(Speed, {}, token::setting_speed_custom);
 ENUM_DEFAULT(Speed, NORMAL);
+
+
+ENUM_DECL(Color)
+{
+	Gray,
+		Blue, LightBlue,
+		Green, LightGreen,
+		Aqua, LightAqua,
+		Red, LightRed,
+		Purple, LightPurple,
+		Yellow, LightYellow,
+		White, LightWhite
+}
+ENUM_DEF(Color, WORD)
+{
+	{ 0x08, L"Gray" },
+	{ 0x01, L"Blue" }, { 0x09, L"LightBlue" },
+	{ 0x02, L"Green" }, { 0x0A, L"LightGreen" },
+	{ 0x03, L"Aqua" }, { 0x0B, L"LightAqua" },
+	{ 0x04, L"Red" }, { 0x0C, L"LightRed" },
+	{ 0x05, L"Purple" }, { 0x0D, L"LightPurple" },
+	{ 0x06, L"Yellow" }, { 0x0E, L"LightYellow" },
+	{ 0x07, L"White" }, { 0x0F, L"LightWhite" },
+};
+ENUM_CUSTOM(Color, {}, L"");
+ENUM_DEFAULT(Color, White);
+
+
+enum struct Element :size_t
+{
+	blank = 0,
+	food,
+	snake,
+	barrier,
+
+	Mask
+};
+
+struct ElementSet
+{
+	struct Appearance
+	{
+		wchar_t facade;
+		Color color;
+	}appearance[static_cast<size_t>(Element::Mask)];
+};
+
+ENUM_DECL(Theme)
+{
+	A, B, C, D, E
+}
+ENUM_DEF(Theme, ElementSet)
+{
+	{
+		{ {
+			{ L'□', Color::Blue },
+			{ L'★', Color::Red },
+			{ L'●', Color::LightYellow },
+			{ L'■', Color::Green }
+			}},
+			L"A"
+	},
+	{
+		{{
+			{ L'■', Color::Gray },
+			{ L'★', Color::Red },
+			{ L'●', Color::LightYellow },
+			{ L'■', Color::Aqua }
+		}},
+		L"B"
+	},
+	{
+		{{
+			{ L'□', Color::Red },
+			{ L'◆', Color::LightGreen },
+			{ L'●', Color::LightBlue },
+			{ L'■', Color::LightRed }
+		}},
+		L"C"
+	},
+	{
+		{{
+			{ L'□', Color::LightBlue },
+			{ L'★', Color::LightYellow },
+			{ L'●', Color::LightPurple },
+			{ L'■', Color::LightWhite }
+		}},
+		L"D"
+	},
+	{
+		{{
+			{ L'○', Color::Gray },
+			{ L'★', Color::LightWhite },
+			{ L'●', Color::LightBlue },
+			{ L'◆', Color::Gray }
+		}},
+		L"E"
+	}
+};
+ENUM_CUSTOM(Theme, {}, L"");
+ENUM_DEFAULT(Theme, A);
 
 
 inline const auto game_title = LR"title(

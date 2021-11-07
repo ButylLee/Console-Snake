@@ -30,6 +30,7 @@ struct GameSettingMember
 	Lang lang;
 	Size width;
 	Size height;
+	Theme theme;
 	bool show_frame = false;
 	// The old console host automatically Line Feed when printing the last character of line.
 	// The new console host doesn't have the same behavior and work whether print(L'\n') or not.

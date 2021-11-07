@@ -12,6 +12,9 @@
 #include "WinMacro.h"
 #include <Windows.h>
 
+/***************************************
+ class Playground
+****************************************/
 void Playground::play()
 {
 	using namespace std::chrono_literals;
@@ -44,8 +47,8 @@ void Playground::play()
 
 void Playground::paintElement(Element Which) noexcept
 {
-	canvas.setColor(PlaygroundElements::get()[Which].color);
-	print(PlaygroundElements::get()[Which].facade);
+	canvas.setColor(PlaygroundElement::get()[Which].color);
+	print(PlaygroundElement::get()[Which].facade);
 }
 
 size_t Playground::getSnakeBodySize() noexcept
