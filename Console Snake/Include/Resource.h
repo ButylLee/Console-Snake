@@ -196,7 +196,16 @@ struct ElementSet
 	{
 		wchar_t facade;
 		Color color;
-	}appearance[static_cast<size_t>(Element::Mask)];
+	}elements[static_cast<size_t>(Element::Mask)];
+
+	const auto& operator[](Element Which) const noexcept
+	{
+		return elements[static_cast<size_t>(Which)];
+	}
+	auto& operator[](Element Which) noexcept
+	{
+		return elements[static_cast<size_t>(Which)];
+	}
 };
 
 ENUM_DECL(Theme)

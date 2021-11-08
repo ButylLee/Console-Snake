@@ -20,28 +20,6 @@ enum struct GameStatus
 	Running, Pausing, Ending
 };
 
-// ------------ class Playground Element ------------
-class PlaygroundElementBase
-{
-protected:
-	PlaygroundElementBase() = default;
-
-public:
-	const auto& operator[](Element Which) const noexcept
-	{
-		return element_set.appearance[static_cast<size_t>(Which)];
-	}
-	auto& operator[](Element Which) noexcept
-	{
-		return element_set.appearance[static_cast<size_t>(Which)];
-	}
-
-private:
-	ElementSet element_set = GameSetting::get().theme;
-};
-using PlaygroundElement = Singleton<PlaygroundElementBase>;
-// ---------------------------------------------------
-
 // ------------- class Playground --------------------
 struct MapNode
 {
