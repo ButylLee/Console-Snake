@@ -234,6 +234,12 @@ void SettingPage::run()
 
 			case K_4:
 			{
+				GameSetting::get().theme.nextValue();
+			}
+			break;
+
+			case K_5:
+			{
 				LocalizedStrings::setLang(
 					GameSetting::get().lang.nextValue()
 				);
@@ -279,10 +285,12 @@ void SettingPage::paintInterface()
 	canvas.setCursor(baseX, baseY + 4);
 	print(~token::setting_show_frame);
 	canvas.setCursor(baseX, baseY + 6);
+	print(~token::setting_theme);
+	canvas.setCursor(baseX, baseY + 8);
 	print(~token::setting_language);
-	canvas.setCursor(baseX - 2, baseY + 8);
+	canvas.setCursor(baseX - 2, baseY + 10);
 	print(~token::setting_save);
-	canvas.setCursor(baseX - 1, baseY + 10);
+	canvas.setCursor(baseX - 1, baseY + 12);
 	print(~token::setting_return);
 }
 
@@ -306,6 +314,9 @@ void SettingPage::paintCurOptions()
 		  : ~token::setting_show_frame_no);
 
 	canvas.setCursor(baseX, baseY + 6);
+	print(GameSetting::get().theme.Name());
+
+	canvas.setCursor(baseX, baseY + 8);
 	print(GameSetting::get().lang.Name());
 }
 
