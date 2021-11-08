@@ -20,7 +20,7 @@ enum struct GameStatus
 	Running, Pausing, Ending
 };
 
-// ------------- class Playground --------------------
+// --------------- class Playground ---------------
 struct MapNode
 {
 	int16_t snake_index;

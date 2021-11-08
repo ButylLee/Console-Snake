@@ -98,7 +98,10 @@ GameSavingBase::GameSavingBase() try
 	}
 
 	// Store the decrypted data to bin_data and wait to be loaded
+	if (sizeof bin_data != binary_pool.length())
+		return; // The save file is invalid
 	std::copy_n(binary_pool.c_str(), sizeof bin_data, reinterpret_cast<unsigned char*>(&bin_data));
+
 	no_save_file = false;
 }
 catch (...)
@@ -115,6 +118,12 @@ void GameSavingBase::convertFromBinaryData() noexcept
 	// setting data
 	{
 		auto& gs = GameSetting::get();
+
+		decltype(gs.theme.Value()) theme_temp;
+		static_assert(sizeof theme_temp == sizeof bin_data.setting.theme, "abnormal struct align.");
+		std::memcpy(&theme_temp, &bin_data.setting.theme, sizeof theme_temp);
+		gs.theme.convertFrom(theme_temp);
+
 		gs.speed.convertFrom(bin_data.setting.speed);
 		gs.width.convertFrom(bin_data.setting.width);
 		gs.height.convertFrom(bin_data.setting.height);
@@ -148,6 +157,11 @@ void GameSavingBase::convertToBinaryData() noexcept
 	// setting data
 	{
 		auto& gs = GameSetting::get();
+
+		auto theme_temp = gs.theme.Value();
+		static_assert(sizeof theme_temp == sizeof bin_data.setting.theme, "abnormal struct align.");
+		std::memcpy(&bin_data.setting.theme, &theme_temp, sizeof theme_temp);
+
 		bin_data.setting.speed = Convert{ gs.speed.Value() };
 		bin_data.setting.width = Convert{ gs.width.Value() };
 		bin_data.setting.height = Convert{ gs.height.Value() };

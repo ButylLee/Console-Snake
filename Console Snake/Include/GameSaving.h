@@ -4,6 +4,7 @@
 
 #include "Singleton.h"
 #include "Rank.h"
+#include "Resource.h"
 #include <cstdint>
 #include <future>
 
@@ -11,6 +12,7 @@ class GameSavingBase
 {
 	struct alignas(8) SettingSavingItem
 	{
+		int64_t theme[static_cast<size_t>(Element::Mask)] = {};
 		int16_t speed = 0;
 		int16_t width = 0;
 		int16_t height = 0;

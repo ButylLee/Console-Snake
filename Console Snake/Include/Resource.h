@@ -8,7 +8,7 @@
 #include "WinMacro.h"
 #include <Windows.h>
 
-#define GAME_VERSION "pre-2.24"
+#define GAME_VERSION "pre-2.25"
 inline const auto save_file_name = "SnakeSaved.bin"_crypt;
 inline constexpr const unsigned char crypto_key[] = {
 	0x54, 0xDE, 0x3B, 0xF2, 0xD8, 0x5D, 0x4E, 0x04,
@@ -19,6 +19,7 @@ inline constexpr const unsigned char crypto_IV[] = {
 	0x92, 0xD1, 0x48, 0x9E, 0x03, 0x9B, 0x4E, 0xA4
 };
 
+// --------------- Language Resource ---------------
 LANG_DEF(
 	en_US,
 	zh_CN,
@@ -108,7 +109,7 @@ MAKE_LOCALIZED_STRS
 	}
 };
 
-
+// --------------- Enum Lang Resource ---------------
 ENUM_DECL(Lang)
 {
 	ENG, CHS, CHT, JPN
@@ -123,7 +124,7 @@ ENUM_DEF(Lang, Locale::Lang)
 ENUM_CUSTOM(Lang, {}, L"");
 ENUM_DEFAULT(Lang, ENG);
 
-
+// --------------- Enum Size Resource ---------------
 ENUM_DECL(Size)
 {
 	XS, S, M, L, XL
@@ -139,12 +140,12 @@ ENUM_DEF(Size, short)
 ENUM_CUSTOM(Size, {}, L"(Custom)"_crypt);
 ENUM_DEFAULT(Size, S);
 
-
+// --------------- Enum Speed Resource ---------------
 ENUM_DECL(Speed)
 {
 	FAST, NORMAL, SLOW
 }
-ENUM_DEF(Speed, int, token::StringName)
+ENUM_DEF(Speed, short, token::StringName)
 {
 	{ 8, token::setting_speed_fast },
 	{ 5, token::setting_speed_normal },
@@ -153,7 +154,7 @@ ENUM_DEF(Speed, int, token::StringName)
 ENUM_CUSTOM(Speed, {}, token::setting_speed_custom);
 ENUM_DEFAULT(Speed, NORMAL);
 
-
+// --------------- Enum Color Resource ---------------
 ENUM_DECL(Color)
 {
 	Gray,
@@ -179,7 +180,7 @@ ENUM_DEF(Color, WORD)
 ENUM_CUSTOM(Color, {}, L"");
 ENUM_DEFAULT(Color, White);
 
-
+// --------------- Theme Resource ---------------
 enum struct Element :size_t
 {
 	blank = 0,
@@ -194,8 +195,13 @@ struct ElementSet
 {
 	struct Appearance
 	{
-		wchar_t facade;
+		wchar_t facade = L'X';
 		Color color;
+
+		friend bool operator==(const Appearance& lhs, const Appearance& rhs) noexcept
+		{
+			return lhs.color == rhs.color && lhs.facade == rhs.facade;
+		}
 	}elements[static_cast<size_t>(Element::Mask)];
 
 	const auto& operator[](Element Which) const noexcept
@@ -205,6 +211,13 @@ struct ElementSet
 	auto& operator[](Element Which) noexcept
 	{
 		return elements[static_cast<size_t>(Which)];
+	}
+	friend bool operator==(const ElementSet& lhs, const ElementSet& rhs) noexcept
+	{
+		return lhs[Element::blank] == rhs[Element::blank] &&
+			lhs[Element::food] == rhs[Element::food] &&
+			lhs[Element::snake] == rhs[Element::snake] &&
+			lhs[Element::barrier] == rhs[Element::barrier];
 	}
 };
 
