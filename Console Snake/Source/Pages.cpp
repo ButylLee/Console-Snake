@@ -300,7 +300,7 @@ void SettingPage::paintInterface()
 	print(~token::setting_show_frame);
 	canvas.setCursor(baseX, baseY + 6);
 	print(~token::setting_theme);
-	canvas.setCursor(baseX + 14, baseY + 6);
+	canvas.setCursor(baseX - 9, baseY + 6);
 	print(~token::setting_customize_theme);
 	canvas.setCursor(baseX, baseY + 8);
 	print(~token::setting_language);
