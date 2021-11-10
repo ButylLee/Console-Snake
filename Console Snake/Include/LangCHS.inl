@@ -29,7 +29,7 @@ L"慢速"_crypt,
 L"自定义"_crypt,
 L"是"_crypt,
 L"否"_crypt,
-L"Ctrl+D)  清除自定义"_crypt,
+L"Ctrl+D)  重置"_crypt,
 
 L"颜色           外观"_crypt,
 L"   空白:  "_crypt,

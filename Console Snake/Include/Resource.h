@@ -8,7 +8,7 @@
 #include "WinMacro.h"
 #include <Windows.h>
 
-#define GAME_VERSION "2.0"
+#define GAME_VERSION "2.01"
 inline const auto save_file_name = "SnakeSaved.bin"_crypt;
 inline constexpr const unsigned char crypto_key[] = {
 	0x54, 0xDE, 0x3B, 0xF2, 0xD8, 0x5D, 0x4E, 0x04,
@@ -53,7 +53,7 @@ TOKEN_DEF(
 	setting_custom,
 	setting_show_frame_yes,
 	setting_show_frame_no,
-	setting_clear_custom,
+	setting_reset_custom,
 
 	custom_theme_list_head,
 	custom_theme_blank,

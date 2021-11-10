@@ -29,7 +29,7 @@ L"SLOW  "_crypt,
 L"CUSTOM"_crypt,
 L"YES"_crypt,
 L"NO "_crypt,
-L"Ctrl+D)  Clear Custom"_crypt,
+L"Ctrl+D)  Reset"_crypt,
 
 L"Color         Facade"_crypt,
 L"  Blank:  "_crypt,

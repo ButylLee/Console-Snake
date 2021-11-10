@@ -412,7 +412,7 @@ void CustomThemePage::paintInterface()
 
 	canvas.setColor(Color::White);
 	canvas.setCursor(5, 30);
-	print(~token::setting_clear_custom);
+	print(~token::setting_reset_custom);
 
 	canvas.setCursor(30, 14);
 	print(~token::custom_theme_list_head);
