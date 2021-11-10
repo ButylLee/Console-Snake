@@ -19,6 +19,7 @@ void ParseCmdAndSet(int count, char* Cmd[])
 		// Command Options:
 		// -nolimit: freely adjust the width and height of Console
 		// -oldconsole: enable the compatibility of old console host
+		// -awesome: force enable colorful title
 		// -size [width]x[height]: set user defined game size
 		if (cmd == "-nolimit"_crypt)
 		{
