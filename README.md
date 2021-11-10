@@ -10,4 +10,6 @@ To build the Project, Clone this repo to local. Then clone [Cryptopp](https://gi
 
 - -**oldconsole**: enable the compatibility of old console host.
 
+- -**awesome**: force enable colorful title.
+
 - -**size [width]x[height]**: set user defined game size.

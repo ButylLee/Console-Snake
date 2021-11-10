@@ -1,5 +1,9 @@
 ﻿#include "Main.h"
 
+// enable Windows Visual Style
+#pragma comment(linker, "\"/manifestdependency:type='win32' name='Microsoft.Windows.Common-Controls' \
+version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
+
 static bool no_limit = false;
 
 void ParseCmdAndSet(int count, char* Cmd[])
@@ -15,6 +19,7 @@ void ParseCmdAndSet(int count, char* Cmd[])
 		// Command Options:
 		// -nolimit: freely adjust the width and height of Console
 		// -oldconsole: enable the compatibility of old console host
+		// -awesome: force enable colorful title
 		// -size [width]x[height]: set user defined game size
 		if (cmd == "-nolimit"_crypt)
 		{
@@ -23,6 +28,10 @@ void ParseCmdAndSet(int count, char* Cmd[])
 		else if (cmd == "-oldconsole"_crypt)
 		{
 			GameSetting::get().old_console_host = true;
+		}
+		else if (cmd == "-awesome"_crypt)
+		{
+			GameData::get().colorful_title = true;
 		}
 		else if (cmd == "-size"_crypt)
 		{

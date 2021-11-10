@@ -6,24 +6,13 @@
 #include "ErrorHandling.h"
 #include "EncryptedString.h"
 #include "wideIO.h"
+#include "Enum.h"
+#include "Resource.h"
 #include "WinMacro.h"
 #include <Windows.h>
 #include <cstdio>
 #include <cstdlib>
 #include <string_view>
-
-enum struct Color :WORD
-{
-	Blue         = 0x01,
-	LightBlue    = 0x09,
-	Green        = 0x02,
-	Aqua         = 0x03,
-	LightAqua    = 0x0B,
-	Red          = 0x04,
-	Yellow       = 0x0E,
-	White        = 0x0F,
-	DefaultColor = 0x07
-};
 
 class Cursor
 {
@@ -130,7 +119,7 @@ private:
 	}
 
 private:
-	Color color = Color::DefaultColor;
+	Color color = Color::White;
 	Cursor cursor;
 	ClientSize size = { 60, 30 };
 };

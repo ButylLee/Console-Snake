@@ -4,6 +4,7 @@
 
 #include "Canvas.h"
 #include "DataSet.h"
+#include "Singleton.h"
 #include "DynArray.h"
 #include <atomic>
 #include <cstdint>
@@ -19,10 +20,11 @@ enum struct GameStatus
 	Running, Pausing, Ending
 };
 
+// --------------- class Playground ---------------
 struct MapNode
 {
 	int16_t snake_index;
-	GameElementTag type;
+	Element type;
 };
 
 struct SnakeNode
@@ -53,8 +55,7 @@ public:
 	void play();
 
 private:
-	template<GameElementTag Which>
-	constexpr void paintElement() noexcept;
+	void paintElement(Element which) noexcept;
 	size_t getSnakeBodySize() noexcept;
 	void setupInvariantAndPaint() noexcept;
 	void createSnake();

@@ -17,7 +17,7 @@ public:
 	struct RankItem {
 		std::wstring name;
 		int score = 0;
-		Speed::value_type::value_type speed = {};
+		Speed::value_type speed = {};
 		Size::value_type width = {};
 		Size::value_type height = {};
 		bool is_win = false;
@@ -38,15 +38,15 @@ protected:
 public:
 	void newResult(std::wstring new_name, int new_score, bool winning)
 	{
-		if (done.valid())
+		if (done.valid()) // wait for last time sorting
 			done.get();
-		rank_lock = true;
+		this->lock();
 
 		rank_table.push_back(
 			{
 				std::move(new_name),
 				new_score,
-				GameSetting::get().speed.Value().value,
+				GameSetting::get().speed.Value(),
 				GameSetting::get().width,
 				GameSetting::get().height,
 				winning
@@ -56,27 +56,26 @@ public:
 		done = std::async(std::launch::async,
 						  [this]
 						  {
-							  auto previous_user = std::find_if(rank_table.begin(), rank_table.end() - 1,
+							  auto previous_user = std::find_if(rank_table.begin(), rank_table.end(),
 																[this](const RankItem& lhs) noexcept
 																{
 																	return lhs.name == rank_table.back().name;
 																});
+							  auto end = rank_table.end();
 							  if (previous_user != rank_table.cend() - 1 && !rank_table.back().name.empty())
 							  {
-								  // only store gamer's best score
+								  // only store named gamer's best score
 								  if (rank_table.back().score >= previous_user->score)
 									  *previous_user = std::move(rank_table.back());
+								  --end;
 							  }
-							  else
-							  {
-								  std::stable_sort(rank_table.begin(), rank_table.end(),
-												   [](const RankItem& lhs, const RankItem& rhs) noexcept
-												   {
-													   return lhs.score > rhs.score;
-												   });
-							  }
+							  std::stable_sort(rank_table.begin(), end,
+											   [](const RankItem& lhs, const RankItem& rhs) noexcept
+											   {
+												   return lhs.score > rhs.score;
+											   });
 							  rank_table.pop_back();
-							  rank_lock = false;
+							  this->unlock();
 						  });
 	}
 
@@ -102,9 +101,22 @@ public:
 		return rank_table;
 	}
 
-	auto& getRankPrior() noexcept
+	auto& getRank() noexcept
+	{
+		while (!finished());
+		return rank_table;
+	}
+
+	auto& getRank_NoLock() noexcept
 	{
 		return rank_table;
+	}
+
+	void clearRank() noexcept
+	{
+		while (!finished());
+		rank_table.clear();
+		rank_table = std::vector<RankItem>{ rank_count };
 	}
 
 private:

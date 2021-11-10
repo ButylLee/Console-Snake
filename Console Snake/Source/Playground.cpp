@@ -6,11 +6,15 @@
 #include <thread>
 #include <chrono>
 #include <utility>
+#include <type_traits>
 #include <string>
 #include <cwctype>
 #include "WinMacro.h"
 #include <Windows.h>
 
+/***************************************
+ class Playground
+****************************************/
 void Playground::play()
 {
 	using namespace std::chrono_literals;
@@ -30,7 +34,7 @@ void Playground::play()
 				else
 				{
 					std::this_thread::sleep_for(30ms + // 30ms - 210ms, level 1-10
-												20ms * (10 - GameSetting::get().speed.Value().value));
+												20ms * (10 - GameSetting::get().speed.Value()));
 				}
 				break;
 			case GameStatus::Pausing:
@@ -41,11 +45,10 @@ void Playground::play()
 	}
 }
 
-template<GameElementTag Which>
-constexpr void Playground::paintElement() noexcept
+void Playground::paintElement(Element which) noexcept
 {
-	canvas.setColor(GameElement<Which>::appearance.color);
-	print(GameElement<Which>::appearance.facade);
+	canvas.setColor(GameSetting::get().theme.Value()[which].color);
+	print(GameSetting::get().theme.Value()[which].facade);
 }
 
 size_t Playground::getSnakeBodySize() noexcept
@@ -63,20 +66,20 @@ void Playground::setupInvariantAndPaint() noexcept
 			if (row == 0 || row == GameSetting::get().height - 1 ||
 				column == 0 || column == GameSetting::get().width - 1)
 			{
-				map[column][row].type = GameElementTag::barrier;
+				map[column][row].type = Element::barrier;
 				map[column][row].snake_index = -1;
 				if (!(GameSetting::get().old_console_host == true &&
 					  row == GameSetting::get().height - 1 &&
 					  column == GameSetting::get().width - 1))
-					paintElement<GameElementTag::barrier>();
+					paintElement(Element::barrier);
 			}
 			else
 			{
-				map[column][row].type = GameElementTag::blank;
+				map[column][row].type = Element::blank;
 				map[column][row].snake_index = index;
 				snake_body[index].x = column;
 				snake_body[index].y = row;
-				paintElement<GameElementTag::blank>();
+				paintElement(Element::blank);
 				index++;
 			}
 		}
@@ -118,9 +121,9 @@ void Playground::createSnake()
 	snake_tail = snake_head = map[begin_head_x][begin_head_y].snake_index;
 	for (size_t i = 0; i < snake_begin_length; i++)
 	{
-		map[begin_head_x][begin_head_y].type = GameElementTag::snake;
+		map[begin_head_x][begin_head_y].type = Element::snake;
 		canvas.setCursor(begin_head_x, begin_head_y);
-		paintElement<GameElementTag::snake>();
+		paintElement(Element::snake);
 		rebindData(snake_tail, begin_head_x, begin_head_y);
 
 		if (i == snake_begin_length - 1)
@@ -162,9 +165,9 @@ void Playground::createFood()
 
 	// generate food on the map
 	auto [x, y] = snake_body[random_index];
-	map[x][y].type = GameElementTag::food;
+	map[x][y].type = Element::food;
 	canvas.setCursor(x, y);
-	paintElement<GameElementTag::food>();
+	paintElement(Element::food);
 }
 
 auto& Playground::getRandomEngine()
@@ -177,6 +180,7 @@ auto& Playground::getRandomEngine()
 template<typename T>
 T Playground::getRandom(T min, T max)
 {
+	static_assert(std::is_integral_v<T>, "getRandom(min,max) expects integral arguments.");
 	static std::uniform_int_distribution<T> dis;
 	using param_type = typename decltype(dis)::param_type;
 	return dis(getRandomEngine(), param_type{ min,max });
@@ -192,31 +196,35 @@ void Playground::updateFrame()
 	switch (snake_direct)
 	{
 		case Direction::Up:
-			head_y--; break;
+			head_y == 0 ? head_y = GameSetting::get().height - 1 : head_y--;
+			break;
 		case Direction::Down:
-			head_y++; break;
+			head_y == GameSetting::get().height - 1 ? head_y = 0 : head_y++;
+			break;
 		case Direction::Left:
-			head_x--; break;
+			head_x == 0 ? head_x = GameSetting::get().width - 1 : head_x--;
+			break;
 		case Direction::Right:
-			head_x++; break;
+			head_x == GameSetting::get().width - 1 ? head_x = 0 : head_x++;
+			break;
 	}
 
 	// check is dashing againest barrier or body
 	auto previous_type = map[head_x][head_y].type;
-	if (previous_type == GameElementTag::barrier || previous_type == GameElementTag::snake)
+	if (previous_type == Element::barrier || previous_type == Element::snake)
 	{
 		game_over = true;
 		return;
 	}
 
 	// process snake head and rebind data
-	map[head_x][head_y].type = GameElementTag::snake;
+	map[head_x][head_y].type = Element::snake;
 	canvas.setCursor(head_x, head_y);
-	paintElement<GameElementTag::snake>();
+	paintElement(Element::snake);
 	rebindData(snake_head, head_x, head_y);
 
 	// process snake tail
-	if (previous_type == GameElementTag::food)
+	if (previous_type == Element::food)
 	{
 		createFood();
 		GameData::get().score++;
@@ -225,9 +233,9 @@ void Playground::updateFrame()
 	{
 		auto [tail_x, tail_y] = snake_body[snake_tail];
 		forwardIndex(snake_tail);
-		map[tail_x][tail_y].type = GameElementTag::blank;
+		map[tail_x][tail_y].type = Element::blank;
 		canvas.setCursor(tail_x, tail_y);
-		paintElement<GameElementTag::blank>();
+		paintElement(Element::blank);
 	}
 }
 
@@ -267,7 +275,7 @@ void Playground::endGame()
 	}
 	else
 	{
-		canvas.setColor(Color::White);
+		canvas.setColor(Color::LightWhite);
 
 		canvas.setCenteredCursor(~token::game_you_died, baseY);
 		print(~token::game_you_died);
@@ -299,7 +307,7 @@ void Playground::endGame()
 	Rank::get().newResult(name, GameData::get().score, is_win);
 
 	// show Retry Or Return info
-	canvas.setColor(Color::White);
+	canvas.setColor(Color::LightWhite);
 	canvas.setCenteredCursor(~token::game_Space_to_retry, baseY + 6);
 	print(~token::game_Space_to_retry);
 

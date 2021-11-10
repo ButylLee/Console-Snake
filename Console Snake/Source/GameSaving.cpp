@@ -98,7 +98,10 @@ GameSavingBase::GameSavingBase() try
 	}
 
 	// Store the decrypted data to bin_data and wait to be loaded
+	if (sizeof bin_data != binary_pool.length())
+		return; // The save file is invalid
 	std::copy_n(binary_pool.c_str(), sizeof bin_data, reinterpret_cast<unsigned char*>(&bin_data));
+
 	no_save_file = false;
 }
 catch (...)
@@ -115,7 +118,13 @@ void GameSavingBase::convertFromBinaryData() noexcept
 	// setting data
 	{
 		auto& gs = GameSetting::get();
-		gs.speed.convertFrom({ FindSpeedName(bin_data.setting.speed),bin_data.setting.speed });
+
+		decltype(gs.theme.Value()) theme_temp;
+		static_assert(sizeof theme_temp == sizeof bin_data.setting.theme, "abnormal struct align.");
+		std::memcpy(&theme_temp, &bin_data.setting.theme, sizeof theme_temp);
+		gs.theme.convertFrom(theme_temp);
+
+		gs.speed.convertFrom(bin_data.setting.speed);
 		gs.width.convertFrom(bin_data.setting.width);
 		gs.height.convertFrom(bin_data.setting.height);
 		LocalizedStrings::setLang(
@@ -128,7 +137,7 @@ void GameSavingBase::convertFromBinaryData() noexcept
 	for (int i = 0; i < Rank::rank_count; i++)
 	{
 		auto& save_item = bin_data.rank_list[i];
-		auto& rank_item = Rank::get().getRankPrior()[i];
+		auto& rank_item = Rank::get().getRank()[i];
 		rank_item.score = Convert{ save_item.score };
 		rank_item.width = Convert{ save_item.width };
 		rank_item.height = Convert{ save_item.height };
@@ -136,6 +145,9 @@ void GameSavingBase::convertFromBinaryData() noexcept
 		rank_item.is_win = Convert{ save_item.is_win };
 		std::copy_n(save_item.name, Rank::name_max_length, buffer);
 		rank_item.name = buffer;
+
+		if (rank_item.is_win)
+			GameData::get().colorful_title = true;
 	}
 }
 
@@ -145,7 +157,12 @@ void GameSavingBase::convertToBinaryData() noexcept
 	// setting data
 	{
 		auto& gs = GameSetting::get();
-		bin_data.setting.speed = Convert{ gs.speed.Value().value };
+
+		auto theme_temp = gs.theme.Value();
+		static_assert(sizeof theme_temp == sizeof bin_data.setting.theme, "abnormal struct align.");
+		std::memcpy(&bin_data.setting.theme, &theme_temp, sizeof theme_temp);
+
+		bin_data.setting.speed = Convert{ gs.speed.Value() };
 		bin_data.setting.width = Convert{ gs.width.Value() };
 		bin_data.setting.height = Convert{ gs.height.Value() };
 		bin_data.setting.lang = Convert{ gs.lang.Value() };
@@ -155,7 +172,7 @@ void GameSavingBase::convertToBinaryData() noexcept
 	for (int i = 0; i < Rank::rank_count; i++)
 	{
 		auto& save_item = bin_data.rank_list[i];
-		auto& rank_item = Rank::get().getRankPrior()[i];
+		auto& rank_item = Rank::get().getRank_NoLock()[i];
 		save_item.score = Convert{ rank_item.score };
 		save_item.width = Convert{ rank_item.width };
 		save_item.height = Convert{ rank_item.height };
@@ -168,7 +185,7 @@ void GameSavingBase::convertToBinaryData() noexcept
 // write save file from memory
 void GameSavingBase::save()
 {
-	if (done.valid())
+	if (done.valid()) // wait for last time saving
 		done.get();
 	Rank::get().lock();
 	convertToBinaryData();

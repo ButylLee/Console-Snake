@@ -5,8 +5,10 @@
 #include "Enum.h"
 #include "LocalizedStrings.h"
 #include "EncryptedString.h"
+#include "WinMacro.h"
+#include <Windows.h>
 
-#define GAME_VERSION "1.40"
+#define GAME_VERSION "2.0"
 inline const auto save_file_name = "SnakeSaved.bin"_crypt;
 inline constexpr const unsigned char crypto_key[] = {
 	0x54, 0xDE, 0x3B, 0xF2, 0xD8, 0x5D, 0x4E, 0x04,
@@ -17,6 +19,7 @@ inline constexpr const unsigned char crypto_IV[] = {
 	0x92, 0xD1, 0x48, 0x9E, 0x03, 0x9B, 0x4E, 0xA4
 };
 
+// --------------- Language Resource ---------------
 LANG_DEF(
 	en_US,
 	zh_CN,
@@ -39,14 +42,24 @@ TOKEN_DEF(
 	setting_speed,
 	setting_map_size,
 	setting_show_frame,
+	setting_theme,
+	setting_customize_theme,
 	setting_language,
+	setting_save,
 	setting_return,
 	setting_speed_fast,
 	setting_speed_normal,
 	setting_speed_slow,
-	setting_speed_custom,
+	setting_custom,
 	setting_show_frame_yes,
 	setting_show_frame_no,
+	setting_clear_custom,
+
+	custom_theme_list_head,
+	custom_theme_blank,
+	custom_theme_food,
+	custom_theme_snake,
+	custom_theme_barrier,
 
 	game_congratulations,
 	game_you_win,
@@ -61,6 +74,7 @@ TOKEN_DEF(
 	rank_win,
 	rank_setting,
 	rank_no_data,
+	rank_clear_all_records,
 
 	about_text,
 	about_caption,
@@ -103,66 +117,192 @@ MAKE_LOCALIZED_STRS
 	}
 };
 
-
-ENUM_DEL(Lang)
-	ENG, CHS, CHT, JPN
-ENUM_DEF(Lang, Locale::Lang)
-	{ L"English"_crypt,Locale::en_US },
-	{ L"简体中文"_crypt,Locale::zh_CN },
-	{ L"繁體中文"_crypt,Locale::zh_TW },
-	{ L"日本語"_crypt,Locale::ja_JP }
-ENUM_END
-ENUM_DEFAULT(Lang, ENG)
-
-
-ENUM_DEL(Size)
-	XS, S, M, L, XL
-ENUM_DEF(Size, short)
-	{ L"(XS)"_crypt,13 },
-	{ L"(S) "_crypt,17 },
-	{ L"(M) "_crypt,21 },
-	{ L"(L) "_crypt,24 },
-	{ L"(XL)"_crypt,27 }
-ENUM_END
-ENUM_DEFAULT(Size, S)
-
-
-// Workaround
-template<typename TBase = int>
-struct LocalStrAndValue
+// --------------- Enum Lang Resource ---------------
+ENUM_DECL(Lang)
 {
-	using value_type = TBase;
-	token::StringName tok;
-	TBase value;
-	friend constexpr bool operator==(const LocalStrAndValue& l, const LocalStrAndValue& r) noexcept
+	ENG, CHS, CHT, JPN
+}
+ENUM_DEF(Lang, Locale::Lang)
+{
+	{ Locale::en_US, L"English"_crypt },
+	{ Locale::zh_CN, L"简体中文"_crypt },
+	{ Locale::zh_TW, L"繁體中文"_crypt },
+	{ Locale::ja_JP, L"日本語"_crypt }
+};
+ENUM_CUSTOM(Lang, {}, L"");
+ENUM_DEFAULT(Lang, ENG);
+
+// --------------- Enum Size Resource ---------------
+ENUM_DECL(Size)
+{
+	XS, S, M, L, XL
+}
+ENUM_DEF(Size, short)
+{
+	{ 13, L"(XS)"_crypt },
+	{ 17, L"(S) "_crypt },
+	{ 21, L"(M) "_crypt },
+	{ 24, L"(L) "_crypt },
+	{ 27, L"(XL)"_crypt }
+};
+ENUM_CUSTOM(Size, {}, L"(Custom)"_crypt);
+ENUM_DEFAULT(Size, S);
+
+// --------------- Enum Speed Resource ---------------
+ENUM_DECL(Speed)
+{
+	FAST, NORMAL, SLOW
+}
+ENUM_DEF(Speed, short, token::StringName)
+{
+	{ 8, token::setting_speed_fast },
+	{ 5, token::setting_speed_normal },
+	{ 1, token::setting_speed_slow }
+};
+ENUM_CUSTOM(Speed, {}, token::setting_custom);
+ENUM_DEFAULT(Speed, NORMAL);
+
+// --------------- Enum Color Resource ---------------
+ENUM_DECL(Color)
+{
+	Black,  Gray,
+	Blue,   LightBlue,
+	Green,  LightGreen,
+	Aqua,   LightAqua,
+	Red,    LightRed,
+	Purple, LightPurple,
+	Yellow, LightYellow,
+	White , LightWhite
+}
+ENUM_DEF(Color, WORD)
+{
+	{ 0x00, L"Black      " }, { 0x08, L"Gray       " },
+	{ 0x01, L"Blue       " }, { 0x09, L"LightBlue  " },
+	{ 0x02, L"Green      " }, { 0x0A, L"LightGreen " },
+	{ 0x03, L"Aqua       " }, { 0x0B, L"LightAqua  " },
+	{ 0x04, L"Red        " }, { 0x0C, L"LightRed   " },
+	{ 0x05, L"Purple     " }, { 0x0D, L"LightPurple" },
+	{ 0x06, L"Yellow     " }, { 0x0E, L"LightYellow" },
+	{ 0x07, L"White      " }, { 0x0F, L"LightWhite " },
+};
+ENUM_CUSTOM(Color, {}, L"");
+ENUM_DEFAULT(Color, White);
+
+// --------------- Enum Facade Resource ---------------
+ENUM_DECL(Facade)
+{
+	FullStar, FullCircle, FullRect, FullDiamond,
+	Star, Circle, Rect, Diamond
+}
+ENUM_DEF(Facade, wchar_t)
+{
+	{ L'★', L"" },
+	{ L'●', L"" },
+	{ L'■', L"" },
+	{ L'◆', L"" },
+	{ L'☆', L"" },
+	{ L'○', L"" },
+	{ L'□', L"" },
+	{ L'◇', L"" },
+};
+ENUM_CUSTOM(Facade, {}, L"");
+ENUM_DEFAULT(Facade, FullStar);
+
+// --------------- Theme Resource ---------------
+enum struct Element :size_t
+{
+	blank = 0,
+	food,
+	snake,
+	barrier,
+
+	Mask
+};
+
+struct ElementSet
+{
+	struct Appearance
 	{
-		return l.tok == r.tok && l.value == r.value;
+		Facade facade;
+		Color color;
+
+		friend constexpr bool operator==(const Appearance& lhs, const Appearance& rhs) noexcept
+		{
+			return lhs.facade == rhs.facade && lhs.color == rhs.color;
+		}
+	}elements[static_cast<size_t>(Element::Mask)];
+
+	constexpr const auto& operator[](Element which) const noexcept
+	{
+		return elements[static_cast<size_t>(which)];
+	}
+	constexpr auto& operator[](Element which) noexcept
+	{
+		return elements[static_cast<size_t>(which)];
+	}
+	friend constexpr bool operator==(const ElementSet& lhs, const ElementSet& rhs) noexcept
+	{
+		return lhs[Element::blank] == rhs[Element::blank] &&
+			lhs[Element::food] == rhs[Element::food] &&
+			lhs[Element::snake] == rhs[Element::snake] &&
+			lhs[Element::barrier] == rhs[Element::barrier];
 	}
 };
 
-ENUM_DEL(Speed)
-	FAST, NORMAL, SLOW
-ENUM_DEF(Speed, LocalStrAndValue<>)
-	{ L"",LocalStrAndValue<>{token::setting_speed_fast, 8} },
-	{ L"",LocalStrAndValue<>{token::setting_speed_normal, 5} },
-	{ L"",LocalStrAndValue<>{token::setting_speed_slow, 1} }
-ENUM_END
-ENUM_DEFAULT(Speed, NORMAL)
-
-inline auto FindSpeedName(Speed::value_type::value_type speed) noexcept
+ENUM_DECL(Theme)
 {
-	switch (speed)
-	{
-		case 8:
-			return token::setting_speed_fast;
-		case 5:
-			return token::setting_speed_normal;
-		case 1:
-			return token::setting_speed_slow;
-		default:
-			return token::setting_speed_custom;
-	}
+	A, B, C, D, E
 }
+ENUM_DEF(Theme, ElementSet)
+{
+	{
+		{{
+			{ Facade::Rect, Color::Blue },
+			{ Facade::FullStar, Color::Red },
+			{ Facade::FullCircle, Color::LightYellow },
+			{ Facade::FullRect, Color::Green }
+		}},
+		L"A     "
+	},
+	{
+		{{
+			{ Facade::FullRect, Color::Gray },
+			{ Facade::FullStar, Color::Red },
+			{ Facade::FullCircle, Color::LightYellow },
+			{ Facade::FullRect, Color::Aqua }
+		}},
+		L"B     "
+	},
+	{
+		{{
+			{ Facade::Rect, Color::Red },
+			{ Facade::FullDiamond, Color::LightGreen },
+			{ Facade::FullCircle, Color::LightBlue },
+			{ Facade::FullRect, Color::LightRed }
+		}},
+		L"C     "
+	},
+	{
+		{{
+			{ Facade::Rect, Color::LightBlue },
+			{ Facade::FullStar, Color::LightYellow },
+			{ Facade::FullCircle, Color::LightPurple },
+			{ Facade::FullRect, Color::LightWhite }
+		}},
+		L"D     "
+	},
+	{
+		{{
+			{ Facade::Circle, Color::Gray },
+			{ Facade::FullStar, Color::LightWhite },
+			{ Facade::FullCircle, Color::LightBlue },
+			{ Facade::FullDiamond, Color::Gray }
+		}},
+		L"E     "
+	}
+};
+ENUM_CUSTOM(Theme, {}, L"Custom");//TODO
+ENUM_DEFAULT(Theme, A);
 
 
 inline const auto game_title = LR"title(

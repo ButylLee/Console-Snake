@@ -188,7 +188,7 @@ void MenuPage::paintInterface()
 	auto [baseX, baseY] = canvas.getClientSize();
 	baseX = baseX / 3 + 4;
 	baseY = baseY / 2 + 2;
-	canvas.setColor(Color::White);
+	canvas.setColor(Color::LightWhite);
 
 	canvas.setCursor(baseX, baseY);
 	print(~token::menu_start_game);
@@ -234,6 +234,22 @@ void SettingPage::run()
 
 			case K_4:
 			{
+				GameSetting::get().theme.nextValue();
+			}
+			break;
+
+			case K_F4:
+			{
+				GameData::get().seletion = PageSel::CustomThemePage;
+				auto page = CreatePage();
+				page->run();
+				canvas.setClientSize(default_size);
+				paintInterface();
+			}
+			break;
+
+			case K_5:
+			{
 				LocalizedStrings::setLang(
 					GameSetting::get().lang.nextValue()
 				);
@@ -244,9 +260,25 @@ void SettingPage::run()
 			break;
 
 			case K_Enter:
+			{
 				GameData::get().seletion = PageSel::MenuPage;
 				GameSaving::get().save();
-				return;
+			}
+			return;
+
+			case K_Esc:
+			{
+				GameData::get().seletion = PageSel::MenuPage;
+				// restore
+				GameSetting::get() = setting_backup;
+				LocalizedStrings::setLang(setting_backup.lang);
+				if (custom_theme_backup)
+					GameSetting::get().theme.setCustomValue(*custom_theme_backup);
+				else
+					GameSetting::get().theme.clearCustomValue();
+				Console::get().setTitle(~token::console_title);
+			}
+			return;
 		}
 	}
 }
@@ -258,7 +290,7 @@ void SettingPage::paintInterface()
 	auto [baseX, baseY] = canvas.getClientSize();
 	baseX = baseX / 3 + 1;
 	baseY = baseY / 2 + 1;
-	canvas.setColor(Color::DefaultColor);
+	canvas.setColor(Color::White);
 
 	canvas.setCursor(baseX, baseY);
 	print(~token::setting_speed);
@@ -267,8 +299,14 @@ void SettingPage::paintInterface()
 	canvas.setCursor(baseX, baseY + 4);
 	print(~token::setting_show_frame);
 	canvas.setCursor(baseX, baseY + 6);
+	print(~token::setting_theme);
+	canvas.setCursor(baseX - 9, baseY + 6);
+	print(~token::setting_customize_theme);
+	canvas.setCursor(baseX, baseY + 8);
 	print(~token::setting_language);
-	canvas.setCursor(baseX - 2, baseY + 8);
+	canvas.setCursor(baseX - 2, baseY + 10);
+	print(~token::setting_save);
+	canvas.setCursor(baseX - 1, baseY + 12);
 	print(~token::setting_return);
 }
 
@@ -277,10 +315,10 @@ void SettingPage::paintCurOptions()
 	auto [baseX, baseY] = canvas.getClientSize();
 	baseX = baseX / 2 + 3;
 	baseY = baseY / 2 + 1;
-	canvas.setColor(Color::DefaultColor);
+	canvas.setColor(Color::White);
 
 	canvas.setCursor(baseX, baseY);
-	print(~GameSetting::get().speed.Value().tok);
+	print(~GameSetting::get().speed.Name());
 
 	canvas.setCursor(baseX, baseY + 2);
 	print(L"%hd X %hd"_crypt, GameSetting::get().width.Value(), GameSetting::get().height.Value());
@@ -292,7 +330,167 @@ void SettingPage::paintCurOptions()
 		  : ~token::setting_show_frame_no);
 
 	canvas.setCursor(baseX, baseY + 6);
+	print(GameSetting::get().theme.Name());
+
+	canvas.setCursor(baseX, baseY + 8);
 	print(GameSetting::get().lang.Name());
+}
+
+/***************************************
+ class CustomThemePage
+****************************************/
+CustomThemePage::CustomThemePage() noexcept
+{
+	auto custom_theme = GameSetting::get().theme.getCustomValue();
+	if (custom_theme)
+		theme_temp = *custom_theme;
+	else
+		theme_temp = Theme{ Theme::A };
+}
+
+void CustomThemePage::run()
+{
+	canvas.setClientSize(default_size);
+	paintInterface();
+
+	while (true)
+	{
+		paintCurOptions();
+		switch (getwch())
+		{
+			case K_Q: case K_q:
+				theme_temp[Element::blank].facade.nextValue();
+				break;
+			case K_W: case K_w:
+				theme_temp[Element::food].facade.nextValue();
+				break;
+			case K_E: case K_e:
+				theme_temp[Element::snake].facade.nextValue();
+				break;
+			case K_R: case K_r:
+				theme_temp[Element::barrier].facade.nextValue();
+				break;
+
+			case K_A: case K_a:
+				theme_temp[Element::blank].color.nextValue();
+				break;
+			case K_S: case K_s:
+				theme_temp[Element::food].color.nextValue();
+				break;
+			case K_D: case K_d:
+				theme_temp[Element::snake].color.nextValue();
+				break;
+			case K_F: case K_f:
+				theme_temp[Element::barrier].color.nextValue();
+				break;
+
+			case K_Ctrl_Dd:
+				GameSetting::get().theme.clearCustomValue();
+				GameData::get().seletion = PageSel::SettingPage;
+				return;
+
+			case K_Enter:
+			case K_Esc:
+				GameSetting::get().theme.setCustomValue(theme_temp);
+				GameData::get().seletion = PageSel::SettingPage;
+				return;
+		}
+	}
+}
+
+void CustomThemePage::paintInterface()
+{
+	static const auto custom_theme_title = LR"title(
+            ______           __                     ________                      
+           / ____/_  _______/ /_____  ____ ___     /_  __/ /_  ___  ____ ___  ___ 
+          / /   / / / / ___/ __/ __ \/ __ `__ \     / / / __ \/ _ \/ __ `__ \/ _ \
+         / /___/ /_/ (__  ) /_/ /_/ / / / / / /    / / / / / /  __/ / / / / /  __/
+         \____/\__,_/____/\__/\____/_/ /_/ /_/    /_/ /_/ /_/\___/_/ /_/ /_/\___/ 
+                                                                                  )title"_crypt;
+	canvas.setColor(Color::LightAqua);
+	print(custom_theme_title);
+
+	canvas.setColor(Color::White);
+	canvas.setCursor(5, 30);
+	print(~token::setting_clear_custom);
+
+	canvas.setCursor(30, 14);
+	print(~token::custom_theme_list_head);
+	canvas.setCursor(22, 16);
+	print(~token::custom_theme_blank);
+	print(L"(A)             (Q)");
+	canvas.setCursor(22, 18);
+	print(~token::custom_theme_food);
+	print(L"(S)             (W)");
+	canvas.setCursor(22, 20);
+	print(~token::custom_theme_snake);
+	print(L"(D)             (E)");
+	canvas.setCursor(22, 22);
+	print(~token::custom_theme_barrier);
+	print(L"(F)             (R)");
+}
+
+void CustomThemePage::paintCurOptions()
+{
+	{
+		constexpr int width = 16, height = 16;
+		constexpr int origin_col = 5, origin_row = 11;
+
+		int row = origin_row, column = origin_col;
+		for (; row < origin_row + height; row++, column = origin_col)
+		{
+			canvas.setCursor(column, row);
+			for (; column < origin_col + width; column++)
+			{
+				if (row == origin_row + 5 && column == origin_col + 3)
+				{
+					canvas.setColor(theme_temp[Element::snake].color);
+					print(theme_temp[Element::snake].facade);
+					print(theme_temp[Element::snake].facade);
+					print(theme_temp[Element::snake].facade);
+					column += 2;
+				}
+				else if (row == origin_row + 11 && column == origin_col + 10)
+				{
+					canvas.setColor(theme_temp[Element::food].color);
+					print(theme_temp[Element::food].facade);
+				}
+				else if (row == origin_row || row == origin_row + height - 1 ||
+						 column == origin_col || column == origin_col + width - 1)
+				{
+					canvas.setColor(theme_temp[Element::barrier].color);
+					print(theme_temp[Element::barrier].facade);
+				}
+				else
+				{
+					canvas.setColor(theme_temp[Element::blank].color);
+					print(theme_temp[Element::blank].facade);
+				}
+			}
+		}
+	}
+	{
+		constexpr int baseX = 29, baseY = 16;
+		constexpr int nextX = baseX + 9;
+		canvas.setColor(Color::White);
+
+		canvas.setCursor(baseX, baseY);
+		print(theme_temp[Element::blank].color.Name());
+		canvas.setCursor(nextX, baseY);
+		print(theme_temp[Element::blank].facade.Value());
+		canvas.setCursor(baseX, baseY + 2);
+		print(theme_temp[Element::food].color.Name());
+		canvas.setCursor(nextX, baseY + 2);
+		print(theme_temp[Element::food].facade.Value());
+		canvas.setCursor(baseX, baseY + 4);
+		print(theme_temp[Element::snake].color.Name());
+		canvas.setCursor(nextX, baseY + 4);
+		print(theme_temp[Element::snake].facade.Value());
+		canvas.setCursor(baseX, baseY + 6);
+		print(theme_temp[Element::barrier].color.Name());
+		canvas.setCursor(nextX, baseY + 6);
+		print(theme_temp[Element::barrier].facade.Value());
+	}
 }
 
 /***************************************
@@ -317,7 +515,7 @@ void BeginPage::run()
 void BeginPage::paintInterface()
 {
 	auto [baseX, baseY] = canvas.getClientSize();
-	canvas.setColor(Color::White);
+	canvas.setColor(Color::LightWhite);
 	canvas.setCenteredCursor(~token::press_any_key, baseY / 2 + 4);
 	print(~token::press_any_key);
 
@@ -325,17 +523,29 @@ void BeginPage::paintInterface()
 		[this]
 		{
 			using namespace std::chrono_literals;
-			for (bool color_flag = false;;)
-			{
-				if (is_press)
-					return;
-				canvas.setCursor(0, 0);
-				canvas.setColor(color_flag ? Color::Aqua : Color::LightBlue);
-				print(game_title);
-				print(~token::game_version);
-				color_flag = !color_flag;
-				std::this_thread::sleep_for(900ms);
-			}
+			if (GameData::get().colorful_title)
+				for (Color color;;)
+				{
+					if (is_press)
+						return;
+					canvas.setCursor(0, 0);
+					canvas.setColor(color.nextValue());
+					print(game_title);
+					print(~token::game_version);
+					std::this_thread::sleep_for(100ms);
+				}
+			else
+				for (bool color_flag = false;;)
+				{
+					if (is_press)
+						return;
+					canvas.setCursor(0, 0);
+					canvas.setColor(color_flag ? Color::Aqua : Color::LightBlue);
+					print(game_title);
+					print(~token::game_version);
+					color_flag = !color_flag;
+					std::this_thread::sleep_for(900ms);
+				}
 		});
 	th_paint.detach();
 }
@@ -352,6 +562,10 @@ void RankPage::run()
 	{
 		switch (getwch())
 		{
+			case K_Ctrl_Dd:
+				Rank::get().clearRank();
+				GameSaving::get().save();
+				[[fallthrough]];
 			case K_Enter:
 			case K_Esc:
 				GameData::get().seletion = PageSel::MenuPage;
@@ -368,7 +582,7 @@ void RankPage::paintInterface()
 	auto [baseX, baseY] = canvas.getClientSize();
 	baseX = baseX / 4 - 1;
 	baseY = baseY / 2 + 1;
-	canvas.setColor(Color::Yellow);
+	canvas.setColor(Color::LightYellow);
 
 	if (Rank::get().getRank()[0].score == 0)
 	{
@@ -377,7 +591,7 @@ void RankPage::paintInterface()
 	}
 	else
 	{
-		int number = 1;
+		int number = 0;
 		std::wstring buffer, name, score, speed;
 		for (const auto& item : Rank::get().getRank())
 		{
@@ -393,17 +607,22 @@ void RankPage::paintInterface()
 			buffer += ~token::rank_setting;
 			buffer += L"%-*ls "_crypt; // arg:speed setting width, speed setting
 			buffer += L"%2d X %2d"_crypt; // arg:size setting
-			canvas.setCursor(baseX, baseY++);
+			canvas.setCursor(baseX, baseY + number);
 			name = item.name.empty() ? ~token::rank_anonymous : item.name;
 			score = item.is_win ? ~token::rank_win : std::to_wstring(item.score);
-			speed = ~FindSpeedName(item.speed);
+			speed = ~Speed::getNameFrom(item.speed);
 
-			print(buffer, number++,
+			print(buffer, ++number,
 				  Rank::name_max_length - StrFullWidthCount(name), name.c_str(),
 				  score.c_str(),
 				  6 - StrFullWidthCount(speed), speed.c_str(),
 				  item.width, item.height);
 		}
+
+		std::this_thread::sleep_for(50ms);
+		canvas.setColor(Color::White);
+		canvas.setCursor(baseX / 2, baseY + 12);
+		print(~token::rank_clear_all_records);
 	}
 	std::this_thread::sleep_for(500ms);
 }
@@ -428,6 +647,9 @@ std::unique_ptr<Page> CreatePage()
 			break;
 		case PageSel::SettingPage:
 			page.reset(new SettingPage);
+			break;
+		case PageSel::CustomThemePage:
+			page.reset(new CustomThemePage);
 			break;
 		case PageSel::RankPage:
 			page.reset(new RankPage);
