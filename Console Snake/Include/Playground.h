@@ -55,7 +55,7 @@ public:
 	void play();
 
 private:
-	void paintElement(Element Which) noexcept;
+	void paintElement(Element which) noexcept;
 	size_t getSnakeBodySize() noexcept;
 	void setupInvariantAndPaint() noexcept;
 	void createSnake();

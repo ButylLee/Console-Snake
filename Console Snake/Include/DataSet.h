@@ -11,6 +11,7 @@ enum struct PageSel
 	MenuPage,
 	GamePage,
 	SettingPage,
+	CustomThemePage,
 	RankPage,
 	AboutPage
 };

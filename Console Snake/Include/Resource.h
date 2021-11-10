@@ -8,7 +8,7 @@
 #include "WinMacro.h"
 #include <Windows.h>
 
-#define GAME_VERSION "pre-2.25"
+#define GAME_VERSION "pre-2.30"
 inline const auto save_file_name = "SnakeSaved.bin"_crypt;
 inline constexpr const unsigned char crypto_key[] = {
 	0x54, 0xDE, 0x3B, 0xF2, 0xD8, 0x5D, 0x4E, 0x04,
@@ -43,15 +43,23 @@ TOKEN_DEF(
 	setting_map_size,
 	setting_show_frame,
 	setting_theme,
+	setting_customize_theme,
 	setting_language,
 	setting_save,
 	setting_return,
 	setting_speed_fast,
 	setting_speed_normal,
 	setting_speed_slow,
-	setting_speed_custom,
+	setting_custom,
 	setting_show_frame_yes,
 	setting_show_frame_no,
+	setting_clear_custom,
+
+	custom_theme_list_head,
+	custom_theme_blank,
+	custom_theme_food,
+	custom_theme_snake,
+	custom_theme_barrier,
 
 	game_congratulations,
 	game_you_win,
@@ -151,34 +159,54 @@ ENUM_DEF(Speed, short, token::StringName)
 	{ 5, token::setting_speed_normal },
 	{ 1, token::setting_speed_slow }
 };
-ENUM_CUSTOM(Speed, {}, token::setting_speed_custom);
+ENUM_CUSTOM(Speed, {}, token::setting_custom);
 ENUM_DEFAULT(Speed, NORMAL);
 
 // --------------- Enum Color Resource ---------------
 ENUM_DECL(Color)
 {
-	Gray,
-		Blue, LightBlue,
-		Green, LightGreen,
-		Aqua, LightAqua,
-		Red, LightRed,
-		Purple, LightPurple,
-		Yellow, LightYellow,
-		White, LightWhite
+	Black,  Gray,
+	Blue,   LightBlue,
+	Green,  LightGreen,
+	Aqua,   LightAqua,
+	Red,    LightRed,
+	Purple, LightPurple,
+	Yellow, LightYellow,
+	White , LightWhite
 }
 ENUM_DEF(Color, WORD)
 {
-	{ 0x08, L"Gray" },
-	{ 0x01, L"Blue" }, { 0x09, L"LightBlue" },
-	{ 0x02, L"Green" }, { 0x0A, L"LightGreen" },
-	{ 0x03, L"Aqua" }, { 0x0B, L"LightAqua" },
-	{ 0x04, L"Red" }, { 0x0C, L"LightRed" },
-	{ 0x05, L"Purple" }, { 0x0D, L"LightPurple" },
-	{ 0x06, L"Yellow" }, { 0x0E, L"LightYellow" },
-	{ 0x07, L"White" }, { 0x0F, L"LightWhite" },
+	{ 0x00, L"Black      " }, { 0x08, L"Gray       " },
+	{ 0x01, L"Blue       " }, { 0x09, L"LightBlue  " },
+	{ 0x02, L"Green      " }, { 0x0A, L"LightGreen " },
+	{ 0x03, L"Aqua       " }, { 0x0B, L"LightAqua  " },
+	{ 0x04, L"Red        " }, { 0x0C, L"LightRed   " },
+	{ 0x05, L"Purple     " }, { 0x0D, L"LightPurple" },
+	{ 0x06, L"Yellow     " }, { 0x0E, L"LightYellow" },
+	{ 0x07, L"White      " }, { 0x0F, L"LightWhite " },
 };
 ENUM_CUSTOM(Color, {}, L"");
 ENUM_DEFAULT(Color, White);
+
+// --------------- Enum Facade Resource ---------------
+ENUM_DECL(Facade)
+{
+	FullStar, FullCircle, FullRect, FullDiamond,
+	Star, Circle, Rect, Diamond
+}
+ENUM_DEF(Facade, wchar_t)
+{
+	{ L'★', L"" },
+	{ L'●', L"" },
+	{ L'■', L"" },
+	{ L'◆', L"" },
+	{ L'☆', L"" },
+	{ L'○', L"" },
+	{ L'□', L"" },
+	{ L'◇', L"" },
+};
+ENUM_CUSTOM(Facade, {}, L"");
+ENUM_DEFAULT(Facade, FullStar);
 
 // --------------- Theme Resource ---------------
 enum struct Element :size_t
@@ -195,24 +223,24 @@ struct ElementSet
 {
 	struct Appearance
 	{
-		wchar_t facade = L'X';
+		Facade facade;
 		Color color;
 
-		friend bool operator==(const Appearance& lhs, const Appearance& rhs) noexcept
+		friend constexpr bool operator==(const Appearance& lhs, const Appearance& rhs) noexcept
 		{
-			return lhs.color == rhs.color && lhs.facade == rhs.facade;
+			return lhs.facade == rhs.facade && lhs.color == rhs.color;
 		}
 	}elements[static_cast<size_t>(Element::Mask)];
 
-	const auto& operator[](Element Which) const noexcept
+	constexpr const auto& operator[](Element which) const noexcept
 	{
-		return elements[static_cast<size_t>(Which)];
+		return elements[static_cast<size_t>(which)];
 	}
-	auto& operator[](Element Which) noexcept
+	constexpr auto& operator[](Element which) noexcept
 	{
-		return elements[static_cast<size_t>(Which)];
+		return elements[static_cast<size_t>(which)];
 	}
-	friend bool operator==(const ElementSet& lhs, const ElementSet& rhs) noexcept
+	friend constexpr bool operator==(const ElementSet& lhs, const ElementSet& rhs) noexcept
 	{
 		return lhs[Element::blank] == rhs[Element::blank] &&
 			lhs[Element::food] == rhs[Element::food] &&
@@ -229,51 +257,51 @@ ENUM_DEF(Theme, ElementSet)
 {
 	{
 		{{
-			{ L'□', Color::Blue },
-			{ L'★', Color::Red },
-			{ L'●', Color::LightYellow },
-			{ L'■', Color::Green }
+			{ Facade::Rect, Color::Blue },
+			{ Facade::FullStar, Color::Red },
+			{ Facade::FullCircle, Color::LightYellow },
+			{ Facade::FullRect, Color::Green }
 		}},
-		L"A"
+		L"A     "
 	},
 	{
 		{{
-			{ L'■', Color::Gray },
-			{ L'★', Color::Red },
-			{ L'●', Color::LightYellow },
-			{ L'■', Color::Aqua }
+			{ Facade::FullRect, Color::Gray },
+			{ Facade::FullStar, Color::Red },
+			{ Facade::FullCircle, Color::LightYellow },
+			{ Facade::FullRect, Color::Aqua }
 		}},
-		L"B"
+		L"B     "
 	},
 	{
 		{{
-			{ L'□', Color::Red },
-			{ L'◆', Color::LightGreen },
-			{ L'●', Color::LightBlue },
-			{ L'■', Color::LightRed }
+			{ Facade::Rect, Color::Red },
+			{ Facade::FullDiamond, Color::LightGreen },
+			{ Facade::FullCircle, Color::LightBlue },
+			{ Facade::FullRect, Color::LightRed }
 		}},
-		L"C"
+		L"C     "
 	},
 	{
 		{{
-			{ L'□', Color::LightBlue },
-			{ L'★', Color::LightYellow },
-			{ L'●', Color::LightPurple },
-			{ L'■', Color::LightWhite }
+			{ Facade::Rect, Color::LightBlue },
+			{ Facade::FullStar, Color::LightYellow },
+			{ Facade::FullCircle, Color::LightPurple },
+			{ Facade::FullRect, Color::LightWhite }
 		}},
-		L"D"
+		L"D     "
 	},
 	{
 		{{
-			{ L'○', Color::Gray },
-			{ L'★', Color::LightWhite },
-			{ L'●', Color::LightBlue },
-			{ L'◆', Color::Gray }
+			{ Facade::Circle, Color::Gray },
+			{ Facade::FullStar, Color::LightWhite },
+			{ Facade::FullCircle, Color::LightBlue },
+			{ Facade::FullDiamond, Color::Gray }
 		}},
-		L"E"
+		L"E     "
 	}
 };
-ENUM_CUSTOM(Theme, {}, L"");
+ENUM_CUSTOM(Theme, {}, L"Custom");//TODO
 ENUM_DEFAULT(Theme, A);
 
 

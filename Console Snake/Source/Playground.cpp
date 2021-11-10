@@ -45,10 +45,10 @@ void Playground::play()
 	}
 }
 
-void Playground::paintElement(Element Which) noexcept
+void Playground::paintElement(Element which) noexcept
 {
-	canvas.setColor(GameSetting::get().theme.Value()[Which].color);
-	print(GameSetting::get().theme.Value()[Which].facade);
+	canvas.setColor(GameSetting::get().theme.Value()[which].color);
+	print(GameSetting::get().theme.Value()[which].facade);
 }
 
 size_t Playground::getSnakeBodySize() noexcept

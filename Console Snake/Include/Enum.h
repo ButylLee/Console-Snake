@@ -108,7 +108,15 @@ public:
 	}
 	constexpr std::add_const_t<NameType> Name() const noexcept
 	{
-		return cur_val == CustomTag::Custom ? enum_custom.second : enum_list[cur_val].second;
+		// back to default value when clearCustomValue() called and happens to be custom value
+		if (cur_val == CustomTag::Custom)
+		{
+			if (enum_custom.first)
+				return enum_custom.second;
+			else
+				defaultValue();
+		}
+		return enum_list[cur_val].second;
 	}
 	constexpr value_type Value() const noexcept
 	{
@@ -119,9 +127,10 @@ public:
 		// back to default value when clearCustomValue() called and happens to be custom value
 		if (cur_val == CustomTag::Custom)
 		{
-			if (!enum_custom.first)
+			if (enum_custom.first)
+				return *enum_custom.first;
+			else
 				defaultValue();
-			return *enum_custom.first;
 		}
 		return enum_list[cur_val].first;
 	}
@@ -139,6 +148,8 @@ public:
 		cur_val = CustomTag::Custom;
 		return val;
 	}
+
+public:
 	constexpr static std::add_const_t<NameType> getNameFrom(value_type val) noexcept
 	{
 		for (size_t i = 0; i < enum_list.size(); i++)
@@ -148,13 +159,27 @@ public:
 		}
 		return enum_custom.second;
 	}
+	constexpr static std::add_const_t<value_type> getValue(const Enum& tag_or_var) noexcept
+	{
+		return tag_or_var;
+	}
 	constexpr static void setCustomValue(value_type custom)
 	{
 		enum_custom.first = std::move(custom);
 	}
+	constexpr static std::optional<value_type> getCustomValue() noexcept
+	{
+		return enum_custom.first;
+	}
 	constexpr static void clearCustomValue() noexcept
 	{
 		enum_custom.first = std::nullopt;
+	}
+
+public:
+	friend constexpr bool operator==(const Enum& lhs, const Enum& rhs) noexcept
+	{
+		return lhs.cur_val == rhs.cur_val;
 	}
 
 private:
