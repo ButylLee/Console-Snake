@@ -137,9 +137,9 @@ void AboutPage::run()
 }
 
 /***************************************
- Base class MainPage
+ Base class NormalPage
 ****************************************/
-void MainPage::paintTitle(ShowVersion show_version)
+void NormalPage::paintTitle(ShowVersion show_version)
 {
 	canvas.setColor(Color::LightBlue);
 	print(game_title);

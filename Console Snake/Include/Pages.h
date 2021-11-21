@@ -28,7 +28,7 @@ public:
 	void run() override;
 };
 
-class MainPage :public Page
+class NormalPage :public Page
 {
 public:
 	void run() override = 0;
@@ -44,7 +44,7 @@ protected:
 	Canvas canvas;
 };
 
-class MenuPage :public MainPage
+class MenuPage :public NormalPage
 {
 public:
 	void run() override;
@@ -53,7 +53,7 @@ private:
 	void paintInterface();
 };
 
-class SettingPage :public MainPage
+class SettingPage :public NormalPage
 {
 public:
 	void run() override;
@@ -65,7 +65,7 @@ private:
 	std::optional<ElementSet> custom_theme_backup = GameSetting::get().theme.getCustomValue();
 };
 
-class CustomThemePage :public MainPage
+class CustomThemePage :public NormalPage
 {
 public:
 	CustomThemePage() noexcept;
@@ -77,7 +77,7 @@ private:
 	ElementSet theme_temp;
 };
 
-class BeginPage :public MainPage
+class BeginPage :public NormalPage
 {
 public:
 	void run() override;
@@ -87,7 +87,7 @@ private:
 	static bool is_press;
 };
 
-class RankPage :public MainPage
+class RankPage :public NormalPage
 {
 public:
 	void run() override;
