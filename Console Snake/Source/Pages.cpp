@@ -14,6 +14,7 @@
 #include <mutex>
 #include <condition_variable>
 #include <atomic>
+#include "AtomicOperation.h"
 #include <chrono>
 #include <memory>
 #include <string>
@@ -50,47 +51,59 @@ void GamePage::run()
 			cond_ready.wait(lk, [] { return true; }); // wait for playground initializing
 			while (true)
 			{
-				if (input_key != Direction::None)
+				if (loadAtomic(input_key) != Direction::None)
 					continue;
 				switch (getwch())
 				{
 					case K_UP: case K_W: case K_w:
-						if (game_status == GameStatus::Running && snake_direct != Direction::Down)
-							input_key = Direction::Up;
+						if (loadAtomic(game_status) == GameStatus::Running &&
+							loadAtomic(snake_direct) != Direction::Down)
+						{
+							storeAtomic(input_key, Direction::Up);
+						}
 						break;
 
 					case K_DOWN: case K_S: case K_s:
-						if (game_status == GameStatus::Running && snake_direct != Direction::Up)
-							input_key = Direction::Down;
+						if (loadAtomic(game_status) == GameStatus::Running &&
+							loadAtomic(snake_direct) != Direction::Up)
+						{
+							storeAtomic(input_key, Direction::Down);
+						}
 						break;
 
 					case K_LEFT: case K_A: case K_a:
-						if (game_status == GameStatus::Running && snake_direct != Direction::Right)
-							input_key = Direction::Left;
+						if (loadAtomic(game_status) == GameStatus::Running &&
+							loadAtomic(snake_direct) != Direction::Right)
+						{
+							storeAtomic(input_key, Direction::Left);
+						}
 						break;
 
 					case K_RIGHT: case K_D: case K_d:
-						if (game_status == GameStatus::Running && snake_direct != Direction::Left)
-							input_key = Direction::Right;
+						if (loadAtomic(game_status) == GameStatus::Running &&
+							loadAtomic(snake_direct) != Direction::Left)
+						{
+							storeAtomic(input_key, Direction::Right);
+						}
 						break;
 
 					case K_Space:
-						if (game_status == GameStatus::Pausing)
+						if (loadAtomic(game_status) == GameStatus::Pausing)
 						{
-							game_status = GameStatus::Running;
+							storeAtomic(game_status, GameStatus::Running);
 							if (GameSetting::get().show_frame)
 								Console::get().setTitle(~token::title_gaming);
 						}
 						else
 						{
-							game_status = GameStatus::Pausing;
+							storeAtomic(game_status, GameStatus::Pausing);
 							if (GameSetting::get().show_frame)
 								Console::get().setTitle(~token::title_pausing);
 						}
 						break;
 
 					case K_Esc:
-						game_status = GameStatus::Ending;
+						storeAtomic(game_status, GameStatus::Ending);
 						return;
 				}
 			}

@@ -20,7 +20,7 @@ void Playground::play()
 	using namespace std::chrono_literals;
 	while (true)
 	{
-		switch (game_status)
+		switch (loadAtomic(game_status))
 		{
 			case GameStatus::Running:
 				updateFrame();
@@ -103,16 +103,16 @@ void Playground::createSnake()
 	if (bool use_x = getRandom(0, 1))
 	{
 		if (begin_head_x < x_range / 2)
-			snake_direct = Direction::Right;
+			storeAtomic(snake_direct, Direction::Right);
 		else
-			snake_direct = Direction::Left;
+			storeAtomic(snake_direct, Direction::Left);
 	}
 	else
 	{
 		if (begin_head_y < y_range / 2)
-			snake_direct = Direction::Down;
+			storeAtomic(snake_direct, Direction::Down);
 		else
-			snake_direct = Direction::Up;
+			storeAtomic(snake_direct, Direction::Up);
 	}
 
 	// place initial snake body
@@ -128,7 +128,7 @@ void Playground::createSnake()
 
 		if (i == snake_begin_length - 1)
 			break;
-		switch (snake_direct)
+		switch (loadAtomic(snake_direct))
 		{
 			case Direction::Up:
 				begin_head_y++; break;
@@ -191,9 +191,9 @@ void Playground::updateFrame()
 	// get new snake head position
 	auto [head_x, head_y] = snake_body[snake_head];
 	forwardIndex(snake_head);
-	if (input_key != Direction::None)
-		snake_direct = input_key.exchange(Direction::None);
-	switch (snake_direct)
+	if (loadAtomic(input_key) != Direction::None)
+		storeAtomic(snake_direct, exchangeAtomic(input_key, Direction::None));
+	switch (loadAtomic(snake_direct))
 	{
 		case Direction::Up:
 			head_y == 0 ? head_y = GameSetting::get().height - 1 : head_y--;

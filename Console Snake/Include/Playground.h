@@ -7,6 +7,7 @@
 #include "Singleton.h"
 #include "DynArray.h"
 #include <atomic>
+#include "AtomicOperation.h"
 #include <cstdint>
 
 enum struct Direction
@@ -48,7 +49,7 @@ public:
 		createSnake();
 		createFood();
 		GameData::get().score = 0;
-		game_status = GameStatus::Running;
+		storeAtomic(game_status, GameStatus::Running);
 	}
 
 public:
