@@ -110,7 +110,7 @@ catch (...)
 	throw;
 }
 
-// convert binary data to game data
+// convert fixed width binary data To game data
 void GameSavingBase::convertFromBinaryData() noexcept
 {
 	if (no_save_file)
@@ -151,7 +151,7 @@ void GameSavingBase::convertFromBinaryData() noexcept
 	}
 }
 
-// convert game data to binary data for saving to file
+// convert game data To fixed width binary data For saving
 void GameSavingBase::convertToBinaryData() noexcept
 {
 	// setting data
@@ -169,6 +169,7 @@ void GameSavingBase::convertToBinaryData() noexcept
 		bin_data.setting.show_frame = Convert{ gs.show_frame };
 	}
 	// rank data
+	Rank::get().lock();
 	for (int i = 0; i < Rank::rank_count; i++)
 	{
 		auto& save_item = bin_data.rank_list[i];
@@ -180,6 +181,7 @@ void GameSavingBase::convertToBinaryData() noexcept
 		save_item.is_win = Convert{ rank_item.is_win };
 		std::copy_n(rank_item.name.c_str(), Rank::name_max_length, save_item.name);
 	}
+	Rank::get().unlock();
 }
 
 // write save file from memory
@@ -187,9 +189,8 @@ void GameSavingBase::save()
 {
 	if (done.valid()) // wait for last time saving
 		done.get();
-	Rank::get().lock();
+
 	convertToBinaryData();
-	Rank::get().unlock();
 
 	done = std::async(std::launch::async,
 					  [this]() noexcept

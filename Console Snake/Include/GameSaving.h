@@ -8,6 +8,15 @@
 #include <cstdint>
 #include <future>
 
+/*--------------------------------------------------
+  GameSaving object: saving and loading save file
+
+  The data flow:
+	  Game Data Structure ->   Fixed Width Data
+									  v
+		 Save File Data   <- Encrypted Binary Data
+--------------------------------------------------*/
+
 class GameSavingBase
 {
 	struct alignas(8) SettingSavingItem

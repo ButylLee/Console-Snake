@@ -10,6 +10,7 @@
 #include <future>
 #include <atomic>
 #include <algorithm>
+#include <cassert>
 
 class RankBase
 {
@@ -62,9 +63,10 @@ public:
 																	return lhs.name == rank_table.back().name;
 																});
 							  auto end = rank_table.end();
+							  assert(previous_user != end);
+							  // find and store previous named gamer's best score
 							  if (previous_user != rank_table.cend() - 1 && !rank_table.back().name.empty())
 							  {
-								  // only store named gamer's best score
 								  if (rank_table.back().score >= previous_user->score)
 									  *previous_user = std::move(rank_table.back());
 								  --end;
