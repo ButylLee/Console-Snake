@@ -46,6 +46,10 @@ protected:
 		print_err(~token::message_init_console_fail);
 		throw;
 	}
+	catch (const Exception&) {
+		print_err(~token::message_init_console_fail);
+		throw;
+	}
 
 public:
 	void setTitle(std::wstring new_title)
@@ -138,7 +142,7 @@ private:
 	{
 		HWND hwnd = GetConsoleWindow();
 		if (hwnd == NULL)
-			throw NativeError(~token::GetConsoleWindow_failed_message);
+			throw Exception(~token::GetConsoleWindow_failed_message);
 		return hwnd;
 	}
 

@@ -4,10 +4,10 @@
 
 #include "wideIO.h"
 #include "Resource.h"
-#include <new>
 #include <string_view>
 #include <stdexcept>
 #include <cstdlib>
+#include <string>
 #include "WinMacro.h"
 #include <Windows.h>
 
@@ -16,30 +16,26 @@ class NativeError
 {
 	using code_type = decltype(GetLastError());
 public:
-	explicit NativeError(DWORD error_code) :code(error_code)
+	explicit NativeError(DWORD error_code) noexcept
+		:code(error_code)
 	{
 		if (!format())
-			throw NativeError(GetLastError());
+		{
+			buffer = L"Format Error Message Failed.";
+			code = code_type{};
+		}
 	}
-	explicit NativeError(const wchar_t* message) noexcept
-		:buffer(message)
-	{}
-	NativeError(std::wstring_view message) noexcept
-		:buffer(message.data())
-	{}
 	~NativeError() noexcept
 	{
-		LocalFree(const_cast<WCHAR*>(buffer));
+		if (code != code_type{})
+			LocalFree((HLOCAL)buffer);
 		buffer = nullptr;
 	}
 	NativeError(const NativeError& other) :NativeError(other.code) {}
 	NativeError& operator=(const NativeError& other)
 	{
-		if (this == &other)
-		{
-			return *this;
-		}
-		rebuild(other.code);
+		if (this != &other)
+			rebuild(other.code);
 		return *this;
 	}
 public:
@@ -48,7 +44,7 @@ public:
 		return buffer;
 	}
 private:
-	bool format() const noexcept
+	bool format() noexcept
 	{
 		return static_cast<bool>(
 			FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER |
@@ -62,14 +58,30 @@ private:
 						   NULL)
 			);
 	}
-	void rebuild(code_type error_code)
+	void rebuild(code_type error_code) noexcept
 	{
 		this->~NativeError();
 		(void)new(this) NativeError(error_code);
 	}
 private:
 	code_type code = {};
-	const WCHAR* buffer = nullptr; // mutable in FormatMessageW call
+	const wchar_t* buffer = nullptr;
+};
+
+class Exception
+{
+public:
+	explicit Exception(std::wstring message)
+		:buffer(std::move(message))
+	{}
+
+	[[nodiscard]] const std::wstring& what() const noexcept
+	{
+		return buffer;
+	}
+
+private:
+	std::wstring buffer;
 };
 
 template<typename T>
@@ -82,6 +94,9 @@ inline T* NewWithHandler() noexcept
 		print_err(~token::message_std_bad_alloc);
 	}
 	catch (const NativeError& error) {
+		print_err(error.what());
+	}
+	catch (const Exception& error) {
 		print_err(error.what());
 	}
 	catch (const std::exception& error) {

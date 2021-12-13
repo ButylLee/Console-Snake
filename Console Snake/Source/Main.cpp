@@ -88,6 +88,10 @@ int main(int argc, char* argv[])
 		print_err(error.what());
 		GameSaving::get().save();
 	}
+	catch (const Exception& error) {
+		print_err(error.what());
+		GameSaving::get().save();
+	}
 	catch (const std::exception& error)
 	{
 		print_err(error.what());
