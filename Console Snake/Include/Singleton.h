@@ -17,9 +17,7 @@ public:
 	Singleton& operator=(const Singleton&) = delete;
 private:
 	Singleton() = default;
-	static std::unique_ptr<Singleton> instance;
+	inline static std::unique_ptr<Singleton> instance{ NewWithHandler<Singleton>() };
 };
-template<typename Base>
-inline std::unique_ptr<Singleton<Base>> Singleton<Base>::instance{ NewWithHandler<Singleton<Base>>() };
 
 #endif // SNAKE_SINGLETON_HEADER_
