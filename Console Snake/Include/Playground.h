@@ -4,7 +4,6 @@
 
 #include "Canvas.h"
 #include "DataSet.h"
-#include "Singleton.h"
 #include "DynArray.h"
 #include <atomic>
 #include "AtomicOperation.h"
