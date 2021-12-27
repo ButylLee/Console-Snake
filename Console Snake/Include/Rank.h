@@ -8,7 +8,8 @@
 #include <vector>
 #include <string>
 #include <future>
-#include <atomic>
+#include <mutex>
+#include <shared_mutex>
 #include <algorithm>
 #include <cassert>
 
@@ -41,82 +42,60 @@ public:
 	{
 		if (done.valid()) // wait for last time sorting
 			done.get();
-		this->lock();
 
-		rank_table.push_back(
-			{
-				std::move(new_name),
-				new_score,
-				GameSetting::get().speed.Value(),
-				GameSetting::get().width,
-				GameSetting::get().height,
-				winning
-			}
-		);
+		RankItem new_one = {
+			std::move(new_name),
+			new_score,
+			GameSetting::get().speed.Value(),
+			GameSetting::get().width,
+			GameSetting::get().height,
+			winning
+		};
 
 		done = std::async(std::launch::async,
-						  [this]
+						  [this, new_one = std::move(new_one)]
 						  {
-							  auto previous_user = std::find_if(rank_table.begin(), rank_table.end(),
-																[this](const RankItem& lhs) noexcept
+							  auto [rank, lock] = this->modifyRank();
+							  rank.push_back(new_one);
+
+							  auto previous_user = std::find_if(rank.begin(), rank.end(),
+																[&](const RankItem& lhs) noexcept
 																{
-																	return lhs.name == rank_table.back().name;
+																	return lhs.name == rank.back().name;
 																});
-							  auto end = rank_table.end();
+							  auto end = rank.end();
 							  assert(previous_user != end);
 							  // find and store previous named gamer's best score
-							  if (previous_user != rank_table.cend() - 1 && !rank_table.back().name.empty())
+							  if (previous_user != rank.cend() - 1 && !rank.back().name.empty())
 							  {
-								  if (rank_table.back().score >= previous_user->score)
-									  *previous_user = std::move(rank_table.back());
+								  if (rank.back().score >= previous_user->score)
+									  *previous_user = std::move(rank.back());
 								  --end;
 							  }
-							  std::stable_sort(rank_table.begin(), end,
+							  std::stable_sort(rank.begin(), end,
 											   [](const RankItem& lhs, const RankItem& rhs) noexcept
 											   {
 												   return lhs.score > rhs.score;
 											   });
-							  rank_table.pop_back();
-							  this->unlock();
+							  rank.pop_back();
 						  });
 	}
 
-	void lock() noexcept
+	std::pair<const std::vector<RankItem>&, std::shared_lock<std::shared_mutex>>
+	getRank() const noexcept
 	{
-		while (rank_lock == true);
-		rank_lock = true;
+		return { rank_table, std::shared_lock{ rank_mutex } };
 	}
 
-	void unlock() noexcept
+	std::pair<std::vector<RankItem>&, std::unique_lock<std::shared_mutex>>
+	modifyRank() noexcept
 	{
-		rank_lock = false;
-	}
-
-	bool finished() const noexcept
-	{
-		return !rank_lock;
-	}
-
-	const auto& getRank() const noexcept
-	{
-		while (!finished());
-		return rank_table;
-	}
-
-	auto& getRank() noexcept
-	{
-		while (!finished());
-		return rank_table;
-	}
-
-	auto& getRank_NoLock() noexcept
-	{
-		return rank_table;
+		return{ rank_table, std::unique_lock{ rank_mutex } };
 	}
 
 	void clearRank() noexcept
 	{
-		while (!finished());
+		std::unique_lock lock(rank_mutex);
 		rank_table.clear();
 		rank_table = std::vector<RankItem>{ rank_count };
 	}
@@ -124,7 +103,7 @@ public:
 private:
 	std::vector<RankItem> rank_table{ rank_count };
 	std::future<void> done;
-	std::atomic<bool> rank_lock = false;
+	mutable std::shared_mutex rank_mutex;
 };
 
 using Rank = Singleton<RankBase>;

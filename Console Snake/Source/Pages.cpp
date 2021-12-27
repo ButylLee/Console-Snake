@@ -597,7 +597,7 @@ void RankPage::paintInterface()
 	baseY = baseY / 2 + 1;
 	canvas.setColor(Color::LightYellow);
 
-	if (Rank::get().getRank()[0].score == 0)
+	if (auto [rank, lock] = Rank::get().getRank(); rank[0].score == 0)
 	{
 		canvas.setCenteredCursor(~token::rank_no_data, baseY);
 		print(~token::rank_no_data);
@@ -606,7 +606,7 @@ void RankPage::paintInterface()
 	{
 		int number = 0;
 		std::wstring buffer, name, score, speed;
-		for (const auto& item : Rank::get().getRank())
+		for (const auto& item : rank)
 		{
 			if (item.score == 0)
 				break;

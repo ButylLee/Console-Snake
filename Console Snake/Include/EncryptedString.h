@@ -89,6 +89,10 @@ inline std::wstring operator""_crypt(const wchar_t* str, size_t len) noexcept
 {
 	return EncryptedString<wchar_t>(str, len);
 }
+inline std::u8string operator""_crypt(const char8_t* str, size_t len) noexcept
+{
+	return EncryptedString<char8_t>(str, len);
+}
 inline std::u16string operator""_crypt(const char16_t* str, size_t len) noexcept
 {
 	return EncryptedString<char16_t>(str, len);
@@ -103,6 +107,10 @@ inline std::string operator""_crypt(const char* str, size_t len) noexcept
 	return str;
 }
 inline std::wstring operator""_crypt(const wchar_t* str, size_t len) noexcept
+{
+	return str;
+}
+inline std::u8string operator""_crypt(const char8_t* str, size_t len) noexcept
 {
 	return str;
 }

@@ -134,10 +134,11 @@ void GameSavingBase::convertFromBinaryData() noexcept
 	}
 	// rank data
 	wchar_t buffer[Rank::name_max_length + 1] = {};
+	auto [rank, lock] = Rank::get().modifyRank();
 	for (int i = 0; i < Rank::rank_count; i++)
 	{
 		auto& save_item = bin_data.rank_list[i];
-		auto& rank_item = Rank::get().getRank()[i];
+		auto& rank_item = rank[i];
 		rank_item.score = Convert{ save_item.score };
 		rank_item.width = Convert{ save_item.width };
 		rank_item.height = Convert{ save_item.height };
@@ -169,11 +170,11 @@ void GameSavingBase::convertToBinaryData() noexcept
 		bin_data.setting.show_frame = Convert{ gs.show_frame };
 	}
 	// rank data
-	Rank::get().lock();
+	auto [rank, lock] = Rank::get().getRank();
 	for (int i = 0; i < Rank::rank_count; i++)
 	{
 		auto& save_item = bin_data.rank_list[i];
-		auto& rank_item = Rank::get().getRank_NoLock()[i];
+		auto& rank_item = rank[i];
 		save_item.score = Convert{ rank_item.score };
 		save_item.width = Convert{ rank_item.width };
 		save_item.height = Convert{ rank_item.height };
@@ -181,7 +182,6 @@ void GameSavingBase::convertToBinaryData() noexcept
 		save_item.is_win = Convert{ rank_item.is_win };
 		std::copy_n(rank_item.name.c_str(), Rank::name_max_length, save_item.name);
 	}
-	Rank::get().unlock();
 }
 
 // write save file from memory
