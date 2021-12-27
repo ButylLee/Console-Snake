@@ -90,7 +90,7 @@ public:
 	std::pair<std::vector<RankItem>&, std::unique_lock<std::shared_mutex>>
 	modifyRank() noexcept
 	{
-		return{ rank_table, std::unique_lock{ rank_mutex } };
+		return { rank_table, std::unique_lock{ rank_mutex } };
 	}
 
 	void clearRank() noexcept
