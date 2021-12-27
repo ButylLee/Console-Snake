@@ -102,7 +102,7 @@ public:
 
 private:
 	std::vector<RankItem> rank_table{ rank_count };
-	std::future<void> done;
+	mutable std::future<void> done;
 	mutable std::shared_mutex rank_mutex;
 };
 
