@@ -78,7 +78,7 @@ private:
 	// The invariant of this class is that ALL map nodes except barrier
 	// and snake_body nodes should have one-to-one correspondence.
 	DynArray<MapNode, 2> map;
-	DynArray<SnakeNode, 1> snake_body;
+	DynArray<SnakeNode> snake_body;
 	int16_t snake_head;
 	int16_t snake_tail;
 
