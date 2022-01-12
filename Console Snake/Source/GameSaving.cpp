@@ -161,7 +161,7 @@ void GameSavingBase::convertToBinaryData() noexcept
 
 		auto theme_temp = gs.theme.Value();
 		static_assert(sizeof theme_temp == sizeof bin_data.setting.theme, "abnormal struct align.");
-		std::memcpy(&bin_data.setting.theme, &theme_temp, sizeof theme_temp);
+		std::memcpy(&bin_data.setting.theme, &theme_temp, sizeof bin_data.setting.theme);
 
 		bin_data.setting.speed = Convert{ gs.speed.Value() };
 		bin_data.setting.width = Convert{ gs.width.Value() };

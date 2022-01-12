@@ -120,7 +120,7 @@ public:
 	}
 	constexpr value_type Value() const noexcept
 	{
-		return static_cast<value_type>(*this);
+		return static_cast<value_type>(*this); // invoke operator value_type
 	}
 	constexpr operator value_type() const noexcept
 	{
