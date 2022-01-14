@@ -228,14 +228,14 @@ void SettingPage::run()
 		{
 			case K_1:
 			{
-				GameSetting::get().speed.nextValue();
+				GameSetting::get().speed.setNextValue();
 			}
 			break;
 
 			case K_2:
 			{
-				GameSetting::get().width.nextValue();
-				GameSetting::get().height.nextValue();
+				GameSetting::get().width.setNextValue();
+				GameSetting::get().height.setNextValue();
 			}
 			break;
 
@@ -247,7 +247,7 @@ void SettingPage::run()
 
 			case K_4:
 			{
-				GameSetting::get().theme.nextValue();
+				GameSetting::get().theme.setNextValue();
 			}
 			break;
 
@@ -264,7 +264,7 @@ void SettingPage::run()
 			case K_5:
 			{
 				LocalizedStrings::setLang(
-					GameSetting::get().lang.nextValue()
+					GameSetting::get().lang.setNextValue()
 				);
 				Console::get().setTitle(~token::console_title);
 				canvas.clear();
@@ -372,29 +372,29 @@ void CustomThemePage::run()
 		switch (getwch())
 		{
 			case K_Q: case K_q:
-				theme_temp[Element::blank].facade.nextValue();
+				theme_temp[Element::blank].facade.setNextValue();
 				break;
 			case K_W: case K_w:
-				theme_temp[Element::food].facade.nextValue();
+				theme_temp[Element::food].facade.setNextValue();
 				break;
 			case K_E: case K_e:
-				theme_temp[Element::snake].facade.nextValue();
+				theme_temp[Element::snake].facade.setNextValue();
 				break;
 			case K_R: case K_r:
-				theme_temp[Element::barrier].facade.nextValue();
+				theme_temp[Element::barrier].facade.setNextValue();
 				break;
 
 			case K_A: case K_a:
-				theme_temp[Element::blank].color.nextValue();
+				theme_temp[Element::blank].color.setNextValue();
 				break;
 			case K_S: case K_s:
-				theme_temp[Element::food].color.nextValue();
+				theme_temp[Element::food].color.setNextValue();
 				break;
 			case K_D: case K_d:
-				theme_temp[Element::snake].color.nextValue();
+				theme_temp[Element::snake].color.setNextValue();
 				break;
 			case K_F: case K_f:
-				theme_temp[Element::barrier].color.nextValue();
+				theme_temp[Element::barrier].color.setNextValue();
 				break;
 
 			case K_Ctrl_Dd:
@@ -405,6 +405,7 @@ void CustomThemePage::run()
 			case K_Enter:
 			case K_Esc:
 				GameSetting::get().theme.setCustomValue(theme_temp);
+				GameSetting::get().theme = Theme::Custom;
 				GameData::get().seletion = PageSel::SettingPage;
 				return;
 		}
@@ -542,7 +543,7 @@ void BeginPage::paintInterface()
 					if (is_press)
 						return;
 					canvas.setCursor(0, 0);
-					canvas.setColor(color.nextValue());
+					canvas.setColor(color.setNextValue());
 					print(game_title);
 					print(~token::game_version);
 					std::this_thread::sleep_for(100ms);

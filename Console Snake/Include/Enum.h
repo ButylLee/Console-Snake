@@ -35,8 +35,8 @@
  *
  * To use a Enum:
  *     Size s = Size::L;
- *     s.nextValue();
- *     s.defaultValue();
+ *     s.setNextValue();
+ *     s.setDefaultValue();
  *     s::setCustomValue(50);
  *     s = Size::CustomValue;
  */
@@ -81,12 +81,12 @@ public:
 	}
 
 public:
-	constexpr const Enum& nextValue() noexcept
+	constexpr const Enum& setNextValue() noexcept
 	{
 		// back to default value when clearCustomValue() called and happens to be custom value
 		if (cur_val == CustomTag::Custom && !enum_custom.first)
 		{
-			defaultValue();
+			setDefaultValue();
 		}
 		else if (cur_val == enum_list.size() - 1)
 		{
@@ -101,7 +101,7 @@ public:
 		}
 		return *this;
 	}
-	constexpr const Enum& defaultValue() const noexcept
+	constexpr const Enum& setDefaultValue() const noexcept
 	{
 		cur_val = default_shift;
 		return *this;
@@ -114,7 +114,7 @@ public:
 			if (enum_custom.first)
 				return enum_custom.second;
 			else
-				defaultValue();
+				setDefaultValue();
 		}
 		return enum_list[cur_val].second;
 	}
@@ -130,7 +130,7 @@ public:
 			if (enum_custom.first)
 				return *enum_custom.first;
 			else
-				defaultValue();
+				setDefaultValue();
 		}
 		return enum_list[cur_val].first;
 	}
@@ -159,7 +159,7 @@ public:
 		}
 		return enum_custom.second;
 	}
-	constexpr static std::add_const_t<value_type> getValue(const Enum& tag_or_var) noexcept
+	constexpr static std::add_const_t<value_type> getValueFrom(const Enum& tag_or_var) noexcept
 	{
 		return tag_or_var;
 	}

@@ -6,6 +6,7 @@
 #include <fstream>
 #include <filesystem>
 #include <stdexcept>
+#include <type_traits>
 #include <cryptopp/cryptlib.h>
 #include <cryptopp/aes.h>
 #include <cryptopp/modes.h>
@@ -120,8 +121,12 @@ void GameSavingBase::convertFromBinaryData() noexcept
 		auto& gs = GameSetting::get();
 
 		decltype(gs.theme.Value()) theme_temp;
-		static_assert(sizeof theme_temp == sizeof bin_data.setting.theme, "abnormal struct align.");
-		std::memcpy(&theme_temp, &bin_data.setting.theme, sizeof theme_temp);
+		auto& elements = theme_temp.elements;
+		for (int i = 0; i < std::extent_v<decltype(theme_temp.elements)>; i++)
+		{
+			elements[i].facade.convertFrom(bin_data.setting.theme[i][0]);
+			elements[i].color.convertFrom(bin_data.setting.theme[i][1]);
+		}
 		gs.theme.convertFrom(theme_temp);
 
 		gs.speed.convertFrom(bin_data.setting.speed);
@@ -160,8 +165,12 @@ void GameSavingBase::convertToBinaryData() noexcept
 		auto& gs = GameSetting::get();
 
 		auto theme_temp = gs.theme.Value();
-		static_assert(sizeof theme_temp == sizeof bin_data.setting.theme, "abnormal struct align.");
-		std::memcpy(&bin_data.setting.theme, &theme_temp, sizeof bin_data.setting.theme);
+		auto& elements = theme_temp.elements;
+		for (int i = 0; i < std::extent_v<decltype(theme_temp.elements)>; i++)
+		{
+			bin_data.setting.theme[i][0] = Convert{ elements[i].facade };
+			bin_data.setting.theme[i][1] = Convert{ elements[i].color };
+		}
 
 		bin_data.setting.speed = Convert{ gs.speed.Value() };
 		bin_data.setting.width = Convert{ gs.width.Value() };

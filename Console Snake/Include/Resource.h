@@ -8,7 +8,7 @@
 #include "WinMacro.h"
 #include <Windows.h>
 
-#define GAME_VERSION "2.05"
+#define GAME_VERSION "2.07"
 inline const auto save_file_name = "SnakeSaved.bin"_crypt;
 inline constexpr const unsigned char crypto_key[] = {
 	0x54, 0xDE, 0x3B, 0xF2, 0xD8, 0x5D, 0x4E, 0x04,
@@ -226,10 +226,8 @@ struct ElementSet
 		Facade facade;
 		Color color;
 
-		friend constexpr bool operator==(const Appearance& lhs, const Appearance& rhs) noexcept
-		{
-			return lhs.facade == rhs.facade && lhs.color == rhs.color;
-		}
+		friend constexpr bool
+			operator==(const Appearance&, const Appearance&) noexcept = default;
 	}elements[static_cast<size_t>(Element::Mask)];
 
 	constexpr const auto& operator[](Element which) const noexcept
@@ -240,13 +238,8 @@ struct ElementSet
 	{
 		return elements[static_cast<size_t>(which)];
 	}
-	friend constexpr bool operator==(const ElementSet& lhs, const ElementSet& rhs) noexcept
-	{
-		return lhs[Element::blank] == rhs[Element::blank] &&
-			lhs[Element::food] == rhs[Element::food] &&
-			lhs[Element::snake] == rhs[Element::snake] &&
-			lhs[Element::barrier] == rhs[Element::barrier];
-	}
+	friend constexpr bool
+		operator==(const ElementSet&, const ElementSet&) noexcept = default;
 };
 
 ENUM_DECL(Theme)

@@ -21,14 +21,14 @@ class GameSavingBase
 {
 	struct alignas(8) SettingSavingItem
 	{
-		int64_t theme[static_cast<size_t>(Element::Mask)] = {};
+		int16_t theme[static_cast<size_t>(Element::Mask)][2] = {};
 		int16_t speed = 0;
 		int16_t width = 0;
 		int16_t height = 0;
 		int8_t lang = 0;
 		int8_t show_frame = 0;
 	};
-	static_assert(sizeof(SettingSavingItem) == 8 + 8 * (size_t)Element::Mask, "sizeof SettingSavingItem is incorrect.");
+	static_assert(sizeof(SettingSavingItem) == 8 + 4 * (size_t)Element::Mask, "sizeof SettingSavingItem is incorrect.");
 
 	struct alignas(8) RankSavingItem
 	{
