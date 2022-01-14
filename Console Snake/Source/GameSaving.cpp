@@ -172,10 +172,10 @@ void GameSavingBase::convertToBinaryData() noexcept
 			bin_data.setting.theme[i][1] = Convert{ elements[i].color };
 		}
 
-		bin_data.setting.speed = Convert{ gs.speed.Value() };
-		bin_data.setting.width = Convert{ gs.width.Value() };
-		bin_data.setting.height = Convert{ gs.height.Value() };
-		bin_data.setting.lang = Convert{ gs.lang.Value() };
+		bin_data.setting.speed = Convert{ gs.speed };
+		bin_data.setting.width = Convert{ gs.width };
+		bin_data.setting.height = Convert{ gs.height };
+		bin_data.setting.lang = Convert{ gs.lang };
 		bin_data.setting.show_frame = Convert{ gs.show_frame };
 	}
 	// rank data
