@@ -1,3 +1,11 @@
+# Console Snake
+
+Classic game **Snake** implemented in Windows Console using modern C++, including features such as ranking, game-saving, theme-customizing.
+
+The game support 4 languages: **English**, **Simplified Chinese**, **Traditional Chinese** and **Japanese**.
+
+This project is developed for my C++ learning:blush:.
+
 # Build The Game
 
 This Project could only be built on Windows, requires Visual Studio(2019 or later).
@@ -13,3 +21,5 @@ To build the Project, Clone this repo to local. Then clone [Cryptopp](https://gi
 - -**awesome**: force enable colorful title.
 
 - -**size [width]x[height]**: set user defined game size.
+
+btw: press 'A' or 'F1' in menu to show the *About* page.
