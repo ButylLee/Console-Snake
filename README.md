@@ -21,3 +21,5 @@ To build the Project, Clone this repo to local. Then clone [Cryptopp](https://gi
 - -**awesome**: force enable colorful title.
 
 - -**size [width]x[height]**: set user defined game size.
+
+btw: press 'A' or 'F1' in menu to show the *About* page.
