@@ -1,7 +1,8 @@
 # Console Snake
 
 Classic game **Snake** implemented in Windows Console using modern C++, including features such as ranking, game-saving, theme-customizing.
-The game support 4 languages: English, Simplified Chinese, Traditional Chinese and Japanese.
+
+The game support 4 languages: **English**, **Simplified Chinese**, **Traditional Chinese** and **Japanese**.
 
 This project is developed for my C++ learning:blush:.
 
