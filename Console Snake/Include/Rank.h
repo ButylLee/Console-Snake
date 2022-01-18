@@ -28,13 +28,14 @@ public:
 	static constexpr auto name_max_length = 12;
 
 protected:
-	RankBase() try
+	RankBase() noexcept
 	{
-		rank_table.reserve(rank_count + 1);
-	}
-	catch (...)
-	{
-		// Strong exception guarantee of vector.reserve
+		try {
+			rank_table.reserve(rank_count + 1);
+		}
+		catch (...) {
+			// Strong exception guarantee of vector.reserve
+		}
 	}
 
 public:
@@ -82,18 +83,18 @@ public:
 	}
 
 	std::pair<const std::vector<RankItem>&, std::shared_lock<std::shared_mutex>>
-	getRank() const noexcept
+	getRank() const
 	{
 		return { rank_table, std::shared_lock{ rank_mutex } };
 	}
 
 	std::pair<std::vector<RankItem>&, std::unique_lock<std::shared_mutex>>
-	modifyRank() noexcept
+	modifyRank()
 	{
 		return { rank_table, std::unique_lock{ rank_mutex } };
 	}
 
-	void clearRank() noexcept
+	void clearRank()
 	{
 		std::unique_lock lock(rank_mutex);
 		rank_table.clear();

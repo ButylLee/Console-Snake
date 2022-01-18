@@ -31,8 +31,8 @@ public:
 			LocalFree((HLOCAL)buffer);
 		buffer = nullptr;
 	}
-	NativeError(const NativeError& other) :NativeError(other.code) {}
-	NativeError& operator=(const NativeError& other)
+	NativeError(const NativeError& other) noexcept :NativeError(other.code) {}
+	NativeError& operator=(const NativeError& other) noexcept
 	{
 		if (this != &other)
 			rebuild(other.code);
@@ -71,7 +71,7 @@ private:
 class Exception
 {
 public:
-	explicit Exception(std::wstring message)
+	explicit Exception(std::wstring message) noexcept
 		:buffer(std::move(message))
 	{}
 
