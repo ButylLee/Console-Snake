@@ -8,7 +8,7 @@
 #include "WinMacro.h"
 #include <Windows.h>
 
-#define GAME_VERSION "2.07"
+#define GAME_VERSION "2.08"
 inline const auto save_file_name = "SnakeSaved.bin"_crypt;
 inline constexpr const unsigned char crypto_key[] = {
 	0x54, 0xDE, 0x3B, 0xF2, 0xD8, 0x5D, 0x4E, 0x04,
@@ -51,6 +51,11 @@ TOKEN_DEF(
 	setting_speed_normal,
 	setting_speed_slow,
 	setting_custom,
+	setting_theme_A,
+	setting_theme_B,
+	setting_theme_C,
+	setting_theme_D,
+	setting_theme_E,
 	setting_show_frame_yes,
 	setting_show_frame_no,
 	setting_reset_custom,
@@ -227,7 +232,7 @@ struct ElementSet
 		Color color;
 
 		friend constexpr bool
-			operator==(const Appearance&, const Appearance&) noexcept = default;
+		operator==(const Appearance&, const Appearance&) noexcept = default;
 	}elements[static_cast<size_t>(Element::Mask)];
 
 	constexpr const auto& operator[](Element which) const noexcept
@@ -239,14 +244,14 @@ struct ElementSet
 		return elements[static_cast<size_t>(which)];
 	}
 	friend constexpr bool
-		operator==(const ElementSet&, const ElementSet&) noexcept = default;
+	operator==(const ElementSet&, const ElementSet&) noexcept = default;
 };
 
 ENUM_DECL(Theme)
 {
 	A, B, C, D, E
 }
-ENUM_DEF(Theme, ElementSet)
+ENUM_DEF(Theme, ElementSet, token::StringName)
 {
 	{
 		{{
@@ -255,7 +260,7 @@ ENUM_DEF(Theme, ElementSet)
 			{ Facade::FullCircle, Color::LightYellow },
 			{ Facade::FullRect, Color::Green }
 		}},
-		L"A     "
+		token::setting_theme_A
 	},
 	{
 		{{
@@ -264,7 +269,7 @@ ENUM_DEF(Theme, ElementSet)
 			{ Facade::FullCircle, Color::LightYellow },
 			{ Facade::FullRect, Color::Aqua }
 		}},
-		L"B     "
+		token::setting_theme_B
 	},
 	{
 		{{
@@ -273,7 +278,7 @@ ENUM_DEF(Theme, ElementSet)
 			{ Facade::FullCircle, Color::LightBlue },
 			{ Facade::FullRect, Color::LightRed }
 		}},
-		L"C     "
+		token::setting_theme_C
 	},
 	{
 		{{
@@ -282,7 +287,7 @@ ENUM_DEF(Theme, ElementSet)
 			{ Facade::FullCircle, Color::LightPurple },
 			{ Facade::FullRect, Color::LightWhite }
 		}},
-		L"D     "
+		token::setting_theme_D
 	},
 	{
 		{{
@@ -291,10 +296,10 @@ ENUM_DEF(Theme, ElementSet)
 			{ Facade::FullCircle, Color::LightBlue },
 			{ Facade::FullDiamond, Color::Gray }
 		}},
-		L"E     "
+		token::setting_theme_E
 	}
 };
-ENUM_CUSTOM(Theme, {}, L"Custom");//TODO
+ENUM_CUSTOM(Theme, {}, token::setting_custom);
 ENUM_DEFAULT(Theme, A);
 
 

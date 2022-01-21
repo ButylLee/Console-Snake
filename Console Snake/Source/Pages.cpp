@@ -343,7 +343,7 @@ void SettingPage::paintCurOptions()
 		  : ~token::setting_show_frame_no);
 
 	canvas.setCursor(baseX, baseY + 6);
-	print(GameSetting::get().theme.Name());
+	print(~GameSetting::get().theme.Name());
 
 	canvas.setCursor(baseX, baseY + 8);
 	print(GameSetting::get().lang.Name());
