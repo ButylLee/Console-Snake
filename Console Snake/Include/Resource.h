@@ -8,7 +8,7 @@
 #include "WinMacro.h"
 #include <Windows.h>
 
-#define GAME_VERSION "2.08"
+#define GAME_VERSION "2.10"
 inline const auto save_file_name = "SnakeSaved.bin"_crypt;
 inline constexpr const unsigned char crypto_key[] = {
 	0x54, 0xDE, 0x3B, 0xF2, 0xD8, 0x5D, 0x4E, 0x04,
@@ -123,26 +123,30 @@ MAKE_LOCALIZED_STRS
 };
 
 // --------------- Enum Lang Resource ---------------
-ENUM_DECL(Lang)
-{
-	ENG, CHS, CHT, JPN
-}
-ENUM_DEF(Lang, Locale::Lang)
+struct LangInfo {
+	enum Tag {
+		ENG, CHS, CHT, JPN,
+		DefaultValue = ENG
+	};
+};
+using Lang = Enum<LangInfo, Locale::Lang>;
+ENUM_DEFINE(Lang)
 {
 	{ Locale::en_US, L"English"_crypt },
 	{ Locale::zh_CN, L"简体中文"_crypt },
 	{ Locale::zh_TW, L"繁體中文"_crypt },
 	{ Locale::ja_JP, L"日本語"_crypt }
 };
-ENUM_CUSTOM(Lang, {}, L"");
-ENUM_DEFAULT(Lang, ENG);
 
 // --------------- Enum Size Resource ---------------
-ENUM_DECL(Size)
-{
-	XS, S, M, L, XL
-}
-ENUM_DEF(Size, short)
+struct SizeInfo {
+	enum Tag {
+		XS, S, M, L, XL,
+		DefaultValue = S
+	};
+};
+using Size = CustomEnum<SizeInfo, short>;
+ENUM_DEFINE(Size)
 {
 	{ 13, L"(XS)"_crypt },
 	{ 17, L"(S) "_crypt },
@@ -150,36 +154,46 @@ ENUM_DEF(Size, short)
 	{ 24, L"(L) "_crypt },
 	{ 27, L"(XL)"_crypt }
 };
-ENUM_CUSTOM(Size, {}, L"(Custom)"_crypt);
-ENUM_DEFAULT(Size, S);
+ENUM_CUSTOM(Size)
+{ 
+	{}, L"(Custom)"_crypt
+};
 
 // --------------- Enum Speed Resource ---------------
-ENUM_DECL(Speed)
-{
-	FAST, NORMAL, SLOW
-}
-ENUM_DEF(Speed, short, token::StringName)
+struct SpeedInfo {
+	enum Tag {
+		FAST, NORMAL, SLOW,
+		DefaultValue = NORMAL
+	};
+};
+using Speed = CustomEnum<SpeedInfo, short, token::StringName>;
+ENUM_DEFINE(Speed)
 {
 	{ 8, token::setting_speed_fast },
 	{ 5, token::setting_speed_normal },
 	{ 1, token::setting_speed_slow }
 };
-ENUM_CUSTOM(Speed, {}, token::setting_custom);
-ENUM_DEFAULT(Speed, NORMAL);
+ENUM_CUSTOM(Speed)
+{
+	{}, token::setting_custom
+};
 
 // --------------- Enum Color Resource ---------------
-ENUM_DECL(Color)
-{
-	Black,  Gray,
-	Blue,   LightBlue,
-	Green,  LightGreen,
-	Aqua,   LightAqua,
-	Red,    LightRed,
-	Purple, LightPurple,
-	Yellow, LightYellow,
-	White , LightWhite
-}
-ENUM_DEF(Color, WORD)
+struct ColorInfo {
+	enum Tag {
+		Black,  Gray,
+		Blue,   LightBlue,
+		Green,  LightGreen,
+		Aqua,   LightAqua,
+		Red,    LightRed,
+		Purple, LightPurple,
+		Yellow, LightYellow,
+		White , LightWhite,
+		DefaultValue = White
+	};
+};
+using Color = Enum<ColorInfo, WORD>;
+ENUM_DEFINE(Color)
 {
 	{ 0x00, L"Black      " }, { 0x08, L"Gray       " },
 	{ 0x01, L"Blue       " }, { 0x09, L"LightBlue  " },
@@ -190,16 +204,17 @@ ENUM_DEF(Color, WORD)
 	{ 0x06, L"Yellow     " }, { 0x0E, L"LightYellow" },
 	{ 0x07, L"White      " }, { 0x0F, L"LightWhite " },
 };
-ENUM_CUSTOM(Color, {}, L"");
-ENUM_DEFAULT(Color, White);
 
 // --------------- Enum Facade Resource ---------------
-ENUM_DECL(Facade)
-{
-	FullStar, FullCircle, FullRect, FullDiamond,
-	Star, Circle, Rect, Diamond
-}
-ENUM_DEF(Facade, wchar_t)
+struct FacadeInfo {
+	enum Tag {
+		FullStar, FullCircle, FullRect, FullDiamond,
+		Star, Circle, Rect, Diamond,
+		DefaultValue = FullStar
+	};
+};
+using Facade = Enum<FacadeInfo, wchar_t>;
+ENUM_DEFINE(Facade)
 {
 	{ L'★', L"" },
 	{ L'●', L"" },
@@ -210,8 +225,6 @@ ENUM_DEF(Facade, wchar_t)
 	{ L'□', L"" },
 	{ L'◇', L"" },
 };
-ENUM_CUSTOM(Facade, {}, L"");
-ENUM_DEFAULT(Facade, FullStar);
 
 // --------------- Theme Resource ---------------
 enum struct Element :size_t
@@ -232,7 +245,7 @@ struct ElementSet
 		Color color;
 
 		friend constexpr bool
-		operator==(const Appearance&, const Appearance&) noexcept = default;
+		operator==(const Appearance&, const Appearance&) = default;
 	}elements[static_cast<size_t>(Element::Mask)];
 
 	constexpr const auto& operator[](Element which) const noexcept
@@ -244,14 +257,17 @@ struct ElementSet
 		return elements[static_cast<size_t>(which)];
 	}
 	friend constexpr bool
-	operator==(const ElementSet&, const ElementSet&) noexcept = default;
+	operator==(const ElementSet&, const ElementSet&) = default;
 };
 
-ENUM_DECL(Theme)
-{
-	A, B, C, D, E
-}
-ENUM_DEF(Theme, ElementSet, token::StringName)
+struct ThemeInfo {
+	enum Tag {
+		A, B, C, D, E,
+		DefaultValue = A
+	};
+};
+using Theme = CustomEnum<ThemeInfo, ElementSet, token::StringName>;
+ENUM_DEFINE(Theme)
 {
 	{
 		{{
@@ -299,8 +315,10 @@ ENUM_DEF(Theme, ElementSet, token::StringName)
 		token::setting_theme_E
 	}
 };
-ENUM_CUSTOM(Theme, {}, token::setting_custom);
-ENUM_DEFAULT(Theme, A);
+ENUM_CUSTOM(Theme)
+{
+	{}, token::setting_custom
+};
 
 
 inline const auto game_title = LR"title(

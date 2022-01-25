@@ -49,163 +49,300 @@
 
 template<typename Base,
 		 typename = std::void_t<typename Base::Tag>,
-		 typename = std::void_t<typename Base::CustomTag>>
-constexpr bool CheckCorrectEnumName = false;
+		 typename = std::void_t<decltype(Base::DefaultValue)>>
+constexpr bool CheckCorrectEnumInfo = false;
 template<typename Base>
-constexpr bool CheckCorrectEnumName<Base, void, void> = true;
+constexpr bool CheckCorrectEnumInfo<Base, void, void> = true;
 
-template<typename EnumName, typename ValueType = int, typename NameType = std::wstring>
-class Enum :public EnumName
+template<typename EnumType, typename TypeInfo>
+class EnumBase
 {
-	static_assert(CheckCorrectEnumName<EnumName>, "Incorrect EnumName type");
-
-	using base_type = std::remove_cv_t<ValueType>;
-	using pair_type = std::pair<base_type, std::add_const_t<NameType>>;
-	using custom_pair_type = std::pair<std::optional<base_type>, std::add_const_t<NameType>>;
-	using list_type = std::vector<pair_type>;
-
-	using Tag = typename EnumName::Tag;
-	using CustomTag = typename EnumName::CustomTag;
+	using Tag = typename TypeInfo::Tag;
+	using NameType = typename TypeInfo::NameType;
+	using ValueType = typename TypeInfo::ValueType;
 
 public:
-	using value_type = base_type;
+	EnumBase() = default;
+	// Tag literals could implicitly cast to CustomEnum
+	constexpr EnumBase(Tag tag) noexcept
+	{
+		current_value_index = static_cast<size_t>(tag);
+	}
+
+public:
+	constexpr const EnumType& setNextValue() noexcept
+	{
+		return static_cast<EnumType*>(this)->setNextValue();
+	}
+	constexpr const EnumType& setDefaultValue() const noexcept
+	{
+		current_value_index = TypeInfo::DefaultValue;
+		return static_cast<const EnumType&>(*this);
+	}
+	constexpr std::add_const_t<NameType> Name() const noexcept
+	{
+		return static_cast<const EnumType*>(this)->Name();
+	}
+	constexpr ValueType Value() const noexcept
+	{
+		return static_cast<ValueType>(*this); // invoke operator value_type
+	}
+	constexpr operator ValueType() const noexcept
+	{
+		return static_cast<const EnumType*>(this)->operator ValueType();
+	}
+	constexpr ValueType convertFrom(ValueType val) noexcept
+	{
+		return static_cast<EnumType*>(this)->convertFrom(val);
+	}
+
+public:
+	static constexpr std::add_const_t<NameType> getNameFrom(ValueType val) noexcept
+	{
+		return EnumType::getNameFrom(val);
+	}
+	static constexpr std::add_const_t<ValueType> getValueFrom(const EnumBase* tag_or_var) noexcept
+	{
+		return tag_or_var;
+	}
+
+public:
+	friend constexpr bool operator==(const EnumBase& lhs, const EnumBase& rhs) noexcept
+	{
+		return lhs.current_value_index == rhs.current_value_index;
+	}
+
+protected:
+	mutable std::make_signed_t<size_t> current_value_index = TypeInfo::DefaultValue;
+};
+
+template<typename EnumInfoT, typename ValueT, typename NameT>
+struct EnumInfo :EnumInfoT
+{
+	static_assert(CheckCorrectEnumInfo<EnumInfoT>, "Incorrect EnumInfo type.");
+	using ValueType = std::remove_cv_t<ValueT>;
+	using NameType = NameT;
+	using Tag = typename EnumInfoT::Tag;
+};
+
+template<typename EnumInfoT, typename ValueT=int,typename NameT=std::wstring>
+class Enum :
+	public EnumInfo<EnumInfoT, ValueT, NameT>,
+	public EnumBase<Enum<EnumInfoT, ValueT, NameT>, EnumInfo<EnumInfoT, ValueT, NameT>>
+{
+	using Base = EnumBase<Enum<EnumInfoT, ValueT, NameT>, EnumInfo<EnumInfoT, ValueT, NameT>>;
+	using Info = EnumInfo<EnumInfoT, ValueT, NameT>;
+public:
+	using Tag = typename Info::Tag;
+	using ValueType = typename Info::ValueType;
+	using NameType = typename Info::NameType;
+private:
+	using pair_type = std::pair<ValueType, std::add_const_t<NameType>>;
+	using list_type = std::vector<pair_type>;
+	
+public:
 	Enum() = default;
-	// Tag literals could implicitly cast to Enum
 	constexpr Enum(Tag tag) noexcept
-	{
-		cur_val = static_cast<size_t>(tag);
-	}
-	constexpr Enum(CustomTag tag) noexcept
-	{
-		cur_val = static_cast<size_t>(tag);
-	}
+		:Base(tag)
+	{}
 
 public:
 	constexpr const Enum& setNextValue() noexcept
 	{
-		// back to default value when clearCustomValue() called and happens to be custom value
-		if (cur_val == CustomTag::Custom && !enum_custom.first)
+		if (this->current_value_index == enum_list.size() - 1)
 		{
-			setDefaultValue();
-		}
-		else if (cur_val == enum_list.size() - 1)
-		{
-			if (enum_custom.first)
-				cur_val = CustomTag::Custom;
-			else
-				cur_val = 0;
+			this->current_value_index = 0;
 		}
 		else
 		{
-			++cur_val;
+			this->current_value_index++;
 		}
 		return *this;
 	}
-	constexpr const Enum& setDefaultValue() const noexcept
+	constexpr NameType Name() const noexcept
 	{
-		cur_val = default_shift;
-		return *this;
+		return enum_list[this->current_value_index].second;
 	}
-	constexpr std::add_const_t<NameType> Name() const noexcept
+	constexpr operator ValueType() const noexcept
 	{
-		// back to default value when clearCustomValue() called and happens to be custom value
-		if (cur_val == CustomTag::Custom)
-		{
-			if (enum_custom.first)
-				return enum_custom.second;
-			else
-				setDefaultValue();
-		}
-		return enum_list[cur_val].second;
+		return enum_list[this->current_value_index].first;
 	}
-	constexpr value_type Value() const noexcept
-	{
-		return static_cast<value_type>(*this); // invoke operator value_type
-	}
-	constexpr operator value_type() const noexcept
-	{
-		// back to default value when clearCustomValue() called and happens to be custom value
-		if (cur_val == CustomTag::Custom)
-		{
-			if (enum_custom.first)
-				return *enum_custom.first;
-			else
-				setDefaultValue();
-		}
-		return enum_list[cur_val].first;
-	}
-	constexpr value_type convertFrom(value_type val) noexcept
+	constexpr ValueType convertFrom(ValueType val) noexcept
 	{
 		for (size_t i = 0; i < enum_list.size(); i++)
 		{
 			if (val == enum_list[i].first)
 			{
-				cur_val = i;
+				this->current_value_index = i;
 				return val;
 			}
 		}
-		setCustomValue(val);
-		cur_val = CustomTag::Custom;
-		return val;
+		this->setDefaultValue();
+		return *this;
 	}
 
 public:
-	constexpr static std::add_const_t<NameType> getNameFrom(value_type val) noexcept
+	static constexpr NameType getNameFrom(ValueType val) noexcept
 	{
 		for (size_t i = 0; i < enum_list.size(); i++)
 		{
 			if (val == enum_list[i].first)
 				return enum_list[i].second;
 		}
-		return enum_custom.second;
+		return {};
 	}
-	constexpr static std::add_const_t<value_type> getValueFrom(const Enum& tag_or_var) noexcept
+	static constexpr ValueType getValueFrom(const Enum& tag_or_var) noexcept
 	{
 		return tag_or_var;
-	}
-	constexpr static void setCustomValue(value_type custom)
-	{
-		enum_custom.first = std::move(custom);
-	}
-	constexpr static std::optional<value_type> getCustomValue() noexcept
-	{
-		return enum_custom.first;
-	}
-	constexpr static void clearCustomValue() noexcept
-	{
-		enum_custom.first = std::nullopt;
 	}
 
 public:
 	friend constexpr bool operator==(const Enum& lhs, const Enum& rhs) noexcept
 	{
-		return lhs.cur_val == rhs.cur_val;
+		return lhs.current_value_index == rhs.current_value_index;
+	}
+
+private:
+	static list_type enum_list;
+};
+
+struct CustomInfo
+{
+	enum CustomTag :int {
+		Custom = -1
+	};
+};
+
+template<typename EnumInfoT, typename ValueT = int, typename NameT = std::wstring>
+class CustomEnum :
+	public EnumInfo<EnumInfoT, ValueT, NameT>,
+	public CustomInfo,
+	public EnumBase<CustomEnum<EnumInfoT, ValueT, NameT>, EnumInfo<EnumInfoT, ValueT, NameT>>
+{
+	using Base = EnumBase<CustomEnum<EnumInfoT, ValueT, NameT>, EnumInfo<EnumInfoT, ValueT, NameT>>;
+	using Info = EnumInfo<EnumInfoT, ValueT, NameT>;
+public:
+	using Tag = typename Info::Tag;
+	using ValueType = typename Info::ValueType;
+	using NameType = typename Info::NameType;
+private:
+	using pair_type = std::pair<ValueType, std::add_const_t<NameType>>;
+	using custom_pair_type = std::pair<std::optional<ValueType>, std::add_const_t<NameType>>;
+	using list_type = std::vector<pair_type>;
+
+public:
+	CustomEnum() = default;
+	constexpr CustomEnum(Tag tag) noexcept
+		:Base(tag)
+	{}
+	constexpr CustomEnum(CustomTag tag) noexcept
+		:Base(static_cast<Tag>(tag))
+	{}
+
+public:
+	constexpr const CustomEnum& setNextValue() noexcept
+	{
+		// back to default value when clearCustomValue() called and happens to be custom value
+		if (this->current_value_index == CustomTag::Custom && !enum_custom.first)
+		{
+			this->setDefaultValue();
+		}
+		else if (this->current_value_index == enum_list.size() - 1)
+		{
+			if (enum_custom.first)
+				this->current_value_index = CustomTag::Custom;
+			else
+				this->current_value_index = 0;
+		}
+		else
+		{
+			this->current_value_index++;
+		}
+		return *this;
+	}
+	constexpr NameType Name() const noexcept
+	{
+		// back to default value when clearCustomValue() called and happens to be custom value
+		if (this->current_value_index == CustomTag::Custom)
+		{
+			if (enum_custom.first)
+				return enum_custom.second;
+			else
+				this->setDefaultValue();
+		}
+		return enum_list[this->current_value_index].second;
+	}
+	constexpr operator ValueType() const noexcept
+	{
+		// back to default value when clearCustomValue() called and happens to be custom value
+		if (this->current_value_index == CustomTag::Custom)
+		{
+			if (enum_custom.first)
+				return *enum_custom.first;
+			else
+				this->setDefaultValue();
+		}
+		return enum_list[this->current_value_index].first;
+	}
+	constexpr ValueType convertFrom(ValueType val) noexcept
+	{
+		for (size_t i = 0; i < enum_list.size(); i++)
+		{
+			if (val == enum_list[i].first)
+			{
+				this->current_value_index = i;
+				return val;
+			}
+		}
+		setCustomValue(val);
+		this->current_value_index = CustomTag::Custom;
+		return val;
+	}
+
+public:
+	static constexpr NameType getNameFrom(ValueType val) noexcept
+	{
+		for (size_t i = 0; i < enum_list.size(); i++)
+		{
+			if (val == enum_list[i].first)
+				return enum_list[i].second;
+		}
+		if (val == enum_custom.first)
+			return enum_custom.second;
+		return {};
+	}
+	static constexpr ValueType getValueFrom(const CustomEnum& tag_or_var) noexcept
+	{
+		return tag_or_var;
+	}
+	static constexpr void setCustomValue(ValueType custom)
+	{
+		enum_custom.first = std::move(custom);
+	}
+	static constexpr std::optional<ValueType> getCustomValue() noexcept
+	{
+		return enum_custom.first;
+	}
+	static constexpr void clearCustomValue() noexcept
+	{
+		enum_custom.first = std::nullopt;
+	}
+
+public:
+	friend constexpr bool operator==(const CustomEnum& lhs, const CustomEnum& rhs) noexcept
+	{
+		return lhs.current_value_index == rhs.current_value_index;
 	}
 
 private:
 	static list_type enum_list;
 	static custom_pair_type enum_custom;
-	static const size_t default_shift;
-	mutable size_t cur_val = default_shift;
 };
 
-#define ENUM_DECL(name) \
-struct name##_tag { \
-	enum Tag :int
+#define ENUM_DEFINE(name) \
+inline name::list_type name::enum_list
 
-#define ENUM_DEF(name, ...) \
-	; \
-	enum CustomTag :int { \
-		Custom = -1 \
-	}; \
-}; \
-using name = Enum<name##_tag, __VA_ARGS__>; \
-inline name::list_type name::enum_list =
-
-#define ENUM_CUSTOM(name, ...) \
-inline name::custom_pair_type name::enum_custom = { __VA_ARGS__ }
-
-#define ENUM_DEFAULT(name, default_value) \
-inline const size_t name::default_shift = name::default_value
+#define ENUM_CUSTOM(name) \
+inline name::custom_pair_type name::enum_custom
 
 #endif // SNAKE_ENUM_HEADER_

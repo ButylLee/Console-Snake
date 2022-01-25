@@ -19,9 +19,9 @@ public:
 	struct RankItem {
 		std::wstring name;
 		int score = 0;
-		Speed::value_type speed = {};
-		Size::value_type width = {};
-		Size::value_type height = {};
+		Speed::ValueType speed = {};
+		Size::ValueType width = {};
+		Size::ValueType height = {};
 		bool is_win = false;
 	};
 	static constexpr auto rank_count = 10;
