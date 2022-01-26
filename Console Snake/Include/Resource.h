@@ -155,7 +155,7 @@ ENUM_DEFINE(Size)
 	{ 27, L"(XL)"_crypt }
 };
 ENUM_CUSTOM(Size)
-{ 
+{
 	{}, L"(Custom)"_crypt
 };
 

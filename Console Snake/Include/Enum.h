@@ -3,42 +3,62 @@
 #define SNAKE_ENUM_HEADER_
 
 /*
- * Enum acts like built-in enum but only store value that pre-defined,
- * and could have not only integral underlying type. It has pre-defined
- * values defined and default value specified in compile-time, only one
- * custom value modified in runtime. The custom value can be null. A
- * Enum object's value can switch circularly in these defined values. It
- * can also store string_view for reflection.
+ *                             Enum & CustomEnum
+ * Enum and CustomEnum acts like built-in enum but only store pre-defined
+ * key-value, and could have not only integral underlying type. It has
+ * pre-defined key-values defined and default key-value specified in
+ * compile-time. CustomEnum could only have one custom value modified in
+ * runtime, and the custom key-value can be null. A Enum object's value
+ * can switch circularly in these defined values. It can also store string
+ * for reflection.
  *
- * To define a Enum type like built-in enum:
+ * To define an Enum or CustomEnum type like built-in enum:
  *     enum class Size :int{
  *         S = 10,
  *         M = 20,
  *         L = 30
  *     };
  *             ||
+ * transfrom it like below:
+ *             ||
  *             vv
- *     ENUM_DECL(Size)
- *     {
- *         S, M, L
- *     }
- *     ENUM_DEF(Size, short, std::wstring) // last two args are optional
+ *     struct SizeInfo {
+ *         enum Tag {
+ *             S, M, L,
+ *             DefaultValue = S
+ *         };
+ *     };
+ *     using Size = CustomEnum<SizeInfo, short, std::string>; // last two args are optional
+ *     ENUM_DEFINE(Size)
  *     {
  *        { 10, L"S" },
  *        { 20, L"M" },
  *        { 30, L"L" }
  *     };
- *     ENUM_CUSTOM(Size, {}, L"Custom");
- *     ENUM_DEFAULT(Size, M);
+ *     ENUM_CUSTOM(Size)
+ *     {
+ *         {}, L"Custom"
+ *     };
  *
- * Note: ALL four macros must be used.
+ * Note: The enum "Tag" and "DefaultValue" value must be defined.
+ *       The macro "ENUM_CUSTOM" is optional if using Enum<...>.
  *
- * To use a Enum:
- *     Size s = Size::L;
- *     s.setNextValue();
- *     s.setDefaultValue();
- *     s::setCustomValue(50);
- *     s = Size::CustomValue;
+ * To use an Enum:
+ *     Size size = Size::L;
+ *     size.setNextValue();
+ *     size.setDefaultValue();
+ *     size.convertFrom(20);
+ *
+ *     auto name = size.Name();
+ *     auto value1 = size.Value();
+ *     short value2 = size;
+ *
+ *     size::setCustomValue(50);
+ *     size = Size::Custom;
+ *
+ * To inquire key-value:
+ *     auto nameOfS = Size::getNameFrom(10);
+ *     auto valueOfL = Size::getValueFrom(Size::L);
  */
 
 #include <utility>
@@ -47,13 +67,17 @@
 #include <type_traits>
 #include <string>
 
-template<typename Base,
-		 typename = std::void_t<typename Base::Tag>,
-		 typename = std::void_t<decltype(Base::DefaultValue)>>
-constexpr bool CheckCorrectEnumInfo = false;
-template<typename Base>
-constexpr bool CheckCorrectEnumInfo<Base, void, void> = true;
+namespace detail {
+	template<typename, typename = void, typename = void>
+	constexpr bool CheckCorrectEnumInfo = false;
+	template<typename Base>
+	constexpr bool CheckCorrectEnumInfo<
+		Base,
+		std::void_t<typename Base::Tag>,
+		std::void_t<decltype(Base::DefaultValue)>> = true;
+}
 
+// ----------------- Base Class EnumBase ----------------
 template<typename EnumType, typename TypeInfo>
 class EnumBase
 {
@@ -74,18 +98,9 @@ public:
 	{
 		return static_cast<EnumType*>(this)->setNextValue();
 	}
-	constexpr const EnumType& setDefaultValue() const noexcept
-	{
-		current_value_index = TypeInfo::DefaultValue;
-		return static_cast<const EnumType&>(*this);
-	}
-	constexpr std::add_const_t<NameType> Name() const noexcept
+	constexpr NameType Name() const noexcept
 	{
 		return static_cast<const EnumType*>(this)->Name();
-	}
-	constexpr ValueType Value() const noexcept
-	{
-		return static_cast<ValueType>(*this); // invoke operator value_type
 	}
 	constexpr operator ValueType() const noexcept
 	{
@@ -96,12 +111,22 @@ public:
 		return static_cast<EnumType*>(this)->convertFrom(val);
 	}
 
+	constexpr const EnumType& setDefaultValue() noexcept
+	{
+		current_value_index = TypeInfo::DefaultValue;
+		return static_cast<const EnumType&>(*this);
+	}
+	constexpr ValueType Value() const noexcept
+	{
+		return static_cast<ValueType>(*this); // invoke operator value_type
+	}
+
 public:
-	static constexpr std::add_const_t<NameType> getNameFrom(ValueType val) noexcept
+	static constexpr NameType getNameFrom(ValueType val) noexcept
 	{
 		return EnumType::getNameFrom(val);
 	}
-	static constexpr std::add_const_t<ValueType> getValueFrom(const EnumBase* tag_or_var) noexcept
+	static constexpr ValueType getValueFrom(const EnumBase& tag_or_var) noexcept
 	{
 		return tag_or_var;
 	}
@@ -113,19 +138,21 @@ public:
 	}
 
 protected:
-	mutable std::make_signed_t<size_t> current_value_index = TypeInfo::DefaultValue;
+	std::make_signed_t<size_t> current_value_index = TypeInfo::DefaultValue;
 };
 
+// ---------------- Helper Class EnumInfo ---------------
 template<typename EnumInfoT, typename ValueT, typename NameT>
-struct EnumInfo :EnumInfoT
+struct EnumInfo :EnumInfoT // Derived for enum items
 {
-	static_assert(CheckCorrectEnumInfo<EnumInfoT>, "Incorrect EnumInfo type.");
+	static_assert(detail::CheckCorrectEnumInfo<EnumInfoT>, "Incorrect EnumInfo type.");
 	using ValueType = std::remove_cv_t<ValueT>;
 	using NameType = NameT;
 	using Tag = typename EnumInfoT::Tag;
 };
 
-template<typename EnumInfoT, typename ValueT=int,typename NameT=std::wstring>
+// ------------------- Main Class Enum ------------------
+template<typename EnumInfoT, typename ValueT = int, typename NameT = std::wstring>
 class Enum :
 	public EnumInfo<EnumInfoT, ValueT, NameT>,
 	public EnumBase<Enum<EnumInfoT, ValueT, NameT>, EnumInfo<EnumInfoT, ValueT, NameT>>
@@ -139,7 +166,7 @@ public:
 private:
 	using pair_type = std::pair<ValueType, std::add_const_t<NameType>>;
 	using list_type = std::vector<pair_type>;
-	
+
 public:
 	Enum() = default;
 	constexpr Enum(Tag tag) noexcept
@@ -191,21 +218,12 @@ public:
 		}
 		return {};
 	}
-	static constexpr ValueType getValueFrom(const Enum& tag_or_var) noexcept
-	{
-		return tag_or_var;
-	}
-
-public:
-	friend constexpr bool operator==(const Enum& lhs, const Enum& rhs) noexcept
-	{
-		return lhs.current_value_index == rhs.current_value_index;
-	}
 
 private:
 	static list_type enum_list;
 };
 
+// ---------------- Main Class CustomEnum ---------------
 struct CustomInfo
 {
 	enum CustomTag :int {
@@ -242,10 +260,9 @@ public:
 public:
 	constexpr const CustomEnum& setNextValue() noexcept
 	{
-		// back to default value when clearCustomValue() called and happens to be custom value
 		if (this->current_value_index == CustomTag::Custom && !enum_custom.first)
 		{
-			this->setDefaultValue();
+			setDefaultValue_force();
 		}
 		else if (this->current_value_index == enum_list.size() - 1)
 		{
@@ -262,25 +279,23 @@ public:
 	}
 	constexpr NameType Name() const noexcept
 	{
-		// back to default value when clearCustomValue() called and happens to be custom value
 		if (this->current_value_index == CustomTag::Custom)
 		{
 			if (enum_custom.first)
 				return enum_custom.second;
 			else
-				this->setDefaultValue();
+				setDefaultValue_force();
 		}
 		return enum_list[this->current_value_index].second;
 	}
 	constexpr operator ValueType() const noexcept
 	{
-		// back to default value when clearCustomValue() called and happens to be custom value
 		if (this->current_value_index == CustomTag::Custom)
 		{
 			if (enum_custom.first)
 				return *enum_custom.first;
 			else
-				this->setDefaultValue();
+				setDefaultValue_force();
 		}
 		return enum_list[this->current_value_index].first;
 	}
@@ -311,10 +326,7 @@ public:
 			return enum_custom.second;
 		return {};
 	}
-	static constexpr ValueType getValueFrom(const CustomEnum& tag_or_var) noexcept
-	{
-		return tag_or_var;
-	}
+
 	static constexpr void setCustomValue(ValueType custom)
 	{
 		enum_custom.first = std::move(custom);
@@ -328,10 +340,11 @@ public:
 		enum_custom.first = std::nullopt;
 	}
 
-public:
-	friend constexpr bool operator==(const CustomEnum& lhs, const CustomEnum& rhs) noexcept
+private:
+	// back to default value when clearCustomValue() called and happens to be custom value
+	constexpr void setDefaultValue_force() const noexcept
 	{
-		return lhs.current_value_index == rhs.current_value_index;
+		const_cast<CustomEnum*>(this)->setDefaultValue();
 	}
 
 private:
