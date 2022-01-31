@@ -47,8 +47,8 @@ class Canvas
 public:
 	Canvas()
 	{
-		setColor();
-		setCursor();
+		applyColor();
+		applyCursor();
 	}
 
 public:
@@ -57,32 +57,32 @@ public:
 		if (color == new_color)
 			return;
 		color = new_color;
-		setColor();
+		applyColor();
 	}
 	void setCursor(short newX, short newY)
 	{
-		cursor = { newX,newY };
-		setCursor();
+		cursor = { newX, newY };
+		applyCursor();
 	}
-	void setCenteredCursor(const std::wstring_view& str, short newY)
+	void setCenteredCursor(std::wstring_view str, short newY)
 	{
-		cursor = { calCenteredCoord(str),newY };
-		setCursor();
+		cursor = { calCenteredCoord(str), newY };
+		applyCursor();
 	}
 	void setClientSize(short width, short height) noexcept
 	{
 		size.width = width;
 		size.height = height;
-		setClientSize();
+		applyClientSize();
 	}
 	void setClientSize(ClientSize new_size)
 	{
 		size = new_size;
-		setClientSize();
+		applyClientSize();
 	}
 	void clear() noexcept
 	{
-		setClientSize(); // use side effect
+		applyClientSize(); // use side effect
 	}
 public:
 	ClientSize getClientSize() const noexcept
@@ -95,17 +95,17 @@ public:
 	}
 
 private:
-	void setColor()
+	void applyColor()
 	{
 		if (!SetConsoleTextAttribute(Console::get().getOutputHandle(), static_cast<WORD>(color)))
 			throw NativeError(GetLastError());
 	}
-	void setCursor()
+	void applyCursor()
 	{
 		if (!SetConsoleCursorPosition(Console::get().getOutputHandle(), cursor))
 			throw NativeError(GetLastError());
 	}
-	void setClientSize() noexcept
+	void applyClientSize() noexcept
 	{
 		char con[33];
 		sprintf_s(con, "mode con: cols=%d lines=%d"_crypt.c_str(), size.width * 2, size.height);
