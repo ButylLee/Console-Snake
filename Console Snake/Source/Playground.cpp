@@ -12,9 +12,6 @@
 #include "WinMacro.h"
 #include <Windows.h>
 
-/***************************************
- class Playground
-****************************************/
 void Playground::play()
 {
 	using namespace std::chrono_literals;
