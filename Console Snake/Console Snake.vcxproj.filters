@@ -56,9 +56,6 @@
     <ClInclude Include="Include\Pages.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Include\DataSet.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="Include\Playground.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -103,6 +100,9 @@
     </ClInclude>
     <ClInclude Include="Include\AtomicOperation.h">
       <Filter>头文件\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\DataSet.h">
+      <Filter>头文件\Resource</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
