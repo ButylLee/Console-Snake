@@ -1,7 +1,10 @@
 ﻿#include "Playground.h"
 #include "Rank.h"
+#include "Console.h"
+
 #include "wideIO.h"
 #include "KeyMap.h"
+
 #include <random>
 #include <thread>
 #include <chrono>

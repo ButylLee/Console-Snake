@@ -1,14 +1,15 @@
 ﻿#include "Pages.h"
-#include "Resource.h"
-#include "KeyMap.h"
+#include "Console.h"
+#include "Playground.h"
+#include "Rank.h"
+#include "GameSaving.h"
 
 #include "wideIO.h"
 #include "ScopeGuard.h"
 
+#include "Resource.h"
+#include "KeyMap.h"
 #include "DataSet.h"
-#include "Playground.h"
-#include "Rank.h"
-#include "GameSaving.h"
 
 #include <thread>
 #include <mutex>
