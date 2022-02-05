@@ -1,7 +1,8 @@
 ﻿#include "GameSaving.h"
 #include "LocalizedStrings.h"
-#include "Resource.h"
 #include "ScopeGuard.h"
+#include "Resource.h"
+#include "DataSet.h"
 #include <algorithm>
 #include <fstream>
 #include <filesystem>
