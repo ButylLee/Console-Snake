@@ -19,13 +19,13 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Rank.cpp" />
     <ClCompile Include="Source\Canvas.cpp" />
     <ClCompile Include="Source\Console.cpp" />
     <ClCompile Include="Source\GameSaving.cpp" />
     <ClCompile Include="Source\Pages.cpp" />
     <ClCompile Include="Source\Main.cpp" />
     <ClCompile Include="Source\Playground.cpp" />
+    <ClCompile Include="Source\Rank.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\AtomicOperation.h" />

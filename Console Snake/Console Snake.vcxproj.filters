@@ -42,7 +42,7 @@
     <ClCompile Include="Source\Canvas.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Rank.cpp">
+    <ClCompile Include="Source\Rank.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
