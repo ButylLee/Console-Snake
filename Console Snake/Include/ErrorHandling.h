@@ -14,20 +14,20 @@
 // handle GetLastError result and convert to readable message to throw
 class NativeError
 {
-	using code_type = decltype(GetLastError());
 public:
-	explicit NativeError(DWORD error_code = GetLastError()) noexcept
+	using CodeType = decltype(GetLastError());
+	explicit NativeError(CodeType error_code = GetLastError()) noexcept
 		:code(error_code)
 	{
 		if (!format())
 		{
 			buffer = L"Format Error Message Failed.";
-			code = code_type{};
+			code = CodeType{};
 		}
 	}
 	~NativeError() noexcept
 	{
-		if (code != code_type{})
+		if (code != CodeType{})
 			LocalFree((HLOCAL)buffer);
 		buffer = nullptr;
 	}
@@ -58,13 +58,13 @@ private:
 						   NULL)
 			);
 	}
-	void rebuild(code_type error_code) noexcept
+	void rebuild(CodeType error_code) noexcept
 	{
 		this->~NativeError();
 		(void)new(this) NativeError(error_code);
 	}
 private:
-	code_type code = {};
+	CodeType code = {};
 	const wchar_t* buffer = nullptr;
 };
 
