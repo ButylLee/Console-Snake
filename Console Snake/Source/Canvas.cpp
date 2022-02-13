@@ -62,13 +62,13 @@ Color Canvas::getColor() const noexcept
 void Canvas::applyColor()
 {
 	if (!SetConsoleTextAttribute(Console::get().getOutputHandle(), static_cast<WORD>(color)))
-		throw NativeError(GetLastError());
+		throw NativeError{};
 }
 
 void Canvas::applyCursor()
 {
 	if (!SetConsoleCursorPosition(Console::get().getOutputHandle(), cursor))
-		throw NativeError(GetLastError());
+		throw NativeError{};
 }
 
 void Canvas::applyClientSize() noexcept

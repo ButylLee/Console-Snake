@@ -25,7 +25,7 @@ catch (const Exception&) {
 void ConsoleBase::setTitle(std::wstring new_title)
 {
 	if (!SetConsoleTitleW(new_title.c_str()))
-		throw NativeError(GetLastError());
+		throw NativeError{};
 	title = std::move(new_title);
 }
 
@@ -54,10 +54,10 @@ void ConsoleBase::setCursorVisible(bool isVisible)
 {
 	CONSOLE_CURSOR_INFO cci;
 	if (!GetConsoleCursorInfo(hOutput, &cci))
-		throw NativeError(GetLastError());
+		throw NativeError{};
 	cci.bVisible = static_cast<BOOL>(isVisible);
 	if (!SetConsoleCursorInfo(hOutput, &cci))
-		throw NativeError(GetLastError());
+		throw NativeError{};
 }
 
 void ConsoleBase::moveToScreenCenter() noexcept
@@ -93,14 +93,14 @@ HANDLE ConsoleBase::getOutputHandle() const noexcept
 void ConsoleBase::setWindowAttribute(LONG_PTR args)
 {
 	if (!SetWindowLongPtrW(hConsole, GWL_STYLE, args))
-		throw NativeError(GetLastError());
+		throw NativeError{};
 }
 
 LONG_PTR ConsoleBase::getWindowAttribute() const
 {
 	LONG_PTR win_att = GetWindowLongPtrW(hConsole, GWL_STYLE);
 	if (win_att == 0)
-		throw NativeError(GetLastError());
+		throw NativeError{};
 	return win_att;
 }
 
@@ -108,7 +108,7 @@ HANDLE ConsoleBase::fetchOutputHandle() const
 {
 	HANDLE handle = GetStdHandle(STD_OUTPUT_HANDLE);
 	if (handle == INVALID_HANDLE_VALUE)
-		throw NativeError(GetLastError());
+		throw NativeError{};
 	return handle;
 }
 

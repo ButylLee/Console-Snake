@@ -21,6 +21,40 @@
 #include <string>
 
 /***************************************
+ Interface Page
+****************************************/
+std::unique_ptr<Page> Page::CreatePage()
+{
+	std::unique_ptr<Page> page;
+
+	switch (GameData::get().seletion)
+	{
+		case PageSel::BeginPage:
+			page.reset(new BeginPage);
+			break;
+		case PageSel::MenuPage:
+			page.reset(new MenuPage);
+			break;
+		case PageSel::GamePage:
+			page.reset(new GamePage);
+			break;
+		case PageSel::SettingPage:
+			page.reset(new SettingPage);
+			break;
+		case PageSel::CustomThemePage:
+			page.reset(new CustomThemePage);
+			break;
+		case PageSel::RankPage:
+			page.reset(new RankPage);
+			break;
+		case PageSel::AboutPage:
+			page.reset(new AboutPage);
+			break;
+	}
+	return page;
+}
+
+/***************************************
  class GamePage
 ****************************************/
 void GamePage::run()
@@ -146,7 +180,7 @@ void AboutPage::run()
 						  (~token::about_caption).c_str(),
 						  MB_OK | MB_ICONINFORMATION);
 	if (msg != IDOK)
-		throw NativeError(GetLastError());
+		throw NativeError{};
 	GameData::get().seletion = PageSel::MenuPage;
 }
 
@@ -640,38 +674,4 @@ void RankPage::paintInterface()
 		print(~token::rank_clear_all_records);
 	}
 	std::this_thread::sleep_for(500ms);
-}
-
-/***************************************
- Function CreatePage
-****************************************/
-std::unique_ptr<Page> CreatePage()
-{
-	std::unique_ptr<Page> page;
-
-	switch (GameData::get().seletion)
-	{
-		case PageSel::BeginPage:
-			page.reset(new BeginPage);
-			break;
-		case PageSel::MenuPage:
-			page.reset(new MenuPage);
-			break;
-		case PageSel::GamePage:
-			page.reset(new GamePage);
-			break;
-		case PageSel::SettingPage:
-			page.reset(new SettingPage);
-			break;
-		case PageSel::CustomThemePage:
-			page.reset(new CustomThemePage);
-			break;
-		case PageSel::RankPage:
-			page.reset(new RankPage);
-			break;
-		case PageSel::AboutPage:
-			page.reset(new AboutPage);
-			break;
-	}
-	return page;
 }

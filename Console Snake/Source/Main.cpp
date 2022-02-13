@@ -6,7 +6,7 @@ version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' la
 
 static bool no_limit = false;
 
-void ParseCmdAndSet(int count, char* Cmd[])
+void ParseCmdAndSet(int count, char* commands[])
 {
 	using namespace std;
 	if (count < 2)
@@ -15,7 +15,7 @@ void ParseCmdAndSet(int count, char* Cmd[])
 	string cmd;
 	for (int i = 1; i < count; i++)
 	{
-		cmd = Cmd[i];
+		cmd = commands[i];
 		// Command Options:
 		// -nolimit: freely adjust the width and height of Console
 		// -oldconsole: enable the compatibility of old console host
@@ -35,7 +35,7 @@ void ParseCmdAndSet(int count, char* Cmd[])
 		}
 		else if (cmd == "-size"_crypt)
 		{
-			cmd = Cmd[++i];
+			cmd = commands[++i];
 			size_t place = cmd.find('x');
 			if (place == string::npos)
 				continue;
@@ -77,7 +77,7 @@ int main(int argc, char* argv[])
 	try {
 		while (true)
 		{
-			auto page = CreatePage();
+			auto page = Page::CreatePage();
 			page->run();
 		}
 	}

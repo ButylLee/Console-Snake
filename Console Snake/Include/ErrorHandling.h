@@ -16,7 +16,7 @@ class NativeError
 {
 	using code_type = decltype(GetLastError());
 public:
-	explicit NativeError(DWORD error_code) noexcept
+	explicit NativeError(DWORD error_code = GetLastError()) noexcept
 		:code(error_code)
 	{
 		if (!format())

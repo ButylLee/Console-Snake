@@ -9,6 +9,8 @@
 class Page
 {
 public:
+	static std::unique_ptr<Page> CreatePage();
+public:
 	virtual void run() = 0;
 	virtual ~Page() = default;
 };
@@ -95,7 +97,5 @@ public:
 private:
 	void paintInterface();
 };
-
-std::unique_ptr<Page> CreatePage();
 
 #endif // SNAKE_PAGES_HEADER_
