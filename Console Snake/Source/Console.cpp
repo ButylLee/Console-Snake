@@ -10,7 +10,7 @@ ConsoleBase::ConsoleBase() try
 	hOutput = fetchOutputHandle();
 	hConsole = fetchConsoleHandle();
 	// set initial window style
-	setWindowAttribute(WS_VISIBLE | WS_CAPTION | WS_SYSMENU | WS_CHILD |
+	setWindowAttribute(WS_VISIBLE | WS_CAPTION | WS_SYSMENU |
 					   WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SIZEBOX);
 }
 catch (const Exception&) {
