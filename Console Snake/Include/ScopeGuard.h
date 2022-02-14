@@ -1,5 +1,6 @@
 ﻿/*
  *         <ScopeGuard>  By James Taylor(ButylLee)
+ *                        2022/2/15
  *          https://github.com/ButylLee/ScopeGuard
  * ScopeGuard is a so-called Universal Resource Management
  * Class that employs RAII pattern. It provides a common way
@@ -22,7 +23,7 @@
  *
  *       -*-*-*-*-*-*-*-*-*-*-*-*-
  *       // acquire resource here
- *       ON_SCOPE_EXIT{
+ *       finally{
  *           // release statment here
  *       };
  *       -*-*-*-*-*-*-*-*-*-*-*-*-
@@ -33,8 +34,8 @@
  *
  *       -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
  *       // acquire resource here
- *       SCOPEGUARD([&] { // release statment });
- *                  ^^^^lambda, function or executable object
+ *       INVOKE_ON_EXIT([&] { // release statment });
+ *                      ^^^^lambda, function or executable object
  *       -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
  *
  * (3) Using function MakeScopeGuard to create named variables so that you
@@ -78,11 +79,11 @@
 #define SG_LINE_NAME(name,line) SG_LINE_NAME_CAT(name,line)
 
 
-#define ON_SCOPE_EXIT \
-		auto SG_LINE_NAME(OnScopeExit_Block_,__LINE__) = \
-		sg::detail::eOnScopeExit() + [&]() noexcept ->void
-#define SCOPEGUARD(callback) \
-		auto SG_LINE_NAME(SCOPEGUARD_,__LINE__) = sg::MakeScopeGuard(callback)
+#define finally \
+		auto SG_LINE_NAME(ScopeGuard_Block_,__LINE__) = \
+		sg::detail::eSgFinally() + [&]() noexcept ->void
+#define INVOKE_ON_EXIT(callback) \
+		auto SG_LINE_NAME(ScopeGuard_,__LINE__) = sg::MakeScopeGuard(callback)
 
 #if SG_USING_TEMPLATE
 #include <utility>
@@ -100,10 +101,10 @@ namespace detail {
 	class ScopeGuard;
 
 	/* --- The helper functions provided multiple usages --- */
-	enum class eOnScopeExit {}; // dummy
+	enum class eSgFinally {}; // dummy
 
 	template<typename TCallback>
-	constexpr ScopeGuard<TCallback> operator+(eOnScopeExit, TCallback&& callback)
+	constexpr ScopeGuard<TCallback> operator+(eSgFinally, TCallback&& callback)
 	{
 		return ScopeGuard<TCallback>(std::forward<TCallback>(callback));
 	}
@@ -120,7 +121,7 @@ namespace detail {
 	{
 		using Callback = std::decay_t<TCallback>;
 
-		friend constexpr ScopeGuard<TCallback> operator+<TCallback>(eOnScopeExit, TCallback&&);
+		friend constexpr ScopeGuard<TCallback> operator+<TCallback>(eSgFinally, TCallback&&);
 		friend constexpr ScopeGuard<TCallback> MakeScopeGuard<TCallback>(TCallback&&);
 	private:
 		explicit ScopeGuard(Callback callback)
@@ -162,12 +163,12 @@ SG_END
 
 SG_BEGIN
 namespace detail{
-	enum class eOnScopeExit {}; // dummy
+	enum class eSgFinally {}; // dummy
 
 	// A simple and easy-understanding implement but take up more size
 	class ScopeGuard final
 	{
-		friend ScopeGuard operator+(eOnScopeExit, std::function<void()>);
+		friend ScopeGuard operator+(eSgFinally, std::function<void()>);
 		friend ScopeGuard MakeScopeGuard(std::function<void()>);
 	private:
 		explicit ScopeGuard(std::function<void()> callback)
@@ -202,7 +203,7 @@ namespace detail{
 	};
 
 	/* --- The helper functions provided multiple usages --- */
-	inline ScopeGuard operator+(eOnScopeExit, std::function<void()> callback)
+	inline ScopeGuard operator+(eSgFinally, std::function<void()> callback)
 	{
 		return ScopeGuard(callback);
 	}

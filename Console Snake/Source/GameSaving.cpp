@@ -86,7 +86,7 @@ GameSavingBase::GameSavingBase() try
 	// Read the encrypted data from save file 
 	auto save_file_size = static_cast<size_t>(file_size(save_file_path));
 	auto* cipher = new unsigned char[save_file_size] {};
-	ON_SCOPE_EXIT{ delete[] cipher; };
+	finally{ delete[] cipher; };
 	save_file.read(reinterpret_cast<char*>(cipher), save_file_size);
 
 	// AES: 128-bit, CBC mode, PKCS7 padding

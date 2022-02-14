@@ -143,7 +143,7 @@ void GamePage::run()
 				}
 			}
 		});
-	ON_SCOPE_EXIT{
+	finally{
 		if (th_input.joinable())
 			th_input.join();
 	};
