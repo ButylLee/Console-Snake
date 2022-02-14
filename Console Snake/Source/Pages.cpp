@@ -180,7 +180,7 @@ void AboutPage::run()
 						  (~token::about_caption).c_str(),
 						  MB_OK | MB_ICONINFORMATION);
 	if (msg != IDOK)
-		throw NativeError{};
+		throw NativeException{};
 	GameData::get().seletion = PageSel::MenuPage;
 }
 

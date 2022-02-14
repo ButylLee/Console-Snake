@@ -60,7 +60,7 @@ void InitConsole()
 		Console::get().setCursorVisible(false);
 		Console::get().setTitle(~token::console_title);
 	}
-	catch (const NativeError& error) {
+	catch (const NativeException& error) {
 		print_err(~token::message_init_fail);
 		print_err(error.what());
 		system("pause");
@@ -83,10 +83,6 @@ int main(int argc, char* argv[])
 	}
 	catch (const std::bad_alloc&) {
 		print_err(~token::message_std_bad_alloc);
-	}
-	catch (const NativeError& error) {
-		print_err(error.what());
-		GameSaving::get().save();
 	}
 	catch (const Exception& error) {
 		print_err(error.what());

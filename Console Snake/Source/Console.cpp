@@ -13,10 +13,6 @@ ConsoleBase::ConsoleBase() try
 	setWindowAttribute(WS_VISIBLE | WS_CAPTION | WS_SYSMENU | WS_CHILD |
 					   WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SIZEBOX);
 }
-catch (const NativeError&) {
-	print_err(~token::message_init_console_fail);
-	throw;
-}
 catch (const Exception&) {
 	print_err(~token::message_init_console_fail);
 	throw;
@@ -25,7 +21,7 @@ catch (const Exception&) {
 void ConsoleBase::setTitle(std::wstring new_title)
 {
 	if (!SetConsoleTitleW(new_title.c_str()))
-		throw NativeError{};
+		throw NativeException{};
 	title = std::move(new_title);
 }
 
@@ -54,10 +50,10 @@ void ConsoleBase::setCursorVisible(bool isVisible)
 {
 	CONSOLE_CURSOR_INFO cci;
 	if (!GetConsoleCursorInfo(hOutput, &cci))
-		throw NativeError{};
+		throw NativeException{};
 	cci.bVisible = static_cast<BOOL>(isVisible);
 	if (!SetConsoleCursorInfo(hOutput, &cci))
-		throw NativeError{};
+		throw NativeException{};
 }
 
 void ConsoleBase::moveToScreenCenter() noexcept
@@ -93,14 +89,14 @@ HANDLE ConsoleBase::getOutputHandle() const noexcept
 void ConsoleBase::setWindowAttribute(LONG_PTR args)
 {
 	if (!SetWindowLongPtrW(hConsole, GWL_STYLE, args))
-		throw NativeError{};
+		throw NativeException{};
 }
 
 LONG_PTR ConsoleBase::getWindowAttribute() const
 {
 	LONG_PTR win_att = GetWindowLongPtrW(hConsole, GWL_STYLE);
 	if (win_att == 0)
-		throw NativeError{};
+		throw NativeException{};
 	return win_att;
 }
 
@@ -108,7 +104,7 @@ HANDLE ConsoleBase::fetchOutputHandle() const
 {
 	HANDLE handle = GetStdHandle(STD_OUTPUT_HANDLE);
 	if (handle == INVALID_HANDLE_VALUE)
-		throw NativeError{};
+		throw NativeException{};
 	return handle;
 }
 
@@ -116,6 +112,6 @@ HWND ConsoleBase::fetchConsoleHandle() const
 {
 	HWND hwnd = GetConsoleWindow();
 	if (hwnd == NULL)
-		throw Exception(~token::GetConsoleWindow_failed_message);
+		throw RuntimeException(~token::GetConsoleWindow_failed_message);
 	return hwnd;
 }

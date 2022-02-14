@@ -11,12 +11,37 @@
 #include "WinMacro.h"
 #include <Windows.h>
 
+// Base type of all exceptions
+class Exception
+{
+public:
+	virtual ~Exception() = default;
+
+	[[nodiscard]] virtual const wchar_t* what() const noexcept = 0;
+};
+
+class RuntimeException :public Exception
+{
+public:
+	explicit RuntimeException(std::wstring message) noexcept
+		:buffer(std::move(message))
+	{}
+
+	[[nodiscard]] const wchar_t* what() const noexcept override
+	{
+		return buffer.c_str();
+	}
+
+private:
+	std::wstring buffer;
+};
+
 // handle GetLastError result and convert to readable message to throw
-class NativeError
+class NativeException :public Exception
 {
 public:
 	using CodeType = decltype(GetLastError());
-	explicit NativeError(CodeType error_code = GetLastError()) noexcept
+	explicit NativeException(CodeType error_code = GetLastError()) noexcept
 		:code(error_code)
 	{
 		if (!format())
@@ -25,21 +50,21 @@ public:
 			code = CodeType{};
 		}
 	}
-	~NativeError() noexcept
+	~NativeException() noexcept
 	{
 		if (code != CodeType{})
 			LocalFree((HLOCAL)buffer);
 		buffer = nullptr;
 	}
-	NativeError(const NativeError& other) noexcept :NativeError(other.code) {}
-	NativeError& operator=(const NativeError& other) noexcept
+	NativeException(const NativeException& other) noexcept :NativeException(other.code) {}
+	NativeException& operator=(const NativeException& other) noexcept
 	{
 		if (this != &other)
 			rebuild(other.code);
 		return *this;
 	}
 public:
-	[[nodiscard]] const wchar_t* what() const noexcept
+	[[nodiscard]] const wchar_t* what() const noexcept override
 	{
 		return buffer;
 	}
@@ -60,28 +85,12 @@ private:
 	}
 	void rebuild(CodeType error_code) noexcept
 	{
-		this->~NativeError();
-		(void)new(this) NativeError(error_code);
+		this->~NativeException();
+		(void)new(this) NativeException(error_code);
 	}
 private:
-	CodeType code = {};
 	const wchar_t* buffer = nullptr;
-};
-
-class Exception
-{
-public:
-	explicit Exception(std::wstring message) noexcept
-		:buffer(std::move(message))
-	{}
-
-	[[nodiscard]] const std::wstring& what() const noexcept
-	{
-		return buffer;
-	}
-
-private:
-	std::wstring buffer;
+	CodeType code = {};
 };
 
 template<typename T>
@@ -92,9 +101,6 @@ inline T* NewWithHandler() noexcept
 	}
 	catch (const std::bad_alloc&) {
 		print_err(~token::message_std_bad_alloc);
-	}
-	catch (const NativeError& error) {
-		print_err(error.what());
 	}
 	catch (const Exception& error) {
 		print_err(error.what());
