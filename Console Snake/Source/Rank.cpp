@@ -27,10 +27,10 @@ void RankBase::newResult(std::wstring new_name, int new_score, bool winning)
 	};
 
 	done = std::async(std::launch::async,
-					  [this, new_one = std::move(new_one)]
+					  [this, new_one = std::move(new_one)]() mutable
 					  {
 						  auto [rank, lock] = this->modifyRank();
-						  rank.push_back(new_one);
+						  rank.push_back(std::move(new_one));
 
 						  auto previous_user = std::find_if(rank.begin(), rank.end(),
 															[&](const RankItem& lhs) noexcept
