@@ -77,7 +77,7 @@ int main(int argc, char* argv[])
 	try {
 		while (true)
 		{
-			auto page = Page::CreatePage();
+			auto page = Page::Create();
 			page->run();
 		}
 	}

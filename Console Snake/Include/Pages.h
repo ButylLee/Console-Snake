@@ -9,7 +9,7 @@
 class Page
 {
 public:
-	static std::unique_ptr<Page> CreatePage();
+	static std::unique_ptr<Page> Create();
 public:
 	virtual void run() = 0;
 	virtual ~Page() = default;

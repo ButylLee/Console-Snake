@@ -23,7 +23,7 @@
 /***************************************
  Interface Page
 ****************************************/
-std::unique_ptr<Page> Page::CreatePage()
+std::unique_ptr<Page> Page::Create()
 {
 	std::unique_ptr<Page> page;
 
@@ -289,7 +289,7 @@ void SettingPage::run()
 			case K_F4:
 			{
 				GameData::get().seletion = PageSel::CustomThemePage;
-				auto page = CreatePage();
+				auto page = Create();
 				page->run();
 				canvas.setClientSize(default_size);
 				paintInterface();
