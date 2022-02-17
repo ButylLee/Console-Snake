@@ -5,7 +5,7 @@
 #include "Resource.h"
 #include "Singleton.h"
 
-enum struct PageSel
+enum struct PageSelect
 {
 	BeginPage,
 	MenuPage,
@@ -18,7 +18,7 @@ enum struct PageSel
 
 struct GameDataMember
 {
-	PageSel seletion = PageSel::BeginPage;
+	PageSelect seletion = PageSelect::BeginPage;
 	int score = 0;
 	bool retry_game = false;
 	bool colorful_title = false;
