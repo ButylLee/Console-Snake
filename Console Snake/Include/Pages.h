@@ -5,9 +5,46 @@
 #include "Canvas.h"
 #include "DataSet.h"
 #include <memory>
+#include <unordered_map>
+#include <cassert>
+
+#pragma region FactoryMacros
+
+#define GET_MAP_FUNC _getMap
+
+#define FACTORY_MAP_DEFINE_(class_name, key_scope) \
+protected: \
+	static auto& GET_MAP_FUNC() \
+	{ \
+		static std::unordered_map<key_scope, std::unique_ptr<class_name>(*)()> map; \
+		return map; \
+	} \
+	template<typename T> \
+	static std::unique_ptr<class_name> _FactoryNew() \
+	{ \
+		return std::make_unique<T>(); \
+	}
+
+#define FACTORY_MAP_REGISTER_(class_name, key_scope) \
+private: \
+	inline static bool _is_registered = [] \
+		{ \
+			auto& map = class_name::GET_MAP_FUNC(); \
+			/* avoid register more than once */ \
+			assert(map.find(key_scope::class_name) == map.end()); \
+			map[key_scope::class_name] = class_name::_FactoryNew<class_name>; \
+			return true; \
+		}()
+
+#define KEY_SCOPE PageSelect
+#define FACTORY_MAP_DEFINE(class_name) FACTORY_MAP_DEFINE_(class_name, KEY_SCOPE)
+#define FACTORY_MAP_REGISTER(class_name) FACTORY_MAP_REGISTER_(class_name, KEY_SCOPE)
+
+#pragma endregion
 
 class Page
 {
+	FACTORY_MAP_DEFINE(Page);
 public:
 	static std::unique_ptr<Page> Create();
 public:
@@ -17,6 +54,7 @@ public:
 
 class GamePage :public Page
 {
+	FACTORY_MAP_REGISTER(GamePage);
 public:
 	void run() override;
 
@@ -26,6 +64,7 @@ private:
 
 class AboutPage :public Page
 {
+	FACTORY_MAP_REGISTER(AboutPage);
 public:
 	void run() override;
 };
@@ -48,6 +87,7 @@ protected:
 
 class MenuPage :public NormalPage
 {
+	FACTORY_MAP_REGISTER(MenuPage);
 public:
 	void run() override;
 
@@ -57,6 +97,7 @@ private:
 
 class SettingPage :public NormalPage
 {
+	FACTORY_MAP_REGISTER(SettingPage);
 public:
 	void run() override;
 
@@ -69,6 +110,7 @@ private:
 
 class CustomThemePage :public NormalPage
 {
+	FACTORY_MAP_REGISTER(CustomThemePage);
 public:
 	CustomThemePage() noexcept;
 	void run() override;
@@ -81,6 +123,7 @@ private:
 
 class BeginPage :public NormalPage
 {
+	FACTORY_MAP_REGISTER(BeginPage);
 public:
 	void run() override;
 
@@ -91,11 +134,18 @@ private:
 
 class RankPage :public NormalPage
 {
+	FACTORY_MAP_REGISTER(RankPage);
 public:
 	void run() override;
 
 private:
 	void paintInterface();
 };
+
+#undef DEFINE_FACTORY_MAP_
+#undef DEFINE_FACTORY_MAP
+#undef FACTORY_MAP_REGISTER_
+#undef FACTORY_MAP_REGISTER
+#undef KEY_SCOPE
 
 #endif // SNAKE_PAGES_HEADER_

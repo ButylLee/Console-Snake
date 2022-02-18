@@ -19,39 +19,17 @@
 #include <chrono>
 #include <memory>
 #include <string>
+#include <cassert>
 
 /***************************************
  Interface Page
 ****************************************/
 std::unique_ptr<Page> Page::Create()
 {
-	std::unique_ptr<Page> page;
-
-	switch (GameData::get().seletion)
-	{
-		case PageSelect::BeginPage:
-			page.reset(new BeginPage);
-			break;
-		case PageSelect::MenuPage:
-			page.reset(new MenuPage);
-			break;
-		case PageSelect::GamePage:
-			page.reset(new GamePage);
-			break;
-		case PageSelect::SettingPage:
-			page.reset(new SettingPage);
-			break;
-		case PageSelect::CustomThemePage:
-			page.reset(new CustomThemePage);
-			break;
-		case PageSelect::RankPage:
-			page.reset(new RankPage);
-			break;
-		case PageSelect::AboutPage:
-			page.reset(new AboutPage);
-			break;
-	}
-	return page;
+	auto& map = Page::GET_MAP_FUNC();
+	auto& key = GameData::get().selection;
+	assert(map.find(key) != map.end());
+	return map[key]();
 }
 
 /***************************************
@@ -165,7 +143,7 @@ void GamePage::run()
 	}
 	else
 	{
-		GameData::get().seletion = PageSelect::MenuPage;
+		GameData::get().selection = PageSelect::MenuPage;
 	}
 	GameSaving::get().save();
 }
@@ -181,7 +159,7 @@ void AboutPage::run()
 						  MB_OK | MB_ICONINFORMATION);
 	if (msg != IDOK)
 		throw NativeException{};
-	GameData::get().seletion = PageSelect::MenuPage;
+	GameData::get().selection = PageSelect::MenuPage;
 }
 
 /***************************************
@@ -210,18 +188,18 @@ void MenuPage::run()
 		{
 			case K_Enter:
 			case K_1:
-				GameData::get().seletion = PageSelect::GamePage;
+				GameData::get().selection = PageSelect::GamePage;
 				return;
 			case K_2:
-				GameData::get().seletion = PageSelect::SettingPage;
+				GameData::get().selection = PageSelect::SettingPage;
 				return;
 			case K_3:
-				GameData::get().seletion = PageSelect::RankPage;
+				GameData::get().selection = PageSelect::RankPage;
 				return;
 			case K_a:
 			case K_A:
 			case K_F1:
-				GameData::get().seletion = PageSelect::AboutPage;
+				GameData::get().selection = PageSelect::AboutPage;
 				return;
 			case K_Esc:
 				exit(EXIT_SUCCESS);
@@ -288,7 +266,7 @@ void SettingPage::run()
 
 			case K_F4:
 			{
-				GameData::get().seletion = PageSelect::CustomThemePage;
+				GameData::get().selection = PageSelect::CustomThemePage;
 				auto page = Page::Create();
 				page->run();
 				canvas.setClientSize(default_size);
@@ -309,14 +287,14 @@ void SettingPage::run()
 
 			case K_Enter:
 			{
-				GameData::get().seletion = PageSelect::MenuPage;
+				GameData::get().selection = PageSelect::MenuPage;
 				GameSaving::get().save();
 			}
 			return;
 
 			case K_Esc:
 			{
-				GameData::get().seletion = PageSelect::MenuPage;
+				GameData::get().selection = PageSelect::MenuPage;
 				// restore
 				GameSetting::get() = setting_backup;
 				LocalizedStrings::setLang(setting_backup.lang);
@@ -434,14 +412,14 @@ void CustomThemePage::run()
 
 			case K_Ctrl_Dd:
 				GameSetting::get().theme.clearCustomValue();
-				GameData::get().seletion = PageSelect::SettingPage;
+				GameData::get().selection = PageSelect::SettingPage;
 				return;
 
 			case K_Enter:
 			case K_Esc:
 				GameSetting::get().theme.setCustomValue(theme_temp);
 				GameSetting::get().theme = Theme::Custom;
-				GameData::get().seletion = PageSelect::SettingPage;
+				GameData::get().selection = PageSelect::SettingPage;
 				return;
 		}
 	}
@@ -556,7 +534,7 @@ void BeginPage::run()
 	if (getwch())
 	{
 		is_press = true;
-		GameData::get().seletion = PageSelect::MenuPage;
+		GameData::get().selection = PageSelect::MenuPage;
 		return;
 	}
 }
@@ -617,7 +595,7 @@ void RankPage::run()
 				[[fallthrough]];
 			case K_Enter:
 			case K_Esc:
-				GameData::get().seletion = PageSelect::MenuPage;
+				GameData::get().selection = PageSelect::MenuPage;
 				return;
 		}
 	}

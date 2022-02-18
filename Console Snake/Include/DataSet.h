@@ -7,18 +7,18 @@
 
 enum struct PageSelect
 {
-	BeginPage,
-	MenuPage,
 	GamePage,
+	AboutPage,
+	MenuPage,
 	SettingPage,
 	CustomThemePage,
-	RankPage,
-	AboutPage
+	BeginPage,
+	RankPage
 };
 
 struct GameDataMember
 {
-	PageSelect seletion = PageSelect::BeginPage;
+	PageSelect selection = PageSelect::BeginPage;
 	int score = 0;
 	bool retry_game = false;
 	bool colorful_title = false;
