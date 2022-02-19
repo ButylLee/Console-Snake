@@ -47,6 +47,7 @@ class Page
 	FACTORY_MAP_DEFINE(Page);
 public:
 	static std::unique_ptr<Page> Create();
+
 public:
 	virtual void run() = 0;
 	virtual ~Page() = default;
@@ -80,6 +81,7 @@ protected:
 	{
 		Yes, No
 	};
+
 protected:
 	void paintTitle(ShowVersion);
 	Canvas canvas;
