@@ -13,13 +13,18 @@ class DynArrayRef
 {
 public:
 	DynArrayRef(T* data_, size_t* sizes, size_t* remains) noexcept
-		: data(data_), my_size(sizes), my_remain(remains)
+		: arr_data(data_), my_size(sizes), my_remain(remains)
 	{}
 
-	auto operator[](size_t index) const noexcept
+	DynArrayRef<T, Dimension - 1> operator[](size_t index) noexcept
+	{
+		return const_cast<DynArrayRef<T, Dimension - 1>&&>(
+			static_cast<const DynArrayRef&>(*this)[index]);
+	}
+	const DynArrayRef<T, Dimension - 1> operator[](size_t index) const noexcept
 	{
 		assert(index < *my_size);
-		return DynArrayRef<T, Dimension - 1>(data + *my_remain * index, my_size + 1, my_remain + 1);
+		return DynArrayRef<T, Dimension - 1>(arr_data + *my_remain * index, my_size + 1, my_remain + 1);
 	}
 	size_t size() const noexcept
 	{
@@ -31,7 +36,7 @@ public:
 	}
 
 private:
-	T* const data;
+	T* const arr_data;
 	size_t* const my_size;
 	size_t* const my_remain;
 };
@@ -41,7 +46,7 @@ class DynArrayRef<T, 1>
 {
 public:
 	DynArrayRef(T* data_, size_t* sizes, size_t*) noexcept
-		: data(data_), my_size(sizes)
+		: arr_data(data_), my_size(sizes)
 	{}
 
 	T& operator[](size_t index) noexcept
@@ -51,7 +56,7 @@ public:
 	const T& operator[](size_t index) const noexcept
 	{
 		assert(index < *my_size);
-		return data[index];
+		return arr_data[index];
 	}
 	size_t size() const noexcept
 	{
@@ -63,7 +68,7 @@ public:
 	}
 
 private:
-	T* const data;
+	T* const arr_data;
 	size_t* const my_size;
 };
 // -------------------------------------------
@@ -108,22 +113,22 @@ public:
 	template<typename... Args>
 	explicit DynArray(Args... sizes)
 		: total_count{ detail::GetTotalSizeAndFill(dim_info.sizes, sizes...) }
-		, data{ detail::NullptrAndFillRemains(Dimension, dim_info.remains, dim_info.sizes) }
+		, arr_data{ detail::NullptrAndFillRemains(Dimension, dim_info.remains, dim_info.sizes) }
 	{
 		static_assert(sizeof...(Args) == Dimension, "The specified Dimension is not equal to sizes args.");
 		static_assert((std::is_convertible_v<Args, size_t> && ...),
 					  "The size types of dimensions must be convertible to size_t.");
 #ifndef NDEBUG
-		data = new T[total_count]{}; // zero initialized
+		arr_data = new T[total_count]{}; // zero initialized
 #else
-		data = new T[total_count];
+		arr_data = new T[total_count];
 #endif
 	}
 
 	~DynArray() noexcept
 	{
-		delete[] data;
-		data = nullptr;
+		delete[] arr_data;
+		arr_data = nullptr;
 #ifndef NDEBUG
 		total_count = 0;
 		std::fill(std::begin(dim_info.sizes), std::end(dim_info.sizes), 0);
@@ -136,11 +141,11 @@ public:
 		this->dim_info = other.dim_info;
 		this->total_count = other.total_count;
 #ifndef NDEBUG
-		this->data = new T[total_count]{};
+		this->arr_data = new T[total_count]{};
 #else
-		this->data = new T[total_count];
+		this->arr_data = new T[total_count];
 #endif
-		std::copy_n(other.data, total_count, this->data);
+		std::copy_n(other.arr_data, total_count, this->arr_data);
 	}
 
 	DynArray& operator=(const DynArray& other)&
@@ -156,10 +161,10 @@ public:
 
 	DynArray(DynArray&& other) noexcept
 	{
-		this->data = other.data;
+		this->arr_data = other.arr_data;
 		this->dim_info = other.dim_info;
 		this->total_count = other.total_count;
-		other.data = nullptr;
+		other.arr_data = nullptr;
 #ifndef NDEBUG
 		other.~DynArray();
 #endif
@@ -178,17 +183,25 @@ public:
 
 	void swap(DynArray& other) noexcept
 	{
-		std::swap(this->data, other.data);
+		std::swap(this->arr_data, other.arr_data);
 		std::swap(this->dim_info, other.dim_info);
 		std::swap(this->total_count, other.total_count);
 	}
 
 public:
-	auto ref() noexcept
+	DynArrayRef<T, Dimension> ref() noexcept
 	{
-		return DynArrayRef<T, Dimension>(data, dim_info.sizes, dim_info.remains);
+		return DynArrayRef<T, Dimension>(arr_data, dim_info.sizes, dim_info.remains);
+	}
+	const DynArrayRef<T, Dimension> ref() const noexcept
+	{
+		return DynArrayRef<T, Dimension>(arr_data, dim_info.sizes, dim_info.remains);
 	}
 	decltype(auto) operator[](size_t index) noexcept
+	{
+		return ref()[index];
+	}
+	decltype(auto) operator[](size_t index) const noexcept
 	{
 		return ref()[index];
 	}
@@ -200,6 +213,14 @@ public:
 	{
 		return total_count;
 	}
+	T* data() noexcept
+	{
+		return arr_data;
+	}
+	const T* data() const noexcept
+	{
+		return arr_data;
+	}
 
 private:
 	struct { // for assigning conveniently
@@ -207,7 +228,7 @@ private:
 		size_t remains[Dimension];
 	}dim_info;
 	size_t total_count;
-	T* data;
+	T* arr_data;
 };
 
 #endif // DYNARRAY_HEADER_
