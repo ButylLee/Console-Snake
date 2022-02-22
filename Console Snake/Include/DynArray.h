@@ -26,6 +26,22 @@ public:
 		assert(index < *my_size);
 		return DynArrayRef<T, Dimension - 1>(arr_data + *my_remain * index, my_size + 1, my_remain + 1);
 	}
+	DynArrayRef<T, Dimension - 1> front() noexcept
+	{
+		return (*this)[0];
+	}
+	const DynArrayRef<T, Dimension - 1> front() const noexcept
+	{
+		return (*this)[0];
+	}
+	DynArrayRef<T, Dimension - 1> back() noexcept
+	{
+		return (*this)[*my_size - 1];
+	}
+	const DynArrayRef<T, Dimension - 1> back() const noexcept
+	{
+		return (*this)[*my_size - 1];
+	}
 	size_t size() const noexcept
 	{
 		return *my_size;
@@ -33,6 +49,14 @@ public:
 	size_t total_size() const noexcept
 	{
 		return *my_remain * *my_size;
+	}
+	T* data() noexcept
+	{
+		return arr_data;
+	}
+	const T* data() const noexcept
+	{
+		return arr_data;
 	}
 
 private:
@@ -58,6 +82,22 @@ public:
 		assert(index < *my_size);
 		return arr_data[index];
 	}
+	T& front() noexcept
+	{
+		return (*this)[0];
+	}
+	const T& front() const noexcept
+	{
+		return (*this)[0];
+	}
+	T& back() noexcept
+	{
+		return (*this)[*my_size - 1];
+	}
+	const T& back() const noexcept
+	{
+		return (*this)[*my_size - 1];
+	}
 	size_t size() const noexcept
 	{
 		return *my_size;
@@ -65,6 +105,14 @@ public:
 	size_t total_size() const noexcept
 	{
 		return size();
+	}
+	T* data() noexcept
+	{
+		return arr_data;
+	}
+	const T* data() const noexcept
+	{
+		return arr_data;
 	}
 
 private:
@@ -204,6 +252,22 @@ public:
 	decltype(auto) operator[](size_t index) const noexcept
 	{
 		return ref()[index];
+	}
+	decltype(auto) front() noexcept
+	{
+		return ref()[0];
+	}
+	decltype(auto) front() const noexcept
+	{
+		return ref()[0];
+	}
+	decltype(auto) back() noexcept
+	{
+		return ref()[size() - 1];
+	}
+	decltype(auto) back() const noexcept
+	{
+		return ref()[size() - 1];
 	}
 	size_t size() const noexcept
 	{
