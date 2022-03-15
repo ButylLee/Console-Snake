@@ -12,6 +12,7 @@
 #include <type_traits>
 #include <string>
 #include <cwctype>
+#include <cassert>
 #include "WinMacro.h"
 #include <Windows.h>
 
@@ -177,12 +178,12 @@ auto& Playground::getRandomEngine()
 }
 
 // random interval: [min,max]
-template<typename T>
+template<std::integral T>
 T Playground::getRandom(T min, T max)
 {
-	static_assert(std::is_integral_v<T>, "getRandom(min,max) expects integral arguments.");
 	static std::uniform_int_distribution<T> dis;
 	using param_type = typename decltype(dis)::param_type;
+	assert(min <= max);
 	return dis(getRandomEngine(), param_type{ min,max });
 }
 

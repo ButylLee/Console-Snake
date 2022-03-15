@@ -8,6 +8,7 @@
 #include <atomic>
 #include "AtomicOperation.h"
 #include <cstdint>
+#include <concepts>
 
 enum struct Direction
 {
@@ -61,7 +62,7 @@ private:
 	void createSnake();
 	void createFood();
 	auto& getRandomEngine();
-	template<typename T>
+	template<std::integral T>
 	T getRandom(T min, T max);
 
 	void updateFrame();
