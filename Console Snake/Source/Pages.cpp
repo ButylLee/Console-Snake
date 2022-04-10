@@ -121,7 +121,7 @@ void GamePage::run()
 				}
 			}
 		});
-	finally{
+	finally {
 		if (th_input.joinable())
 			th_input.join();
 	};
@@ -528,12 +528,9 @@ void BeginPage::run()
 	canvas.setClientSize(default_size);
 	paintInterface();
 
-	if (getwch())
-	{
-		is_press = true;
-		GameData::get().selection = PageSelect::MenuPage;
-		return;
-	}
+	(void)getwch();
+	is_press = true;
+	GameData::get().selection = PageSelect::MenuPage;
 }
 
 void BeginPage::paintInterface()
