@@ -523,9 +523,6 @@ void CustomThemePage::paintCurOptions()
 /***************************************
  class BeginPage
 ****************************************/
-// benign data race
-bool BeginPage::is_press = false;
-
 void BeginPage::run()
 {
 	canvas.setClientSize(default_size);

@@ -131,7 +131,7 @@ public:
 
 private:
 	void paintInterface();
-	static bool is_press;
+	inline static bool is_press = false; // benign data race
 };
 
 class RankPage :public NormalPage
