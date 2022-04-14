@@ -22,21 +22,20 @@ enum struct GameStatus
 };
 
 // --------------- class Playground ---------------
-struct MapNode
-{
-	int16_t snake_index;
-	Element type;
-};
-
-struct SnakeNode
-{
-	uint8_t x;
-	uint8_t y;
-};
-
 class Playground
 {
 	static constexpr int snake_begin_length = 3;
+	struct MapNode
+	{
+		int16_t snake_index;
+		Element type;
+	};
+	struct SnakeNode
+	{
+		uint8_t x;
+		uint8_t y;
+	};
+
 public:
 	Playground(Canvas& canvas, std::atomic<Direction>& input_key,
 			   std::atomic<Direction>& snake_direct, std::atomic<GameStatus>& game_status)
@@ -51,6 +50,8 @@ public:
 		GameData::get().score = 0;
 		storeAtomic(game_status, GameStatus::Running);
 	}
+	Playground(const Playground&) = delete;
+	Playground& operator=(const Playground&) = delete;
 
 public:
 	void play();

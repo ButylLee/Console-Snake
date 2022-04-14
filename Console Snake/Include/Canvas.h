@@ -39,6 +39,8 @@ class Canvas
 {
 public:
 	Canvas();
+	Canvas(const Canvas&) = delete;
+	Canvas& operator=(const Canvas&) = delete;
 
 public:
 	void setColor(Color new_color);

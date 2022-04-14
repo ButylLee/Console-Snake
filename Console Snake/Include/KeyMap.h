@@ -11,7 +11,7 @@
 // 0 to LSB, to avoid conflicting with regular key like K_A.
 #define DOUBLE_KEY(first, second) ((first) | (second) << sizeof(decltype(_getwch())) * CHAR_BIT)
 
-// useing wide char
+// using wide char
 enum Key :decltype(getwch())
 {
 	K_0 = L'0',

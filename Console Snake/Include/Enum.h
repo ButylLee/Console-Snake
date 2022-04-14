@@ -3,14 +3,13 @@
 #define SNAKE_ENUM_HEADER_
 
 /*
- *                             Enum & CustomEnum
- * Enum and CustomEnum acts like built-in enum but only store pre-defined
- * key-value, and could have not only integral underlying type. It has
- * pre-defined key-values defined and default key-value specified in
- * compile-time. CustomEnum could only have one custom value modified in
- * runtime, and the custom key-value can be null. A Enum object's value
- * can switch circularly in these defined values. It can also store string
- * for reflection.
+ *                          Enum & CustomEnum
+ * Enum and CustomEnum act like built-in enum but can only store pre-defined
+ * key-values, whose underlying types are not only integral. It's compile-time
+ * in which the pre-defined key-values are defined and the default key-value is
+ * specified. CustomEnum can have only one custom value that modified in runtime,
+ * which can be null. An Enum object's value can switch circularly among these
+ * pre-defined values. It also stores strings with each key-value for reflection.
  *
  * To define an Enum or CustomEnum type like built-in enum:
  *     enum class Size :int{
