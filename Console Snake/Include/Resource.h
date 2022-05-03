@@ -8,7 +8,7 @@
 #include "WinMacro.h"
 #include <Windows.h>
 
-#define GAME_VERSION "2.11"
+#define GAME_VERSION "2.12"
 inline const auto save_file_name = "SnakeSaved.bin"_crypt;
 inline constexpr const unsigned char crypto_key[] = {
 	0x54, 0xDE, 0x3B, 0xF2, 0xD8, 0x5D, 0x4E, 0x04,

@@ -51,92 +51,9 @@ void GamePage::run()
 	auto height = GameSetting::get().height;
 	canvas.setClientSize(width, height);
 
-	std::atomic<Direction> input_key = Direction::None;
-	std::atomic<Direction> snake_direct;
-	std::atomic<GameStatus> game_status;
+	Playground playground(this->canvas);
+	playground.play();
 
-	std::mutex mut;
-	std::condition_variable cond_ready;
-	std::thread th_input(
-		[&]
-		{
-			std::unique_lock lk(mut);
-			cond_ready.wait(lk, [] { return true; }); // wait for playground initializing
-			while (true)
-			{
-				if (loadAtomic(input_key) != Direction::None)
-					continue;
-				switch (getwch())
-				{
-					case K_UP: case K_W: case K_w:
-						if (loadAtomic(game_status) == GameStatus::Running &&
-							loadAtomic(snake_direct) != Direction::Down)
-						{
-							storeAtomic(input_key, Direction::Up);
-						}
-						break;
-
-					case K_DOWN: case K_S: case K_s:
-						if (loadAtomic(game_status) == GameStatus::Running &&
-							loadAtomic(snake_direct) != Direction::Up)
-						{
-							storeAtomic(input_key, Direction::Down);
-						}
-						break;
-
-					case K_LEFT: case K_A: case K_a:
-						if (loadAtomic(game_status) == GameStatus::Running &&
-							loadAtomic(snake_direct) != Direction::Right)
-						{
-							storeAtomic(input_key, Direction::Left);
-						}
-						break;
-
-					case K_RIGHT: case K_D: case K_d:
-						if (loadAtomic(game_status) == GameStatus::Running &&
-							loadAtomic(snake_direct) != Direction::Left)
-						{
-							storeAtomic(input_key, Direction::Right);
-						}
-						break;
-
-					case K_Space:
-						if (loadAtomic(game_status) == GameStatus::Pausing)
-						{
-							storeAtomic(game_status, GameStatus::Running);
-							if (GameSetting::get().show_frame)
-								Console::get().setTitle(~token::title_gaming);
-						}
-						else
-						{
-							storeAtomic(game_status, GameStatus::Pausing);
-							if (GameSetting::get().show_frame)
-								Console::get().setTitle(~token::title_pausing);
-						}
-						break;
-
-					case K_Esc:
-						storeAtomic(game_status, GameStatus::Ending);
-						return;
-				}
-			}
-		});
-	finally {
-		if (th_input.joinable())
-			th_input.join();
-	};
-
-	{
-		std::unique_lock lk(mut);
-		Playground playground(this->canvas,
-							  input_key,
-							  snake_direct,
-							  game_status);
-		lk.unlock();
-		cond_ready.notify_one();
-
-		playground.play();
-	}
 	if (GameData::get().retry_game == true)
 	{
 		GameData::get().retry_game = false;

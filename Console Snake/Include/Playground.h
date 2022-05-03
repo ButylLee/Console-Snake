@@ -37,12 +37,9 @@ class Playground
 	};
 
 public:
-	Playground(Canvas& canvas, std::atomic<Direction>& input_key,
-			   std::atomic<Direction>& snake_direct, std::atomic<GameStatus>& game_status)
-		: canvas(canvas), input_key(input_key)
-		, snake_direct(snake_direct), game_status(game_status)
+	Playground(Canvas& canvas)
+		: canvas(canvas), snake_body(getSnakeBodySize())
 		, map(GameSetting::get().height, GameSetting::get().width)
-		, snake_body(getSnakeBodySize())
 	{
 		setupInvariantAndPaint();
 		createSnake();
@@ -73,9 +70,9 @@ private:
 
 private:
 	Canvas& canvas;
-	std::atomic<Direction>& input_key;
-	std::atomic<Direction>& snake_direct;
-	std::atomic<GameStatus>& game_status;
+	std::atomic<Direction> input_key = Direction::None;
+	std::atomic<Direction> snake_direct;
+	std::atomic<GameStatus> game_status;
 
 	// The invariant of this class is that ALL map nodes except barrier
 	// and snake_body nodes should have one-to-one correspondence.

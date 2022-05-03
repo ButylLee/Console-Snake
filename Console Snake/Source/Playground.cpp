@@ -4,6 +4,7 @@
 
 #include "wideIO.h"
 #include "KeyMap.h"
+#include "ScopeGuard.h"
 
 #include <random>
 #include <thread>
@@ -19,6 +20,76 @@
 void Playground::play()
 {
 	using namespace std::chrono_literals;
+
+	std::thread th_input(
+		[this]
+		{
+			while (true)
+			{
+				if (game_over)
+					return;
+				if (loadAtomic(input_key) != Direction::None)
+					continue;
+				switch (getwch())
+				{
+					case K_UP: case K_W: case K_w:
+						if (loadAtomic(game_status) == GameStatus::Running &&
+							loadAtomic(snake_direct) != Direction::Down)
+						{
+							storeAtomic(input_key, Direction::Up);
+						}
+						break;
+
+					case K_DOWN: case K_S: case K_s:
+						if (loadAtomic(game_status) == GameStatus::Running &&
+							loadAtomic(snake_direct) != Direction::Up)
+						{
+							storeAtomic(input_key, Direction::Down);
+						}
+						break;
+
+					case K_LEFT: case K_A: case K_a:
+						if (loadAtomic(game_status) == GameStatus::Running &&
+							loadAtomic(snake_direct) != Direction::Right)
+						{
+							storeAtomic(input_key, Direction::Left);
+						}
+						break;
+
+					case K_RIGHT: case K_D: case K_d:
+						if (loadAtomic(game_status) == GameStatus::Running &&
+							loadAtomic(snake_direct) != Direction::Left)
+						{
+							storeAtomic(input_key, Direction::Right);
+						}
+						break;
+
+					case K_Space:
+						if (loadAtomic(game_status) == GameStatus::Pausing)
+						{
+							storeAtomic(game_status, GameStatus::Running);
+							if (GameSetting::get().show_frame)
+								Console::get().setTitle(~token::title_gaming);
+						}
+						else
+						{
+							storeAtomic(game_status, GameStatus::Pausing);
+							if (GameSetting::get().show_frame)
+								Console::get().setTitle(~token::title_pausing);
+						}
+						break;
+
+					case K_Esc:
+						storeAtomic(game_status, GameStatus::Ending);
+						return;
+				}
+			}
+		});
+	finally {
+		if (th_input.joinable())
+			th_input.join();
+	};
+
 	while (true)
 	{
 		switch (loadAtomic(game_status))
