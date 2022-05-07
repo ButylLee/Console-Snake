@@ -26,7 +26,7 @@
 ****************************************/
 std::unique_ptr<Page> Page::Create()
 {
-	auto& map = Page::GET_MAP_FUNC();
+	auto& map = Page::FUNC_GET_MAP();
 	auto& key = GameData::get().selection;
 	assert(map.find(key) != map.end());
 	return map[key]();
@@ -501,6 +501,8 @@ void RankPage::run()
 		switch (getwch())
 		{
 			case K_Ctrl_Dd:
+				if (is_no_data)
+					continue;
 				Rank::get().clearRank();
 				GameSaving::get().save();
 				[[fallthrough]];
@@ -526,6 +528,7 @@ void RankPage::paintInterface()
 	{
 		canvas.setCenteredCursor(~token::rank_no_data, baseY);
 		print(~token::rank_no_data);
+		is_no_data = true;
 	}
 	else
 	{

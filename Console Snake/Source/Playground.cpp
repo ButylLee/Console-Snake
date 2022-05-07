@@ -358,25 +358,28 @@ void Playground::endGame()
 	print(buffer);
 
 	// show info and get gamer's name
-	canvas.setColor(Color::Green);
-	canvas.setCenteredCursor(~token::game_enter_your_name, baseY + 3);
-	print(~token::game_enter_your_name);
-
-	canvas.setColor(Color::LightAqua);
-	std::wstring name;
-	for (wchar_t ch;;)
+	if (GameData::get().score != 0)
 	{
-		ch = getwchar();
-		if (ch == L'\n')
-			break;
-		if (iswprint(ch))
-			name += ch;
+		canvas.setColor(Color::Green);
+		canvas.setCenteredCursor(~token::game_enter_your_name, baseY + 3);
+		print(~token::game_enter_your_name);
+
+		canvas.setColor(Color::LightAqua);
+		std::wstring name;
+		for (wchar_t ch;;)
+		{
+			ch = getwchar();
+			if (ch == L'\n')
+				break;
+			if (iswprint(ch))
+				name += ch;
+		}
+		if (name.find_first_not_of(L' ') == std::string::npos)
+			name.clear(); // clear if only has spaces
+		if (name.length() > Rank::name_max_length)
+			name.resize(Rank::name_max_length);
+		Rank::get().newResult(name, GameData::get().score, is_win);
 	}
-	if (name.find_first_not_of(L' ') == std::string::npos)
-		name.clear(); // clear if only has spaces
-	if (name.length() > Rank::name_max_length)
-		name.resize(Rank::name_max_length);
-	Rank::get().newResult(name, GameData::get().score, is_win);
 
 	// show Retry Or Return info
 	canvas.setColor(Color::LightWhite);

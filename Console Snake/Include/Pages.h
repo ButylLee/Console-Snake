@@ -10,11 +10,11 @@
 
 #pragma region FactoryMacros
 
-#define GET_MAP_FUNC _getMap
+#define FUNC_GET_MAP _getMap
 
 #define FACTORY_MAP_DEFINE_(class_name, key_scope) \
 protected: \
-	static auto& GET_MAP_FUNC() \
+	static auto& FUNC_GET_MAP() \
 	{ \
 		static std::unordered_map<key_scope, std::unique_ptr<class_name>(*)()> map; \
 		return map; \
@@ -29,7 +29,7 @@ protected: \
 private: \
 	inline static bool _is_registered = [] \
 		{ \
-			auto& map = class_name::GET_MAP_FUNC(); \
+			auto& map = class_name::FUNC_GET_MAP(); \
 			/* avoid register more than once */ \
 			assert(map.find(key_scope::class_name) == map.end()); \
 			map[key_scope::class_name] = class_name::_FactoryNew<class_name>; \
@@ -142,6 +142,7 @@ public:
 
 private:
 	void paintInterface();
+	bool is_no_data = false;
 };
 
 #undef DEFINE_FACTORY_MAP_
