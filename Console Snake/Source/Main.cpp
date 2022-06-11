@@ -1,4 +1,17 @@
-﻿#include "Main.h"
+﻿#include "Console.h"
+#include "Pages.h"
+#include "DataSet.h"
+#include "GameSaving.h"
+
+#include "wideIO.h"
+#include "Resource.h"
+#include "EncryptedString.h"
+
+#include "WinMacro.h"
+#include <Windows.h>
+#include <clocale>
+#include <cstdlib>
+#include <string>
 
 // enable Windows Visual Style
 #pragma comment(linker, "\"/manifestdependency:type='win32' name='Microsoft.Windows.Common-Controls' \

@@ -53,9 +53,6 @@
     <ClInclude Include="Include\Console.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Include\Main.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="Include\Pages.h">
       <Filter>头文件</Filter>
     </ClInclude>

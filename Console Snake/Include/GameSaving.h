@@ -28,7 +28,8 @@ class GameSavingBase
 		int8_t lang = 0;
 		int8_t show_frame = 0;
 	};
-	static_assert(sizeof(SettingSavingItem) == 8 + 4 * (size_t)Element::Mask, "sizeof SettingSavingItem is incorrect.");
+	static_assert(sizeof(SettingSavingItem) == 8 + 4 * (size_t)Element::Mask,
+				  "sizeof SettingSavingItem is incorrect.");
 
 	struct alignas(8) RankSavingItem
 	{
@@ -39,7 +40,8 @@ class GameSavingBase
 		int8_t is_win = 0;
 		wchar_t name[Rank::name_max_length] = {};
 	};
-	static_assert(sizeof(RankSavingItem) == 8 + 2 * Rank::name_max_length, "sizeof RankSavingItem is incorrect.");
+	static_assert(sizeof(RankSavingItem) == 8 + sizeof(wchar_t) * Rank::name_max_length,
+				  "sizeof RankSavingItem is incorrect.");
 
 protected:
 	GameSavingBase();
@@ -56,7 +58,8 @@ private:
 		SettingSavingItem setting;
 		RankSavingItem rank_list[Rank::rank_count];
 	}bin_data;
-	static_assert(sizeof(bin_data) == sizeof(SettingSavingItem) + sizeof(RankSavingItem) * Rank::rank_count, "sizeof bin_data is incorrect.");
+	static_assert(sizeof(bin_data) == sizeof(SettingSavingItem) + sizeof(RankSavingItem) * Rank::rank_count,
+				  "sizeof bin_data is incorrect.");
 
 	std::future<void> done;
 	bool no_save_file = true;
