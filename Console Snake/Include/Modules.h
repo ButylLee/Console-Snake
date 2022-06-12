@@ -5,11 +5,22 @@
 #include <vector>
 #include <ranges>
 
+template<typename T>
+inline void* ModuleNew()
+{
+	return new T;
+}
+
+template<typename T>
+inline void ModuleDelete(void* object) noexcept
+{
+	delete static_cast<T*>(object);
+}
+
 class ModuleManager
 {
 	template<typename Base>
 	friend class ModuleRegister;
-public:
 	struct ModuleManageFunc
 	{
 		using CreatorFunc = void* (*)();
@@ -17,7 +28,6 @@ public:
 		CreatorFunc creator = nullptr;
 		DeleterFunc deleter = nullptr;
 	};
-
 public:
 	ModuleManager()
 	{
@@ -53,10 +63,10 @@ private:
 	inline static ModuleRegister* instance = nullptr;
 	inline static bool _is_registered = []
 	{
-		ModuleManager::functions.emplace_back(
+		ModuleManager::functions.push_back(
 			{
-				[]()->void* { return new ModuleRegister; },
-				[](void* p) { delete (ModuleRegister*)p; }
+				ModuleNew<ModuleRegister>,
+				ModuleDelete<ModuleRegister>
 			}
 		);
 		return true;
