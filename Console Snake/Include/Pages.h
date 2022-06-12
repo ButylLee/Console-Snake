@@ -3,7 +3,7 @@
 #define SNAKE_PAGES_HEADER_
 
 #include "Canvas.h"
-#include "DataSet.h"
+#include "GlobalData.h"
 #include <memory>
 #include <unordered_map>
 #include <cassert>
@@ -106,7 +106,7 @@ public:
 private:
 	void paintInterface();
 	void paintCurOptions();
-	GameSettingMember setting_backup = GameSetting::get();
+	GameSetting setting_backup = GameSetting::get();
 	std::optional<ElementSet> custom_theme_backup = GameSetting::get().theme.getCustomValue();
 };
 

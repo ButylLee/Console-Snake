@@ -1,9 +1,9 @@
 ﻿#pragma once
-#ifndef SNAKE_DATASET_HEADER_
-#define SNAKE_DATASET_HEADER_
+#ifndef SNAKE_GLOBALDATA_HEADER_
+#define SNAKE_GLOBALDATA_HEADER_
 
 #include "Resource.h"
-#include "Singleton.h"
+#include "GlobalResourceWrapper.h"
 
 enum struct PageSelect
 {
@@ -23,7 +23,7 @@ struct GameDataMember
 	bool retry_game = false;
 	bool colorful_title = false;
 };
-using GameData = Singleton<GameDataMember>;
+using GameData = GlobalResourceWrapper<GameDataMember>;
 
 struct GameSettingMember
 {
@@ -37,6 +37,6 @@ struct GameSettingMember
 	// The new console host doesn't have the same behavior and work whether print(L'\n') or not.
 	bool old_console_host = false;
 };
-using GameSetting = Singleton<GameSettingMember>;
+using GameSetting = GlobalResourceWrapper<GameSettingMember>;
 
-#endif // SNAKE_DATASET_HEADER_
+#endif // SNAKE_GLOBALDATA_HEADER_

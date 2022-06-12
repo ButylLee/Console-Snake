@@ -9,7 +9,8 @@
 
 #include "Resource.h"
 #include "KeyMap.h"
-#include "DataSet.h"
+#include "GlobalData.h"
+#include "ErrorHandling.h"
 
 #include <thread>
 #include <mutex>

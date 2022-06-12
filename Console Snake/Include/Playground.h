@@ -3,7 +3,7 @@
 #define SNAKE_PLAYGROUND_HEADER_
 
 #include "Canvas.h"
-#include "DataSet.h"
+#include "GlobalData.h"
 #include "DynArray.h"
 #include <atomic>
 #include "AtomicOperation.h"

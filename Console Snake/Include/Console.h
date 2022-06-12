@@ -2,7 +2,7 @@
 #ifndef SNAKE_CONSOLE_HEADER_
 #define SNAKE_CONSOLE_HEADER_
 
-#include "Singleton.h"
+#include "Modules.h"
 #include "WinMacro.h"
 #include <Windows.h>
 #include <string>
@@ -56,6 +56,6 @@ private:
 	std::wstring title;
 };
 
-using Console = Singleton<ConsoleBase>;
+using Console = ModuleRegister<ConsoleBase>;
 
 #endif // SNAKE_CONSOLE_HEADER_

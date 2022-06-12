@@ -2,7 +2,9 @@
 #include "LocalizedStrings.h"
 #include "ScopeGuard.h"
 #include "Resource.h"
-#include "DataSet.h"
+#include "GlobalData.h"
+#include "ErrorHandling.h"
+#include "wideIO.h"
 #include <algorithm>
 #include <fstream>
 #include <filesystem>
