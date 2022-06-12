@@ -2,7 +2,7 @@
 #ifndef SNAKE_RANK_HEADER_
 #define SNAKE_RANK_HEADER_
 
-#include "Singleton.h"
+#include "Modules.h"
 #include "DataSet.h"
 #include <utility>
 #include <vector>
@@ -45,6 +45,6 @@ private:
 	mutable std::shared_mutex rank_mutex;
 };
 
-using Rank = Singleton<RankBase>;
+using Rank = ModuleRegister<RankBase>;
 
 #endif // SNAKE_RANK_HEADER_

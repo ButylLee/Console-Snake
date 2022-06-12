@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Application.cpp" />
     <ClCompile Include="Source\Canvas.cpp" />
     <ClCompile Include="Source\Console.cpp" />
     <ClCompile Include="Source\GameSaving.cpp" />
@@ -28,6 +29,7 @@
     <ClCompile Include="Source\Rank.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Include\Application.h" />
     <ClInclude Include="Include\AtomicOperation.h" />
     <ClInclude Include="Include\Canvas.h" />
     <ClInclude Include="Include\Console.h" />
@@ -39,6 +41,7 @@
     <ClInclude Include="Include\GameSaving.h" />
     <ClInclude Include="Include\KeyMap.h" />
     <ClInclude Include="Include\LocalizedStrings.h" />
+    <ClInclude Include="Include\Modules.h" />
     <ClInclude Include="Include\Pages.h" />
     <ClInclude Include="Include\Playground.h" />
     <ClInclude Include="Include\Rank.h" />

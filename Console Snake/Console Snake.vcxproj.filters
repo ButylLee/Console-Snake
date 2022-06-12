@@ -45,6 +45,9 @@
     <ClCompile Include="Source\Rank.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Application.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\Canvas.h">
@@ -103,6 +106,12 @@
     </ClInclude>
     <ClInclude Include="Include\DataSet.h">
       <Filter>头文件\Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Application.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Modules.h">
+      <Filter>头文件\Utility</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

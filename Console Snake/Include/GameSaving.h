@@ -2,7 +2,7 @@
 #ifndef SNAKE_GAMESAVING_HEADER_
 #define SNAKE_GAMESAVING_HEADER_
 
-#include "Singleton.h"
+#include "Modules.h"
 #include "Rank.h"
 #include "Resource.h"
 #include <cstdint>
@@ -65,6 +65,6 @@ private:
 	bool no_save_file = true;
 };
 
-using GameSaving = Singleton<GameSavingBase>;
+using GameSaving = ModuleRegister<GameSavingBase>;
 
 #endif // SNAKE_GAMESAVING_HEADER_
