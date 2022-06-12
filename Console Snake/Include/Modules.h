@@ -5,18 +5,6 @@
 #include <vector>
 #include <ranges>
 
-template<typename T>
-inline void* ModuleNew()
-{
-	return new T;
-}
-
-template<typename T>
-inline void ModuleDelete(void* object) noexcept
-{
-	delete static_cast<T*>(object);
-}
-
 class ModuleManager
 {
 	template<typename Base>
@@ -61,6 +49,14 @@ public:
 	ModuleRegister& operator=(const ModuleRegister&) = delete;
 private:
 	inline static ModuleRegister* instance = nullptr;
+
+	template<typename T>
+	static void* ModuleNew() { return new T; }
+	template<typename T>
+	static void ModuleDelete(void* object) noexcept
+	{
+		delete static_cast<T*>(object);
+	}
 	inline static bool _is_registered = []
 	{
 		ModuleManager::functions.push_back(
