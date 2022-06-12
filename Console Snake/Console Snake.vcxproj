@@ -33,7 +33,7 @@
     <ClInclude Include="Include\AtomicOperation.h" />
     <ClInclude Include="Include\Canvas.h" />
     <ClInclude Include="Include\Console.h" />
-    <ClInclude Include="Include\DataSet.h" />
+    <ClInclude Include="Include\GlobalData.h" />
     <ClInclude Include="Include\DynArray.h" />
     <ClInclude Include="Include\EncryptedString.h" />
     <ClInclude Include="Include\Enum.h" />

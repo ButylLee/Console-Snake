@@ -3,7 +3,7 @@
 #define SNAKE_RANK_HEADER_
 
 #include "Modules.h"
-#include "DataSet.h"
+#include "GlobalData.h"
 #include <utility>
 #include <vector>
 #include <string>

@@ -1,7 +1,7 @@
 ﻿#include "Application.h"
 #include "Console.h"
 #include "Pages.h"
-#include "DataSet.h"
+#include "GlobalData.h"
 #include "GameSaving.h"
 
 #include "wideIO.h"

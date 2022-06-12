@@ -13,7 +13,7 @@ public:
 	{
 		if (!instance) instance = this;
 	}
-	static Base& get() noexcept { return *instance; }
+	static GlobalResourceWrapper& get() noexcept { return *instance; }
 private:
 	inline static GlobalResourceWrapper* instance = nullptr;
 };

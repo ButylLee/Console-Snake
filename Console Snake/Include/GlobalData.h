@@ -1,6 +1,6 @@
 ﻿#pragma once
-#ifndef SNAKE_DATASET_HEADER_
-#define SNAKE_DATASET_HEADER_
+#ifndef SNAKE_GLOBALDATA_HEADER_
+#define SNAKE_GLOBALDATA_HEADER_
 
 #include "Resource.h"
 #include "GlobalResourceWrapper.h"
@@ -39,4 +39,4 @@ struct GameSettingMember
 };
 using GameSetting = GlobalResourceWrapper<GameSettingMember>;
 
-#endif // SNAKE_DATASET_HEADER_
+#endif // SNAKE_GLOBALDATA_HEADER_

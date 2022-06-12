@@ -104,7 +104,7 @@
     <ClInclude Include="Include\AtomicOperation.h">
       <Filter>头文件\Utility</Filter>
     </ClInclude>
-    <ClInclude Include="Include\DataSet.h">
+    <ClInclude Include="Include\GlobalData.h">
       <Filter>头文件\Resource</Filter>
     </ClInclude>
     <ClInclude Include="Include\Application.h">

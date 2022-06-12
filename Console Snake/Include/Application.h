@@ -2,7 +2,7 @@
 #ifndef SNAKE_APPLICATION_HEADER_
 #define SNAKE_APPLICATION_HEADER_
 
-#include "DataSet.h"
+#include "GlobalData.h"
 
 class Application
 {
