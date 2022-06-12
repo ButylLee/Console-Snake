@@ -7,6 +7,7 @@
 #include "wideIO.h"
 #include "Resource.h"
 #include "EncryptedString.h"
+#include "ErrorHandling.h"
 
 #include "WinMacro.h"
 #include <Windows.h>
@@ -17,7 +18,7 @@
 
 static bool no_limit = false;
 
-static void ParseCmdAndSet(int count, char* commands[])
+static void ParseCMDAndSet(int count, char* commands[])
 {
 	using namespace std;
 	if (count < 2)
@@ -83,7 +84,7 @@ static void InitConsole()
 Application::Application(int argc, char* argv[])
 {
 	GameSaving::get().convertFromBinaryData();
-	ParseCmdAndSet(argc, argv);
+	ParseCMDAndSet(argc, argv);
 	InitConsole();
 }
 

@@ -7,7 +7,7 @@
 
 // TEMPLATE Singleton
 template<typename Base>
-class Singleton :public Base
+class [[deprecated]] Singleton :public Base
 {
 	template<typename T>
 	friend T* NewWithHandler() noexcept;

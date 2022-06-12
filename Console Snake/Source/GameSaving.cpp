@@ -3,6 +3,8 @@
 #include "ScopeGuard.h"
 #include "Resource.h"
 #include "DataSet.h"
+#include "ErrorHandling.h"
+#include "wideIO.h"
 #include <algorithm>
 #include <fstream>
 #include <filesystem>

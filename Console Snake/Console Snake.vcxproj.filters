@@ -113,6 +113,9 @@
     <ClInclude Include="Include\Modules.h">
       <Filter>头文件\Utility</Filter>
     </ClInclude>
+    <ClInclude Include="Include\GlobalResourceWrapper.h">
+      <Filter>头文件\Utility</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Include\LangENG.inl">

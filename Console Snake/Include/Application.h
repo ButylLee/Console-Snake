@@ -2,6 +2,8 @@
 #ifndef SNAKE_APPLICATION_HEADER_
 #define SNAKE_APPLICATION_HEADER_
 
+#include "DataSet.h"
+
 class Application
 {
 public:
@@ -12,6 +14,9 @@ public:
 public:
 	int run();
 
+private:
+	GameData game_data;
+	GameSetting game_setting;
 };
 
 #endif // SNAKE_APPLICATION_HEADER_

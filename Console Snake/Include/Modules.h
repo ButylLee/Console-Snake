@@ -4,6 +4,7 @@
 
 #include <vector>
 #include <ranges>
+#include <type_traits>
 
 class ModuleManager
 {
@@ -42,11 +43,16 @@ template<typename Base>
 class ModuleRegister :public Base
 {
 public:
-	ModuleRegister() noexcept :Base() { if (!instance) instance = this; }
+	ModuleRegister() noexcept(std::is_nothrow_default_constructible_v<Base>)
+		:Base()
+	{
+		if (!instance) instance = this;
+	}
 	static Base& get() noexcept { return *instance; }
 
 	ModuleRegister(const ModuleRegister&) = delete;
 	ModuleRegister& operator=(const ModuleRegister&) = delete;
+
 private:
 	inline static ModuleRegister* instance = nullptr;
 

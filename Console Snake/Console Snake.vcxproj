@@ -39,6 +39,7 @@
     <ClInclude Include="Include\Enum.h" />
     <ClInclude Include="Include\ErrorHandling.h" />
     <ClInclude Include="Include\GameSaving.h" />
+    <ClInclude Include="Include\GlobalResourceWrapper.h" />
     <ClInclude Include="Include\KeyMap.h" />
     <ClInclude Include="Include\LocalizedStrings.h" />
     <ClInclude Include="Include\Modules.h" />
