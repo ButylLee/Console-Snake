@@ -4,6 +4,7 @@
 
 #include <vector>
 #include <ranges>
+#include <cassert>
 #include <type_traits>
 
 class ModuleManager
@@ -24,9 +25,12 @@ public:
 		{
 			objects.emplace_back(func.creator());
 		}
+		dtor_guard.ptr = this;
 	}
 	~ModuleManager() noexcept
 	{
+		assert(objects.size() == functions.size());
+		dtor_guard.ptr = nullptr;
 		for (auto& func : functions | std::views::reverse)
 		{
 			func.deleter(objects.back());
@@ -35,8 +39,12 @@ public:
 	}
 
 private:
-	inline static std::vector<ModuleManageFunc> functions;
 	std::vector<void*> objects;
+	inline static std::vector<ModuleManageFunc> functions;
+	inline static struct DtorGuard {
+		ModuleManager* ptr = nullptr;
+		~DtorGuard() noexcept { if (ptr) ptr->~ModuleManager(); }
+	}dtor_guard; // in case of exit() call and so on
 };
 
 template<typename Base>
