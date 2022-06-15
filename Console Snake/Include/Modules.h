@@ -2,6 +2,7 @@
 #ifndef SNAKE_MODULES_HEADER_
 #define SNAKE_MODULES_HEADER_
 
+#include "ErrorHandling.h"
 #include <vector>
 #include <ranges>
 #include <cassert>
@@ -21,6 +22,7 @@ class ModuleManager
 public:
 	ModuleManager()
 	{
+		assert(dtor_guard.ptr == nullptr);
 		for (auto& func : functions)
 		{
 			objects.emplace_back(func.creator());
@@ -65,7 +67,7 @@ private:
 	inline static ModuleRegister* instance = nullptr;
 
 	template<typename T>
-	static void* ModuleNew() { return new T; }
+	static void* ModuleNew() { return NewWithHandler<T>(); }
 	template<typename T>
 	static void ModuleDelete(void* object) noexcept
 	{
