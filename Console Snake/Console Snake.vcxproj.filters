@@ -71,9 +71,6 @@
     <ClInclude Include="Include\DynArray.h">
       <Filter>头文件\Import</Filter>
     </ClInclude>
-    <ClInclude Include="Include\EncryptedString.h">
-      <Filter>头文件\Import</Filter>
-    </ClInclude>
     <ClInclude Include="Include\ScopeGuard.h">
       <Filter>头文件\Import</Filter>
     </ClInclude>

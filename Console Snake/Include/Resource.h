@@ -4,12 +4,11 @@
 
 #include "Enum.h"
 #include "LocalizedStrings.h"
-#include "EncryptedString.h"
 #include "WinMacro.h"
 #include <Windows.h>
 
 #define GAME_VERSION "2.15"
-inline const auto save_file_name = "SnakeSaved.bin"_crypt;
+inline const auto save_file_name = "SnakeSaved.bin";
 inline constexpr const unsigned char crypto_key[] = {
 	0x54, 0xDE, 0x3B, 0xF2, 0xD8, 0x5D, 0x4E, 0x04,
 	0xB2, 0xBE, 0x4D, 0xCC, 0xC3, 0xAD, 0xEB, 0x1C
@@ -132,10 +131,10 @@ struct LangInfo {
 using Lang = Enum<LangInfo, Locale::Lang>;
 ENUM_DEFINE(Lang)
 {
-	{ Locale::en_US, L"English"_crypt },
-	{ Locale::zh_CN, L"简体中文"_crypt },
-	{ Locale::zh_TW, L"繁體中文"_crypt },
-	{ Locale::ja_JP, L"日本語"_crypt }
+	{ Locale::en_US, L"English" },
+	{ Locale::zh_CN, L"简体中文" },
+	{ Locale::zh_TW, L"繁體中文" },
+	{ Locale::ja_JP, L"日本語" }
 };
 
 // --------------- Enum Size Resource ---------------
@@ -148,15 +147,15 @@ struct SizeInfo {
 using Size = CustomEnum<SizeInfo, short>;
 ENUM_DEFINE(Size)
 {
-	{ 13, L"(XS)"_crypt },
-	{ 17, L"(S) "_crypt },
-	{ 21, L"(M) "_crypt },
-	{ 24, L"(L) "_crypt },
-	{ 27, L"(XL)"_crypt }
+	{ 13, L"(XS)" },
+	{ 17, L"(S) " },
+	{ 21, L"(M) " },
+	{ 24, L"(L) " },
+	{ 27, L"(XL)" }
 };
 ENUM_CUSTOM(Size)
 {
-	{}, L"(Custom)"_crypt
+	{}, L"(Custom)"
 };
 
 // --------------- Enum Speed Resource ---------------
@@ -335,6 +334,6 @@ inline const auto game_title = LR"title(
               \:\/:/  /      |::/  /       /:/  /     |:|  |      \:\ \/__/  
                \::/  /       /:/  /       /:/  /      |:|  |       \:\__\    
                 \/__/        \/__/        \/__/        \|__|        \/__/    
-                                                                )title"_crypt;
+                                                                )title";
 
 #endif // SNAKE_RESOURCE_HEADER_

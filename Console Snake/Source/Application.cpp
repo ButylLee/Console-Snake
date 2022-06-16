@@ -6,7 +6,6 @@
 
 #include "wideIO.h"
 #include "Resource.h"
-#include "EncryptedString.h"
 #include "ErrorHandling.h"
 
 #include "WinMacro.h"
@@ -33,19 +32,19 @@ static void ParseCMDAndSet(int count, char* commands[])
 		// -oldconsole: enable the compatibility of old console host
 		// -awesome: force enable colorful title
 		// -size [width]x[height]: set user defined game size
-		if (cmd == "-nolimit"_crypt)
+		if (cmd == "-nolimit")
 		{
 			no_limit = true;
 		}
-		else if (cmd == "-oldconsole"_crypt)
+		else if (cmd == "-oldconsole")
 		{
 			GameSetting::get().old_console_host = true;
 		}
-		else if (cmd == "-awesome"_crypt)
+		else if (cmd == "-awesome")
 		{
 			GameData::get().colorful_title = true;
 		}
-		else if (cmd == "-size"_crypt)
+		else if (cmd == "-size")
 		{
 			cmd = commands[++i];
 			size_t place = cmd.find('x');

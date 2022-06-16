@@ -35,7 +35,6 @@
     <ClInclude Include="Include\Console.h" />
     <ClInclude Include="Include\GlobalData.h" />
     <ClInclude Include="Include\DynArray.h" />
-    <ClInclude Include="Include\EncryptedString.h" />
     <ClInclude Include="Include\Enum.h" />
     <ClInclude Include="Include\ErrorHandling.h" />
     <ClInclude Include="Include\GameSaving.h" />

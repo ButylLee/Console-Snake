@@ -265,7 +265,7 @@ void SettingPage::paintCurOptions()
 	print(~GameSetting::get().speed.Name());
 
 	canvas.setCursor(baseX, baseY + 2);
-	print(L"%hd X %hd"_crypt, GameSetting::get().width.Value(), GameSetting::get().height.Value());
+	print(L"%hd X %hd", GameSetting::get().width.Value(), GameSetting::get().height.Value());
 	print(GameSetting::get().width.Name());
 
 	canvas.setCursor(baseX, baseY + 4);
@@ -351,7 +351,7 @@ void CustomThemePage::paintInterface()
           / /   / / / / ___/ __/ __ \/ __ `__ \     / / / __ \/ _ \/ __ `__ \/ _ \
          / /___/ /_/ (__  ) /_/ /_/ / / / / / /    / / / / / /  __/ / / / / /  __/
          \____/\__,_/____/\__/\____/_/ /_/ /_/    /_/ /_/ /_/\___/_/ /_/ /_/\___/ 
-                                                                                  )title"_crypt;
+                                                                                  )title";
 	canvas.setColor(Color::LightAqua);
 	print(custom_theme_title);
 
@@ -543,12 +543,12 @@ void RankPage::paintInterface()
 
 			// no std::format, sad:-(
 			buffer = ~token::rank_No; // arg:number
-			buffer += L"%-*ls"_crypt; // arg:name width, name.c_str
-			buffer += item.is_win ? L" %ls"_crypt : L" %4ls"_crypt; // arg:score or win
-			buffer += L" | "_crypt;
+			buffer += L"%-*ls"; // arg:name width, name.c_str
+			buffer += item.is_win ? L" %ls" : L" %4ls"; // arg:score or win
+			buffer += L" | ";
 			buffer += ~token::rank_setting;
-			buffer += L"%-*ls "_crypt; // arg:speed setting width, speed setting
-			buffer += L"%2d X %2d"_crypt; // arg:size setting
+			buffer += L"%-*ls "; // arg:speed setting width, speed setting
+			buffer += L"%2d X %2d"; // arg:size setting
 			canvas.setCursor(baseX, baseY + number);
 			name = item.name.empty() ? ~token::rank_anonymous : item.name;
 			score = item.is_win ? ~token::rank_win : std::to_wstring(item.score);
