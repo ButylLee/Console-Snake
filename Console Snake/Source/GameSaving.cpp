@@ -1,5 +1,4 @@
 ﻿#include "GameSaving.h"
-#include "LocalizedStrings.h"
 #include "ScopeGuard.h"
 #include "Resource.h"
 #include "GlobalData.h"
