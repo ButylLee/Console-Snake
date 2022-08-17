@@ -100,7 +100,7 @@ inline T* NewWithHandler() noexcept
 		return new T;
 	}
 	catch (const std::bad_alloc&) {
-		print_err(~token::message_std_bad_alloc);
+		print_err(~Token::message_std_bad_alloc);
 	}
 	catch (const Exception& error) {
 		print_err(error.what());
@@ -109,7 +109,7 @@ inline T* NewWithHandler() noexcept
 		print_err(error.what());
 	}
 	catch (...) {
-		print_err(~token::message_unknown_error);
+		print_err(~Token::message_unknown_error);
 	}
 
 	system("pause");

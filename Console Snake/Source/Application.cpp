@@ -69,10 +69,10 @@ static void InitConsole()
 		Console::get().moveToScreenCenter();
 		Console::get().setConsoleWindow(no_limit ? Console::Sizable : Console::NotSizable, Console::OnlyMin);
 		Console::get().setCursorVisible(false);
-		Console::get().setTitle(~token::console_title);
+		Console::get().setTitle(~Token::console_title);
 	}
 	catch (const NativeException& error) {
-		print_err(~token::message_init_fail);
+		print_err(~Token::message_init_fail);
 		print_err(error.what());
 		system("pause");
 		exit(EXIT_FAILURE);
@@ -97,7 +97,7 @@ int Application::run()
 		}
 	}
 	catch (const std::bad_alloc&) {
-		print_err(~token::message_std_bad_alloc);
+		print_err(~Token::message_std_bad_alloc);
 	}
 	catch (const Exception& error) {
 		print_err(error.what());
@@ -107,7 +107,7 @@ int Application::run()
 		print_err(error.what());
 	}
 	catch (...) {
-		print_err(~token::message_unknown_error);
+		print_err(~Token::message_unknown_error);
 		GameSaving::get().save();
 	}
 

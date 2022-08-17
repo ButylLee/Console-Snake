@@ -15,7 +15,7 @@
  * !!All the string should use wide char!!
  *
  * to use token to get relevant localized string:
- *     printf(~token::myname);
+ *     printf(~Token::myname);
  * to set new language:
  *     LocalizedStrings::setLang(Locale::new_lang);
  */
@@ -24,11 +24,11 @@
 
 class LocalizedStrings;
 
-struct token;
+struct Token;
 struct Locale;
 
 #define TOKEN_DEF(...) \
-struct token \
+struct Token \
 { \
 	enum StringName :size_t \
 	{ \
@@ -48,20 +48,20 @@ struct Locale \
 #define DEF_LOCALIZED_STR() \
 class LocalizedStrings \
 { \
-	friend const std::wstring operator~(token::StringName) noexcept; \
+	friend const std::wstring operator~(Token::StringName) noexcept; \
 	LocalizedStrings() = delete; \
 public: \
 	static void setLang(Locale::Lang) noexcept; \
 private: \
 	static Locale::Lang lang; \
-	static const std::wstring strings[Locale::_LangMask][token::_NameMask]; \
+	static const std::wstring strings[Locale::_LangMask][Token::_NameMask]; \
 }; \
 inline void LocalizedStrings::setLang(Locale::Lang new_lang) noexcept \
 { \
 	if (new_lang != Locale::_LangMask) \
 		lang = new_lang; \
 } \
-inline const std::wstring operator~(token::StringName name) noexcept \
+inline const std::wstring operator~(Token::StringName name) noexcept \
 { \
 	return { LocalizedStrings::strings[LocalizedStrings::lang][name] }; \
 }
@@ -70,6 +70,6 @@ inline const std::wstring operator~(token::StringName name) noexcept \
 inline Locale::Lang LocalizedStrings::lang = Locale::default_lang
 
 #define MAKE_LOCALIZED_STRS \
-inline const std::wstring LocalizedStrings::strings[Locale::_LangMask][token::_NameMask] = 
+inline const std::wstring LocalizedStrings::strings[Locale::_LangMask][Token::_NameMask] = 
 
 #endif // SNAKE_LOCALIZEDSTRINGS_HEADER_

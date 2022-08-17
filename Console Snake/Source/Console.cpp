@@ -14,7 +14,7 @@ ConsoleBase::ConsoleBase() try
 					   WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SIZEBOX);
 }
 catch (const Exception&) {
-	print_err(~token::message_init_console_fail);
+	print_err(~Token::message_init_console_fail);
 	throw;
 }
 
@@ -112,6 +112,6 @@ HWND ConsoleBase::fetchConsoleHandle() const
 {
 	HWND hwnd = GetConsoleWindow();
 	if (hwnd == NULL)
-		throw RuntimeException(~token::GetConsoleWindow_failed_message);
+		throw RuntimeException(~Token::GetConsoleWindow_failed_message);
 	return hwnd;
 }

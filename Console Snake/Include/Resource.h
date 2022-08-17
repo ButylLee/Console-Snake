@@ -8,7 +8,7 @@
 #include <Windows.h>
 
 #define GAME_VERSION "2.15"
-inline const auto save_file_name = "SnakeSaved.bin";
+inline constexpr auto save_file_name = "SnakeSaved.bin";
 inline constexpr const unsigned char crypto_key[] = {
 	0x54, 0xDE, 0x3B, 0xF2, 0xD8, 0x5D, 0x4E, 0x04,
 	0xB2, 0xBE, 0x4D, 0xCC, 0xC3, 0xAD, 0xEB, 0x1C
@@ -165,16 +165,16 @@ struct SpeedInfo {
 		DefaultValue = NORMAL
 	};
 };
-using Speed = CustomEnum<SpeedInfo, short, token::StringName>;
+using Speed = CustomEnum<SpeedInfo, short, Token::StringName>;
 ENUM_DEFINE(Speed)
 {
-	{ 8, token::setting_speed_fast },
-	{ 5, token::setting_speed_normal },
-	{ 1, token::setting_speed_slow }
+	{ 8, Token::setting_speed_fast },
+	{ 5, Token::setting_speed_normal },
+	{ 1, Token::setting_speed_slow }
 };
 ENUM_CUSTOM(Speed)
 {
-	{}, token::setting_custom
+	{}, Token::setting_custom
 };
 
 // --------------- Enum Color Resource ---------------
@@ -265,7 +265,7 @@ struct ThemeInfo {
 		DefaultValue = A
 	};
 };
-using Theme = CustomEnum<ThemeInfo, ElementSet, token::StringName>;
+using Theme = CustomEnum<ThemeInfo, ElementSet, Token::StringName>;
 ENUM_DEFINE(Theme)
 {
 	{
@@ -275,7 +275,7 @@ ENUM_DEFINE(Theme)
 			{ Facade::FullCircle, Color::LightYellow },
 			{ Facade::FullRect, Color::Green }
 		}},
-		token::setting_theme_A
+		Token::setting_theme_A
 	},
 	{
 		{{
@@ -284,7 +284,7 @@ ENUM_DEFINE(Theme)
 			{ Facade::FullCircle, Color::LightYellow },
 			{ Facade::FullRect, Color::Aqua }
 		}},
-		token::setting_theme_B
+		Token::setting_theme_B
 	},
 	{
 		{{
@@ -293,7 +293,7 @@ ENUM_DEFINE(Theme)
 			{ Facade::FullCircle, Color::LightBlue },
 			{ Facade::FullRect, Color::LightRed }
 		}},
-		token::setting_theme_C
+		Token::setting_theme_C
 	},
 	{
 		{{
@@ -302,7 +302,7 @@ ENUM_DEFINE(Theme)
 			{ Facade::FullCircle, Color::LightPurple },
 			{ Facade::FullRect, Color::LightWhite }
 		}},
-		token::setting_theme_D
+		Token::setting_theme_D
 	},
 	{
 		{{
@@ -311,16 +311,16 @@ ENUM_DEFINE(Theme)
 			{ Facade::FullCircle, Color::LightBlue },
 			{ Facade::FullDiamond, Color::Gray }
 		}},
-		token::setting_theme_E
+		Token::setting_theme_E
 	}
 };
 ENUM_CUSTOM(Theme)
 {
-	{}, token::setting_custom
+	{}, Token::setting_custom
 };
 
 
-inline const auto game_title = LR"title(
+inline constexpr auto game_title = LR"title(
 
 
                  ___          ___          ___          ___          ___     

@@ -109,7 +109,7 @@ GameSavingBase::GameSavingBase() try
 }
 catch (...)
 {
-	print_err(~token::message_init_gamesaving_fail);
+	print_err(~Token::message_init_gamesaving_fail);
 	throw;
 }
 
@@ -221,24 +221,24 @@ void GameSavingBase::save()
 							  save_file.write(cipher.c_str(), cipher.size());
 						  }
 						  catch (const std::bad_alloc&) {
-							  print_err(~token::message_std_bad_alloc);
+							  print_err(~Token::message_std_bad_alloc);
 							  system("pause");
 							  exit(EXIT_FAILURE);
 						  }
 						  catch (const CryptoPP::Exception&) {
-							  print_err(~token::message_process_savedata_fail);
-							  print_err(~token::message_savefile_not_updated);
+							  print_err(~Token::message_process_savedata_fail);
+							  print_err(~Token::message_savefile_not_updated);
 							  system("pause");
 							  return;
 						  }
 						  catch (const std::exception&) {
-							  print_err(~token::message_update_savefile_fail);
+							  print_err(~Token::message_update_savefile_fail);
 							  system("pause");
 							  return;
 						  }
 						  catch (...) {
-							  print_err(~token::message_unknown_error);
-							  print_err(~token::message_savefile_not_updated);
+							  print_err(~Token::message_unknown_error);
+							  print_err(~Token::message_savefile_not_updated);
 							  system("pause");
 							  exit(EXIT_FAILURE);
 						  }

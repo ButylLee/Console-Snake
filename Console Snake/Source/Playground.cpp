@@ -11,11 +11,30 @@
 #include <chrono>
 #include <utility>
 #include <type_traits>
+#include <concepts>
 #include <string>
 #include <cwctype>
 #include <cassert>
 #include "WinMacro.h"
 #include <Windows.h>
+
+namespace {
+	auto& getRandomEngine()
+	{
+		static std::minstd_rand engine(std::random_device{}());
+		return engine;
+	}
+
+	// random interval: [min,max]
+	template<std::integral T>
+	T getRandom(T min, T max)
+	{
+		static std::uniform_int_distribution<T> dis;
+		using param_type = typename decltype(dis)::param_type;
+		assert(min <= max);
+		return dis(getRandomEngine(), param_type{ min,max });
+	}
+}
 
 void Playground::play()
 {
@@ -69,13 +88,13 @@ void Playground::play()
 						{
 							storeAtomic(game_status, GameStatus::Running);
 							if (GameSetting::get().show_frame)
-								Console::get().setTitle(~token::title_gaming);
+								Console::get().setTitle(~Token::title_gaming);
 						}
 						else
 						{
 							storeAtomic(game_status, GameStatus::Pausing);
 							if (GameSetting::get().show_frame)
-								Console::get().setTitle(~token::title_pausing);
+								Console::get().setTitle(~Token::title_pausing);
 						}
 						break;
 
@@ -242,22 +261,6 @@ void Playground::createFood()
 	paintElement(Element::food);
 }
 
-auto& Playground::getRandomEngine()
-{
-	static std::minstd_rand engine(std::random_device{}());
-	return engine;
-}
-
-// random interval: [min,max]
-template<std::integral T>
-T Playground::getRandom(T min, T max)
-{
-	static std::uniform_int_distribution<T> dis;
-	using param_type = typename decltype(dis)::param_type;
-	assert(min <= max);
-	return dis(getRandomEngine(), param_type{ min,max });
-}
-
 void Playground::updateFrame()
 {
 	// get new snake head position
@@ -339,20 +342,20 @@ void Playground::endGame()
 	if (GameData::get().score + snake_begin_length == getSnakeBodySize())
 	{
 		is_win = true;
-		Console::get().setTitle(~token::game_congratulations);
+		Console::get().setTitle(~Token::game_congratulations);
 		canvas.setColor(Color::Green);
 
-		canvas.setCenteredCursor(~token::game_you_win, baseY);
-		print(~token::game_you_win);
+		canvas.setCenteredCursor(~Token::game_you_win, baseY);
+		print(~Token::game_you_win);
 	}
 	else
 	{
 		canvas.setColor(Color::LightWhite);
 
-		canvas.setCenteredCursor(~token::game_you_died, baseY);
-		print(~token::game_you_died);
+		canvas.setCenteredCursor(~Token::game_you_died, baseY);
+		print(~Token::game_you_died);
 	}
-	buffer = ~token::game_show_score;
+	buffer = ~Token::game_show_score;
 	buffer += std::to_wstring(GameData::get().score);
 	canvas.setCenteredCursor(buffer, baseY + 1);
 	print(buffer);
@@ -361,8 +364,8 @@ void Playground::endGame()
 	if (GameData::get().score != 0)
 	{
 		canvas.setColor(Color::Green);
-		canvas.setCenteredCursor(~token::game_enter_your_name, baseY + 3);
-		print(~token::game_enter_your_name);
+		canvas.setCenteredCursor(~Token::game_enter_your_name, baseY + 3);
+		print(~Token::game_enter_your_name);
 
 		canvas.setColor(Color::LightAqua);
 		std::wstring name;
@@ -383,11 +386,11 @@ void Playground::endGame()
 
 	// show Retry Or Return info
 	canvas.setColor(Color::LightWhite);
-	canvas.setCenteredCursor(~token::game_Space_to_retry, baseY + 6);
-	print(~token::game_Space_to_retry);
+	canvas.setCenteredCursor(~Token::game_Space_to_retry, baseY + 6);
+	print(~Token::game_Space_to_retry);
 
-	canvas.setCenteredCursor(~token::game_Esc_to_return, baseY + 7);
-	print(~token::game_Esc_to_return);
+	canvas.setCenteredCursor(~Token::game_Esc_to_return, baseY + 7);
+	print(~Token::game_Esc_to_return);
 
 	while (true)
 	{

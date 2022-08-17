@@ -38,10 +38,10 @@ std::unique_ptr<Page> Page::Create()
 ****************************************/
 void GamePage::run()
 {
-	auto sg_title = sg::MakeScopeGuard([] { Console::get().setTitle(~token::console_title); });
+	auto sg_title = sg::MakeScopeGuard([] { Console::get().setTitle(~Token::console_title); });
 	if (GameSetting::get().show_frame)
 	{
-		Console::get().setTitle(~token::title_gaming);
+		Console::get().setTitle(~Token::title_gaming);
 	}
 	else
 	{
@@ -72,8 +72,8 @@ void GamePage::run()
 void AboutPage::run()
 {
 	int msg = MessageBoxW(Console::get().getConsoleHandle(),
-						  (~token::about_text).c_str(),
-						  (~token::about_caption).c_str(),
+						  (~Token::about_text).c_str(),
+						  (~Token::about_caption).c_str(),
 						  MB_OK | MB_ICONINFORMATION);
 	if (msg != IDOK)
 		throw NativeException{};
@@ -88,7 +88,7 @@ void NormalPage::paintTitle(ShowVersion show_version)
 	canvas.setColor(Color::LightBlue);
 	print(game_title);
 	if (show_version == ShowVersion::Yes)
-		print(~token::game_version);
+		print(~Token::game_version);
 }
 
 /***************************************
@@ -135,13 +135,13 @@ void MenuPage::paintInterface()
 	canvas.setColor(Color::LightWhite);
 
 	canvas.setCursor(baseX, baseY);
-	print(~token::menu_start_game);
+	print(~Token::menu_start_game);
 	canvas.setCursor(baseX, baseY + 2);
-	print(~token::menu_setting);
+	print(~Token::menu_setting);
 	canvas.setCursor(baseX, baseY + 4);
-	print(~token::menu_rank);
+	print(~Token::menu_rank);
 	canvas.setCursor(baseX - 1, baseY + 6);
-	print(~token::menu_exit);
+	print(~Token::menu_exit);
 }
 
 /***************************************
@@ -197,7 +197,7 @@ void SettingPage::run()
 				LocalizedStrings::setLang(
 					GameSetting::get().lang.setNextValue()
 				);
-				Console::get().setTitle(~token::console_title);
+				Console::get().setTitle(~Token::console_title);
 				canvas.clear();
 				paintInterface();
 			}
@@ -220,7 +220,7 @@ void SettingPage::run()
 					GameSetting::get().theme.setCustomValue(*custom_theme_backup);
 				else
 					GameSetting::get().theme.clearCustomValue();
-				Console::get().setTitle(~token::console_title);
+				Console::get().setTitle(~Token::console_title);
 			}
 			return;
 		}
@@ -237,21 +237,21 @@ void SettingPage::paintInterface()
 	canvas.setColor(Color::White);
 
 	canvas.setCursor(baseX, baseY);
-	print(~token::setting_speed);
+	print(~Token::setting_speed);
 	canvas.setCursor(baseX, baseY + 2);
-	print(~token::setting_map_size);
+	print(~Token::setting_map_size);
 	canvas.setCursor(baseX, baseY + 4);
-	print(~token::setting_show_frame);
+	print(~Token::setting_show_frame);
 	canvas.setCursor(baseX, baseY + 6);
-	print(~token::setting_theme);
+	print(~Token::setting_theme);
 	canvas.setCursor(baseX - 9, baseY + 6);
-	print(~token::setting_customize_theme);
+	print(~Token::setting_customize_theme);
 	canvas.setCursor(baseX, baseY + 8);
-	print(~token::setting_language);
+	print(~Token::setting_language);
 	canvas.setCursor(baseX - 2, baseY + 10);
-	print(~token::setting_save);
+	print(~Token::setting_save);
 	canvas.setCursor(baseX - 1, baseY + 12);
-	print(~token::setting_return);
+	print(~Token::setting_return);
 }
 
 void SettingPage::paintCurOptions()
@@ -270,8 +270,8 @@ void SettingPage::paintCurOptions()
 
 	canvas.setCursor(baseX, baseY + 4);
 	print(GameSetting::get().show_frame
-		  ? ~token::setting_show_frame_yes
-		  : ~token::setting_show_frame_no);
+		  ? ~Token::setting_show_frame_yes
+		  : ~Token::setting_show_frame_no);
 
 	canvas.setCursor(baseX, baseY + 6);
 	print(~GameSetting::get().theme.Name());
@@ -345,7 +345,7 @@ void CustomThemePage::run()
 
 void CustomThemePage::paintInterface()
 {
-	static const auto custom_theme_title = LR"title(
+	static constexpr auto custom_theme_title = LR"title(
             ______           __                     ________                      
            / ____/_  _______/ /_____  ____ ___     /_  __/ /_  ___  ____ ___  ___ 
           / /   / / / / ___/ __/ __ \/ __ `__ \     / / / __ \/ _ \/ __ `__ \/ _ \
@@ -357,21 +357,21 @@ void CustomThemePage::paintInterface()
 
 	canvas.setColor(Color::White);
 	canvas.setCursor(5, 30);
-	print(~token::setting_reset_custom);
+	print(~Token::setting_reset_custom);
 
 	canvas.setCursor(30, 14);
-	print(~token::custom_theme_list_head);
+	print(~Token::custom_theme_list_head);
 	canvas.setCursor(22, 16);
-	print(~token::custom_theme_blank);
+	print(~Token::custom_theme_blank);
 	print(L"(A)             (Q)");
 	canvas.setCursor(22, 18);
-	print(~token::custom_theme_food);
+	print(~Token::custom_theme_food);
 	print(L"(S)             (W)");
 	canvas.setCursor(22, 20);
-	print(~token::custom_theme_snake);
+	print(~Token::custom_theme_snake);
 	print(L"(D)             (E)");
 	canvas.setCursor(22, 22);
-	print(~token::custom_theme_barrier);
+	print(~Token::custom_theme_barrier);
 	print(L"(F)             (R)");
 }
 
@@ -455,8 +455,8 @@ void BeginPage::paintInterface()
 {
 	auto [baseX, baseY] = canvas.getClientSize();
 	canvas.setColor(Color::LightWhite);
-	canvas.setCenteredCursor(~token::press_any_key, baseY / 2 + 4);
-	print(~token::press_any_key);
+	canvas.setCenteredCursor(~Token::press_any_key, baseY / 2 + 4);
+	print(~Token::press_any_key);
 
 	std::thread th_paint(
 		[this]
@@ -470,7 +470,7 @@ void BeginPage::paintInterface()
 					canvas.setCursor(0, 0);
 					canvas.setColor(color.setNextValue());
 					print(game_title);
-					print(~token::game_version);
+					print(~Token::game_version);
 					std::this_thread::sleep_for(100ms);
 				}
 			else
@@ -481,7 +481,7 @@ void BeginPage::paintInterface()
 					canvas.setCursor(0, 0);
 					canvas.setColor(color_flag ? Color::Aqua : Color::LightBlue);
 					print(game_title);
-					print(~token::game_version);
+					print(~Token::game_version);
 					color_flag = !color_flag;
 					std::this_thread::sleep_for(900ms);
 				}
@@ -527,8 +527,8 @@ void RankPage::paintInterface()
 
 	if (auto [rank, lock] = Rank::get().getRank(); rank[0].score == 0)
 	{
-		canvas.setCenteredCursor(~token::rank_no_data, baseY);
-		print(~token::rank_no_data);
+		canvas.setCenteredCursor(~Token::rank_no_data, baseY);
+		print(~Token::rank_no_data);
 		is_no_data = true;
 	}
 	else
@@ -542,16 +542,16 @@ void RankPage::paintInterface()
 			std::this_thread::sleep_for(50ms);
 
 			// no std::format, sad:-(
-			buffer = ~token::rank_No; // arg:number
+			buffer = ~Token::rank_No; // arg:number
 			buffer += L"%-*ls"; // arg:name width, name.c_str
 			buffer += item.is_win ? L" %ls" : L" %4ls"; // arg:score or win
 			buffer += L" | ";
-			buffer += ~token::rank_setting;
+			buffer += ~Token::rank_setting;
 			buffer += L"%-*ls "; // arg:speed setting width, speed setting
 			buffer += L"%2d X %2d"; // arg:size setting
 			canvas.setCursor(baseX, baseY + number);
-			name = item.name.empty() ? ~token::rank_anonymous : item.name;
-			score = item.is_win ? ~token::rank_win : std::to_wstring(item.score);
+			name = item.name.empty() ? ~Token::rank_anonymous : item.name;
+			score = item.is_win ? ~Token::rank_win : std::to_wstring(item.score);
 			speed = ~Speed::getNameFrom(item.speed);
 
 			print(buffer, ++number,
@@ -564,7 +564,7 @@ void RankPage::paintInterface()
 		std::this_thread::sleep_for(50ms);
 		canvas.setColor(Color::White);
 		canvas.setCursor(baseX / 2, baseY + 12);
-		print(~token::rank_clear_all_records);
+		print(~Token::rank_clear_all_records);
 	}
 	std::this_thread::sleep_for(500ms);
 }
