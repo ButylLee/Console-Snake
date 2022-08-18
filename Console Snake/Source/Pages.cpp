@@ -172,7 +172,8 @@ void SettingPage::run()
 
 			case K_3:
 			{
-				GameSetting::get().show_frame = !GameSetting::get().show_frame;
+				if (!GameSetting::get().old_console_host)
+					GameSetting::get().show_frame = !GameSetting::get().show_frame;
 			}
 			break;
 

@@ -38,6 +38,7 @@ static void ParseCMDAndSet(int count, char* commands[])
 		else if (cmd == "-oldconsole")
 		{
 			GameSetting::get().old_console_host = true;
+			GameSetting::get().show_frame = true;
 		}
 		else if (cmd == "-awesome")
 		{

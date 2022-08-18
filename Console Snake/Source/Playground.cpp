@@ -158,7 +158,7 @@ void Playground::setupInvariantAndPaint() noexcept
 			{
 				map[column][row].type = Element::barrier;
 				map[column][row].snake_index = -1;
-				if (!(GameSetting::get().old_console_host == true &&
+				if (!(GameSetting::get().old_console_host &&
 					  row == GameSetting::get().height - 1 &&
 					  column == GameSetting::get().width - 1))
 					paintElement(Element::barrier);
