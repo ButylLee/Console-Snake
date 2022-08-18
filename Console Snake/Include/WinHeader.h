@@ -2,13 +2,15 @@
 #ifndef SNAKE_WINMACRO_HEADER_
 #define SNAKE_WINMACRO_HEADER_
 
-/* Include this header file before including Windows.h */
+/* Include this header file to include Windows.h */
 
 #define WIN32_LEAN_AND_MEAN
 #define NOSERVICE
 #define NOMCX
 #define NOIME
 #define NOMINMAX
+
+#include <Windows.h>
 
 // enable Windows Visual Style
 #pragma comment(linker, "\"/manifestdependency:type='win32' name='Microsoft.Windows.Common-Controls' \

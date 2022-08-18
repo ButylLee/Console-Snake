@@ -15,8 +15,7 @@
 #include <string>
 #include <cwctype>
 #include <cassert>
-#include "WinMacro.h"
-#include <Windows.h>
+#include "WinHeader.h"
 
 namespace {
 	auto& getRandomEngine()

@@ -86,7 +86,7 @@ void AboutPage::run()
 void NormalPage::paintTitle(ShowVersion show_version)
 {
 	canvas.setColor(Color::LightBlue);
-	print(game_title);
+	print(Resource::game_title);
 	if (show_version == ShowVersion::Yes)
 		print(~Token::game_version);
 }
@@ -469,7 +469,7 @@ void BeginPage::paintInterface()
 						return;
 					canvas.setCursor(0, 0);
 					canvas.setColor(color.setNextValue());
-					print(game_title);
+					print(Resource::game_title);
 					print(~Token::game_version);
 					std::this_thread::sleep_for(100ms);
 				}
@@ -480,7 +480,7 @@ void BeginPage::paintInterface()
 						return;
 					canvas.setCursor(0, 0);
 					canvas.setColor(color_flag ? Color::Aqua : Color::LightBlue);
-					print(game_title);
+					print(Resource::game_title);
 					print(~Token::game_version);
 					color_flag = !color_flag;
 					std::this_thread::sleep_for(900ms);

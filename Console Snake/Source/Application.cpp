@@ -8,8 +8,7 @@
 #include "Resource.h"
 #include "ErrorHandling.h"
 
-#include "WinMacro.h"
-#include <Windows.h>
+#include "WinHeader.h"
 #include <clocale>
 #include <cstdlib>
 #include <cstdlib>

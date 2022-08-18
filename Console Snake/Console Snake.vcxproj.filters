@@ -83,7 +83,7 @@
     <ClInclude Include="Include\wideIO.h">
       <Filter>头文件\Utility</Filter>
     </ClInclude>
-    <ClInclude Include="Include\WinMacro.h">
+    <ClInclude Include="Include\WinHeader.h">
       <Filter>头文件\Utility</Filter>
     </ClInclude>
     <ClInclude Include="Include\Enum.h">

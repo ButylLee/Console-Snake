@@ -8,8 +8,7 @@
 #include <stdexcept>
 #include <cstdlib>
 #include <string>
-#include "WinMacro.h"
-#include <Windows.h>
+#include "WinHeader.h"
 
 // Base type of all exceptions
 class Exception

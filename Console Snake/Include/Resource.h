@@ -4,19 +4,107 @@
 
 #include "Enum.h"
 #include "LocalizedStrings.h"
-#include "WinMacro.h"
-#include <Windows.h>
+#include "WinHeader.h"
+#include <random>
+#include <type_traits>
 
 #define GAME_VERSION "2.15"
-inline constexpr auto save_file_name = "SnakeSaved.bin";
-inline constexpr const unsigned char crypto_key[] = {
-	0x54, 0xDE, 0x3B, 0xF2, 0xD8, 0x5D, 0x4E, 0x04,
-	0xB2, 0xBE, 0x4D, 0xCC, 0xC3, 0xAD, 0xEB, 0x1C
-};
-inline constexpr const unsigned char crypto_IV[] = {
-	0xE9, 0x5C, 0x99, 0x13, 0xCC, 0x94, 0x4A, 0x0C,
-	0x92, 0xD1, 0x48, 0x9E, 0x03, 0x9B, 0x4E, 0xA4
-};
+
+namespace Resource {
+	inline constexpr const char* save_file_name = "SnakeSaved.bin";
+	inline constexpr const unsigned char crypto_key[] = {
+		0x54, 0xDE, 0x3B, 0xF2, 0xD8, 0x5D, 0x4E, 0x04,
+		0xB2, 0xBE, 0x4D, 0xCC, 0xC3, 0xAD, 0xEB, 0x1C,
+	};
+	inline constexpr const unsigned char crypto_IV[] = {
+		0xE9, 0x5C, 0x99, 0x13, 0xCC, 0x94, 0x4A, 0x0C,
+		0x92, 0xD1, 0x48, 0x9E, 0x03, 0x9B, 0x4E, 0xA4,
+	};
+	inline const wchar_t* const game_title = []
+	{
+		static constexpr const wchar_t* titles[] = { LR"title(
+
+
+                 ___          ___          ___          ___          ___     
+                /\  \        /\__\        /\  \        /\__\        /\  \    
+               /::\  \      /::|  |      /::\  \      /:/  /       /::\  \   
+              /:/\ \  \    /:|:|  |     /:/\:\  \    /:/__/       /:/\:\  \  
+             _\:\~\ \  \  /:/|:|  |__  /::\~\:\  \  /::\__\____  /::\~\:\  \ 
+            /\ \:\ \ \__\/:/ |:| /\__\/:/\:\ \:\__\/:/\:::::\__\/:/\:\ \:\__\
+            \:\ \:\ \/__/\/__|:|/:/  /\/__\:\/:/  /\/_|:|~~|~   \:\~\:\ \/__/
+             \:\ \:\__\      |:/:/  /      \::/  /    |:|  |     \:\ \:\__\  
+              \:\/:/  /      |::/  /       /:/  /     |:|  |      \:\ \/__/  
+               \::/  /       /:/  /       /:/  /      |:|  |       \:\__\    
+                \/__/        \/__/        \/__/        \|__|        \/__/    
+                                                                )title", // Isometric1
+			LR"title(
+
+
+                 ___          ___          ___          ___          ___     
+                /  /\        /__/\        /  /\        /__/|        /  /\    
+               /  /:/_       \  \:\      /  /::\      |  |:|       /  /:/_   
+              /  /:/ /\       \  \:\    /  /:/\:\     |  |:|      /  /:/ /\  
+             /  /:/ /::\  _____\__\:\  /  /:/~/::\  __|  |:|     /  /:/ /:/_ 
+            /__/:/ /:/\:\/__/::::::::\/__/:/ /:/\:\/__/\_|:|____/__/:/ /:/ /\
+            \  \:\/:/~/:/\  \:\~~\~~\/\  \:\/:/__\/\  \:\/:::::/\  \:\/:/ /:/
+             \  \::/ /:/  \  \:\  ~~~  \  \::/      \  \::/~~~~  \  \::/ /:/ 
+              \__\/ /:/    \  \:\       \  \:\       \  \:\       \  \:\/:/  
+                /__/:/      \  \:\       \  \:\       \  \:\       \  \::/   
+                \__\/        \__\/        \__\/        \__\/        \__\/    
+                                                                )title", // Isometric3
+			LR"title(
+
+
+
+
+                ________   ________    ________   ___  __     _______      
+               |\   ____\ |\   ___  \ |\   __  \ |\  \|\  \  |\  ___ \     
+               \ \  \___|_\ \  \\ \  \\ \  \|\  \\ \  \/  /|_\ \   __/|    
+                \ \_____  \\ \  \\ \  \\ \   __  \\ \   ___  \\ \  \_|/__  
+                 \|____|\  \\ \  \\ \  \\ \  \ \  \\ \  \\ \  \\ \  \_|\ \ 
+                   ____\_\  \\ \__\\ \__\\ \__\ \__\\ \__\\ \__\\ \_______\
+                  |\_________\\|__| \|__| \|__|\|__| \|__| \|__| \|_______|
+                  \|_________|                                             
+                                                                )title", // 3D-ASCII
+			LR"title(
+
+                                  ,--.                        ,--.           
+              .--.--.           ,--.'|    ,---,           ,--/  /|     ,---,.
+             /  /    '.     ,--,:  : |   '  .' \       ,---,': / '   ,'  .' |
+            |  :  /`. /  ,`--.'`|  ' :  /  ;    '.     :   : '/ /  ,---.'   |
+            ;  |  |--`   |   :  :  | | :  :       \    |   '   ,   |   |   .'
+            |  :  ;_     :   |   \ | : :  |   /\   \   '   |  /    :   :  |-,
+             \  \    `.  |   : '  '; | |  :  ' ;.   :  |   ;  ;    :   |  ;/|
+              `----.   \ '   ' ;.    ; |  |  ;/  \   \ :   '   \   |   :   .'
+              __ \  \  | |   | | \   | '  :  | \  \ ,' |   |    '  |   |  |-,
+             /  /`--'  / '   : |  ; .' |  |  '  '--'   '   : |.  \ '   :  ;/|
+            '--'.     /  |   | '`--'   |  :  :         |   | '_\.' |   |    \
+              `--'---'   '   : |       |  | ,'         '   : |     |   :   .'
+                         ;   |.'       `--''           ;   |,'     |   | ,'  
+                         '---'                         '---'       `----'    
+                                                                )title", // 3D Diagonal
+			LR"title(
+
+
+
+
+                     $$$$$$\                      $$\                 
+                    $$  __$$\                     $$ |                
+                    $$ /  \__|$$$$$$$\   $$$$$$\  $$ |  $$\  $$$$$$\  
+                    \$$$$$$\  $$  __$$\  \____$$\ $$ | $$  |$$  __$$\ 
+                     \____$$\ $$ |  $$ | $$$$$$$ |$$$$$$  / $$$$$$$$ |
+                    $$\   $$ |$$ |  $$ |$$  __$$ |$$  _$$<  $$   ____|
+                    \$$$$$$  |$$ |  $$ |\$$$$$$$ |$$ | \$$\ \$$$$$$$\ 
+                     \______/ \__|  \__| \_______|\__|  \__| \_______|
+                                                                )title", // Big Money-nw
+		};
+
+		std::random_device engine;
+		std::uniform_int_distribution<size_t> dis;
+		using param_type = typename decltype(dis)::param_type;
+		return titles[dis(engine, param_type{ 0, std::extent_v<decltype(titles)> - 1 })];
+	}();
+} // namespace Resource
 
 // --------------- Language Resource ---------------
 LANG_DEF(
@@ -244,7 +332,7 @@ struct ElementSet
 		Color color;
 
 		friend constexpr bool
-		operator==(const Appearance&, const Appearance&) = default;
+			operator==(const Appearance&, const Appearance&) = default;
 	}elements[static_cast<size_t>(Element::Mask)];
 
 	constexpr const auto& operator[](Element which) const noexcept
@@ -256,7 +344,7 @@ struct ElementSet
 		return elements[static_cast<size_t>(which)];
 	}
 	friend constexpr bool
-	operator==(const ElementSet&, const ElementSet&) = default;
+		operator==(const ElementSet&, const ElementSet&) = default;
 };
 
 struct ThemeInfo {
@@ -318,22 +406,5 @@ ENUM_CUSTOM(Theme)
 {
 	{}, Token::setting_custom
 };
-
-
-inline constexpr auto game_title = LR"title(
-
-
-                 ___          ___          ___          ___          ___     
-                /\  \        /\__\        /\  \        /\__\        /\  \    
-               /::\  \      /::|  |      /::\  \      /:/  /       /::\  \   
-              /:/\ \  \    /:|:|  |     /:/\:\  \    /:/__/       /:/\:\  \  
-             _\:\~\ \  \  /:/|:|  |__  /::\~\:\  \  /::\__\____  /::\~\:\  \ 
-            /\ \:\ \ \__\/:/ |:| /\__\/:/\:\ \:\__\/:/\:::::\__\/:/\:\ \:\__\
-            \:\ \:\ \/__/\/__|:|/:/  /\/__\:\/:/  /\/_|:|~~|~   \:\~\:\ \/__/
-             \:\ \:\__\      |:/:/  /      \::/  /    |:|  |     \:\ \:\__\  
-              \:\/:/  /      |::/  /       /:/  /     |:|  |      \:\ \/__/  
-               \::/  /       /:/  /       /:/  /      |:|  |       \:\__\    
-                \/__/        \/__/        \/__/        \|__|        \/__/    
-                                                                )title";
 
 #endif // SNAKE_RESOURCE_HEADER_

@@ -3,8 +3,7 @@
 #define SNAKE_CONSOLE_HEADER_
 
 #include "Modules.h"
-#include "WinMacro.h"
-#include <Windows.h>
+#include "WinHeader.h"
 #include <string>
 
 class ConsoleBase

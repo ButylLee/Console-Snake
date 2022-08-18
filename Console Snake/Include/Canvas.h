@@ -3,8 +3,7 @@
 #define SNAKE_CANVAS_HEADER_
 
 #include "Resource.h"
-#include "WinMacro.h"
-#include <Windows.h>
+#include "WinHeader.h"
 #include <string_view>
 
 class Cursor

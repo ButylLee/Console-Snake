@@ -38,8 +38,8 @@ namespace {
 	{
 		using namespace CryptoPP;
 
-		static SecByteBlock key(crypto_key, AES::DEFAULT_KEYLENGTH);
-		static SecByteBlock iv(crypto_IV, AES::BLOCKSIZE);
+		static SecByteBlock key(Resource::crypto_key, AES::DEFAULT_KEYLENGTH);
+		static SecByteBlock iv(Resource::crypto_IV, AES::BLOCKSIZE);
 		CBC_Mode<AES>::Encryption encry;
 		encry.SetKeyWithIV(key, key.size(), iv);
 
@@ -56,8 +56,8 @@ namespace {
 	{
 		using namespace CryptoPP;
 
-		static SecByteBlock key(crypto_key, AES::DEFAULT_KEYLENGTH);
-		static SecByteBlock iv(crypto_IV, AES::BLOCKSIZE);
+		static SecByteBlock key(Resource::crypto_key, AES::DEFAULT_KEYLENGTH);
+		static SecByteBlock iv(Resource::crypto_IV, AES::BLOCKSIZE);
 		CBC_Mode<AES>::Decryption decry;
 		decry.SetKeyWithIV(key, key.size(), iv);
 
@@ -78,7 +78,7 @@ GameSavingBase::GameSavingBase() try
 	std::ios::sync_with_stdio(false);
 
 	// Try to open the save file
-	path save_file_path(save_file_name);
+	path save_file_path(Resource::save_file_name);
 	std::ifstream save_file(save_file_path, std::ios::binary);
 	if (!save_file.is_open())
 		return;
@@ -216,7 +216,7 @@ void GameSavingBase::save()
 							  cipher = AES_encrypt(binary_pool);
 
 							  // Open the save file and write
-							  std::ofstream save_file(save_file_name, std::ios::binary);
+							  std::ofstream save_file(Resource::save_file_name, std::ios::binary);
 							  save_file.exceptions(std::ios_base::badbit | std::ios_base::failbit);
 							  save_file.write(cipher.c_str(), cipher.size());
 						  }

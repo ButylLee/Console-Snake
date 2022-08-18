@@ -49,7 +49,7 @@
     <ClInclude Include="Include\ScopeGuard.h" />
     <ClInclude Include="Include\Singleton.h" />
     <ClInclude Include="Include\wideIO.h" />
-    <ClInclude Include="Include\WinMacro.h" />
+    <ClInclude Include="Include\WinHeader.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Include\LangCHS.inl" />
