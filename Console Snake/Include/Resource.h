@@ -8,7 +8,7 @@
 #include <random>
 #include <type_traits>
 
-#define GAME_VERSION "2.15"
+#define GAME_VERSION "2.16"
 
 namespace Resource {
 	inline constexpr const char* save_file_name = "SnakeSaved.bin";
@@ -332,7 +332,7 @@ struct ElementSet
 		Color color;
 
 		friend constexpr bool
-			operator==(const Appearance&, const Appearance&) = default;
+		operator==(const Appearance&, const Appearance&) = default;
 	}elements[static_cast<size_t>(Element::Mask)];
 
 	constexpr const auto& operator[](Element which) const noexcept
@@ -344,7 +344,7 @@ struct ElementSet
 		return elements[static_cast<size_t>(which)];
 	}
 	friend constexpr bool
-		operator==(const ElementSet&, const ElementSet&) = default;
+	operator==(const ElementSet&, const ElementSet&) = default;
 };
 
 struct ThemeInfo {
