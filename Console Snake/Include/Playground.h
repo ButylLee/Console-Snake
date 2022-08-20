@@ -7,7 +7,6 @@
 #include "DynArray.h"
 #include "Resource.h"
 #include <atomic>
-#include "AtomicOperation.h"
 #include <chrono>
 #include <cstdint>
 
@@ -47,7 +46,7 @@ public:
 		createSnake();
 		createFood();
 		GameData::get().score = 0;
-		storeAtomic(game_status, GameStatus::Running);
+		game_status = GameStatus::Running;
 	}
 	Playground(const Playground&) = delete;
 	Playground& operator=(const Playground&) = delete;

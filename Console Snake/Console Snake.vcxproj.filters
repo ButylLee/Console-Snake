@@ -98,9 +98,6 @@
     <ClInclude Include="Include\GameSaving.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Include\AtomicOperation.h">
-      <Filter>头文件\Utility</Filter>
-    </ClInclude>
     <ClInclude Include="Include\GlobalData.h">
       <Filter>头文件\Resource</Filter>
     </ClInclude>

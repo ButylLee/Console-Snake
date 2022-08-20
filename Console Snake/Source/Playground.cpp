@@ -47,59 +47,59 @@ void Playground::play()
 			{
 				if (game_over)
 					return;
-				if (loadAtomic(input_key) != Direction::None)
+				if (input_key != Direction::None)
 					continue;
 				switch (getwch())
 				{
 					case K_UP: case K_W: case K_w:
-						if (loadAtomic(game_status) == GameStatus::Running &&
-							loadAtomic(snake_direct) != Direction::Down)
+						if (game_status == GameStatus::Running &&
+							snake_direct != Direction::Down)
 						{
-							storeAtomic(input_key, Direction::Up);
+							input_key = Direction::Up;
 						}
 						break;
 
 					case K_DOWN: case K_S: case K_s:
-						if (loadAtomic(game_status) == GameStatus::Running &&
-							loadAtomic(snake_direct) != Direction::Up)
+						if (game_status == GameStatus::Running &&
+							snake_direct != Direction::Up)
 						{
-							storeAtomic(input_key, Direction::Down);
+							input_key = Direction::Down;
 						}
 						break;
 
 					case K_LEFT: case K_A: case K_a:
-						if (loadAtomic(game_status) == GameStatus::Running &&
-							loadAtomic(snake_direct) != Direction::Right)
+						if (game_status == GameStatus::Running &&
+							snake_direct != Direction::Right)
 						{
-							storeAtomic(input_key, Direction::Left);
+							input_key = Direction::Left;
 						}
 						break;
 
 					case K_RIGHT: case K_D: case K_d:
-						if (loadAtomic(game_status) == GameStatus::Running &&
-							loadAtomic(snake_direct) != Direction::Left)
+						if (game_status == GameStatus::Running &&
+							snake_direct != Direction::Left)
 						{
-							storeAtomic(input_key, Direction::Right);
+							input_key = Direction::Right;
 						}
 						break;
 
 					case K_Space:
-						if (loadAtomic(game_status) == GameStatus::Pausing)
+						if (game_status == GameStatus::Pausing)
 						{
-							storeAtomic(game_status, GameStatus::Running);
+							game_status = GameStatus::Running;
 							if (GameSetting::get().show_frame)
 								Console::get().setTitle(~Token::title_gaming);
 						}
 						else
 						{
-							storeAtomic(game_status, GameStatus::Pausing);
+							game_status = GameStatus::Pausing;
 							if (GameSetting::get().show_frame)
 								Console::get().setTitle(~Token::title_pausing);
 						}
 						break;
 
 					case K_Esc:
-						storeAtomic(game_status, GameStatus::Ending);
+						game_status = GameStatus::Ending;
 						return;
 				}
 			}
@@ -129,7 +129,7 @@ void Playground::play()
 
 	while (true)
 	{
-		switch (loadAtomic(game_status))
+		switch (game_status)
 		{
 			case GameStatus::Running:
 			{
@@ -225,16 +225,16 @@ void Playground::createSnake()
 	if (bool use_x = getRandom(0, 1))
 	{
 		if (begin_head_x < x_range / 2)
-			storeAtomic(snake_direct, Direction::Right);
+			snake_direct = Direction::Right;
 		else
-			storeAtomic(snake_direct, Direction::Left);
+			snake_direct = Direction::Left;
 	}
 	else
 	{
 		if (begin_head_y < y_range / 2)
-			storeAtomic(snake_direct, Direction::Down);
+			snake_direct = Direction::Down;
 		else
-			storeAtomic(snake_direct, Direction::Up);
+			snake_direct = Direction::Up;
 	}
 
 	// place initial snake body
@@ -250,7 +250,7 @@ void Playground::createSnake()
 
 		if (i == snake_begin_length - 1)
 			break;
-		switch (loadAtomic(snake_direct))
+		switch (snake_direct)
 		{
 			case Direction::Up:
 				begin_head_y++; break;
@@ -297,8 +297,8 @@ void Playground::updateFrame()
 	// get new snake head position
 	auto [head_x, head_y] = snake_body[snake_head];
 	forwardIndex(snake_head);
-	if (loadAtomic(input_key) != Direction::None)
-		storeAtomic(snake_direct, exchangeAtomic(input_key, Direction::None));
+	if (input_key != Direction::None)
+		snake_direct = input_key.exchange(Direction::None);
 	nextPosition(head_x, head_y);
 
 	// check is dashing againest barrier or body
@@ -350,7 +350,7 @@ void Playground::forwardIndex(int16_t& index) noexcept
 
 void Playground::nextPosition(uint8_t& x, uint8_t& y) noexcept
 {
-	switch (loadAtomic(snake_direct))
+	switch (snake_direct)
 	{
 		case Direction::Up:
 			y == 0 ? y = GameSetting::get().height - 1 : y--;

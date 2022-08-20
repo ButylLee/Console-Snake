@@ -30,7 +30,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\Application.h" />
-    <ClInclude Include="Include\AtomicOperation.h" />
     <ClInclude Include="Include\Canvas.h" />
     <ClInclude Include="Include\Console.h" />
     <ClInclude Include="Include\GlobalData.h" />

@@ -16,7 +16,6 @@
 #include <mutex>
 #include <condition_variable>
 #include <atomic>
-#include "AtomicOperation.h"
 #include <chrono>
 #include <memory>
 #include <string>
