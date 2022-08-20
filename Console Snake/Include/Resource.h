@@ -249,16 +249,16 @@ ENUM_CUSTOM(Size)
 // --------------- Enum Speed Resource ---------------
 struct SpeedInfo {
 	enum Tag {
-		FAST, NORMAL, SLOW,
+		SLOW, NORMAL, FAST,
 		DefaultValue = NORMAL
 	};
 };
 using Speed = CustomEnum<SpeedInfo, short, Token::StringName>;
 ENUM_DEFINE(Speed)
 {
-	{ 8, Token::setting_speed_fast },
+	{ 1, Token::setting_speed_slow },
 	{ 5, Token::setting_speed_normal },
-	{ 1, Token::setting_speed_slow }
+	{ 8, Token::setting_speed_fast }
 };
 ENUM_CUSTOM(Speed)
 {

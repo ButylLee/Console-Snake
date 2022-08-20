@@ -13,6 +13,7 @@
 #include <type_traits>
 #include <concepts>
 #include <string>
+#include <memory>
 #include <cwctype>
 #include <cassert>
 #include "WinHeader.h"
@@ -108,11 +109,30 @@ void Playground::play()
 			th_input.join();
 	};
 
+	bool pausing_flicker_flag = false;
+	auto timer_end = std::make_shared<bool>(false);
+
+	std::thread th_timer(
+		[timer_end, &pausing_flicker_flag]
+		{
+			using namespace std::chrono_literals;
+			for (; !*timer_end;)
+			{
+				std::this_thread::sleep_for(pause_flicker_interval);
+				pausing_flicker_flag = !pausing_flicker_flag;
+			}
+		});
+	th_timer.detach();
+	finally {
+		*timer_end = true;
+	};
+
 	while (true)
 	{
 		switch (loadAtomic(game_status))
 		{
 			case GameStatus::Running:
+			{
 				updateFrame();
 				if (game_over)
 				{
@@ -126,9 +146,21 @@ void Playground::play()
 					std::this_thread::sleep_for(30ms + // 30ms - 210ms, level 1-10
 												20ms * (10 - GameSetting::get().speed.Value()));
 				}
-				break;
+			}
+			break;
+
 			case GameStatus::Pausing:
-				break;
+			{
+				auto [x, y] = snake_body[snake_head];
+				nextPosition(x, y);
+				canvas.setCursor(x, y);
+				if (pausing_flicker_flag)
+					paintElement(Element::snake);
+				else
+					paintElement(map[x][y].type);
+			}
+			break;
+
 			case GameStatus::Ending:
 				return;
 		}
@@ -267,21 +299,7 @@ void Playground::updateFrame()
 	forwardIndex(snake_head);
 	if (loadAtomic(input_key) != Direction::None)
 		storeAtomic(snake_direct, exchangeAtomic(input_key, Direction::None));
-	switch (loadAtomic(snake_direct))
-	{
-		case Direction::Up:
-			head_y == 0 ? head_y = GameSetting::get().height - 1 : head_y--;
-			break;
-		case Direction::Down:
-			head_y == GameSetting::get().height - 1 ? head_y = 0 : head_y++;
-			break;
-		case Direction::Left:
-			head_x == 0 ? head_x = GameSetting::get().width - 1 : head_x--;
-			break;
-		case Direction::Right:
-			head_x == GameSetting::get().width - 1 ? head_x = 0 : head_x++;
-			break;
-	}
+	nextPosition(head_x, head_y);
 
 	// check is dashing againest barrier or body
 	auto previous_type = map[head_x][head_y].type;
@@ -328,6 +346,25 @@ void Playground::forwardIndex(int16_t& index) noexcept
 	index = index == 0
 		? static_cast<int16_t>(snake_body.total_size() - 1)
 		: index - 1;
+}
+
+void Playground::nextPosition(uint8_t& x, uint8_t& y) noexcept
+{
+	switch (loadAtomic(snake_direct))
+	{
+		case Direction::Up:
+			y == 0 ? y = GameSetting::get().height - 1 : y--;
+			break;
+		case Direction::Down:
+			y == GameSetting::get().height - 1 ? y = 0 : y++;
+			break;
+		case Direction::Left:
+			x == 0 ? x = GameSetting::get().width - 1 : x--;
+			break;
+		case Direction::Right:
+			x == GameSetting::get().width - 1 ? x = 0 : x++;
+			break;
+	}
 }
 
 void Playground::endGame()

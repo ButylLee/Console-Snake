@@ -5,8 +5,10 @@
 #include "Canvas.h"
 #include "GlobalData.h"
 #include "DynArray.h"
+#include "Resource.h"
 #include <atomic>
 #include "AtomicOperation.h"
+#include <chrono>
 #include <cstdint>
 
 enum struct Direction
@@ -24,6 +26,7 @@ enum struct GameStatus
 class Playground
 {
 	static constexpr int snake_begin_length = 3;
+	static constexpr std::chrono::milliseconds pause_flicker_interval{ 500 };
 	struct MapNode
 	{
 		int16_t snake_index;
@@ -62,6 +65,7 @@ private:
 	void updateFrame();
 	void rebindData(int16_t snake_index, int8_t map_x, int8_t map_y) noexcept;
 	void forwardIndex(int16_t& index) noexcept;
+	void nextPosition(uint8_t& x, uint8_t& y) noexcept;
 	void endGame();
 
 private:
@@ -69,6 +73,7 @@ private:
 	std::atomic<Direction> input_key = Direction::None;
 	std::atomic<Direction> snake_direct;
 	std::atomic<GameStatus> game_status;
+	bool game_over = false;
 
 	// The invariant of this class is that ALL map nodes except barrier
 	// and snake_body nodes should have one-to-one correspondence.
@@ -76,8 +81,6 @@ private:
 	DynArray<SnakeNode> snake_body;
 	int16_t snake_head;
 	int16_t snake_tail;
-
-	bool game_over = false;
 };
 
 #endif // SNAKE_PLAYGROUND_HEADER_
