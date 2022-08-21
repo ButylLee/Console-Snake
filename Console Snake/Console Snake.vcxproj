@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Application.cpp" />
+    <ClCompile Include="Source\Arena.cpp" />
     <ClCompile Include="Source\Canvas.cpp" />
     <ClCompile Include="Source\Console.cpp" />
     <ClCompile Include="Source\GameSaving.cpp" />
@@ -30,6 +31,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\Application.h" />
+    <ClInclude Include="Include\Arena.h" />
     <ClInclude Include="Include\Canvas.h" />
     <ClInclude Include="Include\Console.h" />
     <ClInclude Include="Include\GlobalData.h" />

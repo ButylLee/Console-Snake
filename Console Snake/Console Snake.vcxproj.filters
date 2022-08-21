@@ -48,6 +48,9 @@
     <ClCompile Include="Source\Application.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Arena.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\Canvas.h">
@@ -109,6 +112,9 @@
     </ClInclude>
     <ClInclude Include="Include\GlobalResourceWrapper.h">
       <Filter>头文件\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Arena.h">
+      <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
