@@ -109,17 +109,17 @@ void Playground::play()
 			th_input.join();
 	};
 
-	bool pausing_flicker_flag = false;
+	bool pause_flicker_flag = false;
 	auto timer_end = std::make_shared<bool>(false);
 
 	std::thread th_timer(
-		[timer_end, &pausing_flicker_flag]
+		[timer_end, &pause_flicker_flag]
 		{
 			using namespace std::chrono_literals;
 			for (; !*timer_end;)
 			{
 				std::this_thread::sleep_for(pause_flicker_interval);
-				pausing_flicker_flag = !pausing_flicker_flag;
+				pause_flicker_flag = !pause_flicker_flag;
 			}
 		});
 	th_timer.detach();
@@ -154,7 +154,7 @@ void Playground::play()
 				auto [x, y] = snake_body[snake_head];
 				nextPosition(x, y);
 				canvas.setCursor(x, y);
-				if (pausing_flicker_flag)
+				if (pause_flicker_flag)
 					paintElement(Element::snake);
 				else
 					paintElement(map[x][y].type);

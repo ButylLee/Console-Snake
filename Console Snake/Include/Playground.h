@@ -10,22 +10,19 @@
 #include <chrono>
 #include <cstdint>
 
-enum struct Direction
-{
-	None,
-	Up, Down, Left, Right
-};
-
-enum struct GameStatus
-{
-	Running, Pausing, Ending
-};
-
-// --------------- class Playground ---------------
 class Playground
 {
 	static constexpr int snake_begin_length = 3;
 	static constexpr std::chrono::milliseconds pause_flicker_interval{ 500 };
+	enum struct Direction
+	{
+		None,
+		Up, Down, Left, Right
+	};
+	enum struct GameStatus
+	{
+		Running, Pausing, Ending
+	};
 	struct MapNode
 	{
 		int16_t snake_index;
