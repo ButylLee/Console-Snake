@@ -2,8 +2,11 @@
 #include "ErrorHandling.h"
 #include "wideIO.h"
 #include "Resource.h"
+#include "WinHeader.h"
 #include <utility>
 #include <cstdlib>
+#include <climits>
+#include <cassert>
 
 ConsoleBase::ConsoleBase() try
 {
@@ -114,4 +117,15 @@ HWND ConsoleBase::fetchConsoleHandle() const
 	if (hwnd == NULL)
 		throw RuntimeException(~Token::GetConsoleWindow_failed_message);
 	return hwnd;
+}
+
+void ungetwch(wint ch) noexcept
+{
+	static constexpr auto half_bits = sizeof(wint) / 2 * CHAR_BIT;
+	static constexpr auto mask = (1 << half_bits) - 1;
+	auto first = ch & mask;
+	auto second = ch >> half_bits & mask;
+	assert(first != 0);
+	PostMessageW(Console::get().getConsoleHandle(), WM_CHAR, first, 0);
+	PostMessageW(Console::get().getConsoleHandle(), WM_CHAR, second, 0);
 }

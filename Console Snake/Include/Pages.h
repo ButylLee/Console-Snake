@@ -63,6 +63,16 @@ private:
 	Canvas canvas;
 };
 
+class DemoPage :public Page
+{
+	FACTORY_MAP_REGISTER(DemoPage);
+public:
+	void run() override;
+
+private:
+	Canvas canvas;
+};
+
 class AboutPage :public Page
 {
 	FACTORY_MAP_REGISTER(AboutPage);
@@ -131,7 +141,7 @@ public:
 
 private:
 	void paintInterface();
-	inline static bool is_press = false; // benign data race
+	bool is_press = false; // benign data race
 };
 
 class RankPage :public NormalPage

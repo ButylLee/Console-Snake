@@ -23,10 +23,11 @@
     <ClCompile Include="Source\Arena.cpp" />
     <ClCompile Include="Source\Canvas.cpp" />
     <ClCompile Include="Source\Console.cpp" />
+    <ClCompile Include="Source\DemoGround.cpp" />
     <ClCompile Include="Source\GameSaving.cpp" />
     <ClCompile Include="Source\Pages.cpp" />
     <ClCompile Include="Source\Main.cpp" />
-    <ClCompile Include="Source\Playground.cpp" />
+    <ClCompile Include="Source\PlayGround.cpp" />
     <ClCompile Include="Source\Rank.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -34,6 +35,7 @@
     <ClInclude Include="Include\Arena.h" />
     <ClInclude Include="Include\Canvas.h" />
     <ClInclude Include="Include\Console.h" />
+    <ClInclude Include="Include\DemoGround.h" />
     <ClInclude Include="Include\GlobalData.h" />
     <ClInclude Include="Include\DynArray.h" />
     <ClInclude Include="Include\Enum.h" />
@@ -44,7 +46,7 @@
     <ClInclude Include="Include\LocalizedStrings.h" />
     <ClInclude Include="Include\Modules.h" />
     <ClInclude Include="Include\Pages.h" />
-    <ClInclude Include="Include\Playground.h" />
+    <ClInclude Include="Include\PlayGround.h" />
     <ClInclude Include="Include\Rank.h" />
     <ClInclude Include="Include\Resource.h" />
     <ClInclude Include="Include\ScopeGuard.h" />

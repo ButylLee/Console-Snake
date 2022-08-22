@@ -1,12 +1,12 @@
 ﻿#include "Pages.h"
 #include "Console.h"
-#include "Playground.h"
+#include "PlayGround.h"
+#include "DemoGround.h"
 #include "Rank.h"
 #include "GameSaving.h"
 
 #include "wideIO.h"
 #include "ScopeGuard.h"
-
 #include "Resource.h"
 #include "KeyMap.h"
 #include "GlobalData.h"
@@ -20,6 +20,7 @@
 #include <memory>
 #include <string>
 #include <cassert>
+#include "WinHeader.h"
 
 /***************************************
  Interface Page
@@ -51,7 +52,7 @@ void GamePage::run()
 	auto height = GameSetting::get().height;
 	canvas.setClientSize(width, height);
 
-	Playground playground(this->canvas);
+	PlayGround playground(this->canvas);
 	playground.play();
 
 	if (GameData::get().retry_game == true)
@@ -63,6 +64,15 @@ void GamePage::run()
 		GameData::get().selection = PageSelect::MenuPage;
 	}
 	GameSaving::get().save();
+}
+
+/***************************************
+ class DemoPage
+****************************************/
+void DemoPage::run()
+{
+	//TODO
+	GameData::get().selection = PageSelect::BeginPage;
 }
 
 /***************************************
@@ -99,6 +109,24 @@ void MenuPage::run()
 	canvas.setClientSize(default_size);
 	paintInterface();
 
+	bool enter_demoground = false;
+	auto enable_timer = std::make_shared<bool>(true);
+	std::thread th_timer(
+		[enable_timer, &enter_demoground]
+		{
+			using namespace std::chrono_literals;
+			std::this_thread::sleep_for(15s);
+			if (*enable_timer)
+			{
+				enter_demoground = true;
+				ungetwch(K_Ctrl_Home);
+			}
+		});
+	th_timer.detach();
+	finally {
+		*enable_timer = false;
+	};
+
 	while (true)
 	{
 		switch (getwch())
@@ -117,6 +145,12 @@ void MenuPage::run()
 			case K_A:
 			case K_F1:
 				GameData::get().selection = PageSelect::AboutPage;
+				return;
+			case K_Ctrl_Home:
+				if (enter_demoground)
+					GameData::get().selection = PageSelect::DemoPage;
+				else
+					GameData::get().selection = PageSelect::BeginPage;
 				return;
 			case K_Esc:
 				exit(EXIT_SUCCESS);

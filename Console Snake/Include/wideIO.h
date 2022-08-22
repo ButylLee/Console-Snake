@@ -84,14 +84,8 @@ inline wint getwch() noexcept
 
 /***************************************
  Function: unget wide char
- ONLY SUPPORT SINGLE VALUE KEY
 ****************************************/
-[[deprecated("_kbhit() could not detect ungetwch()")]]
-inline auto ungetwch(wint ch) noexcept
-{
-	// due to the limitation of ungetch buffer, only single value key is supported
-	return _ungetwch(static_cast<wint_t>(ch)); // truncation
-}
+void ungetwch(wint ch) noexcept;
 
 /***************************************
  Function: calculate the full-width length

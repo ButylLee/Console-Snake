@@ -7,7 +7,7 @@
 #include <atomic>
 #include <chrono>
 
-class Playground
+class PlayGround
 {
 	static constexpr std::chrono::milliseconds pause_flicker_interval{ 500 };
 	enum struct GameStatus
@@ -16,9 +16,9 @@ class Playground
 	};
 
 public:
-	Playground(Canvas& canvas);
-	Playground(const Playground&) = delete;
-	Playground& operator=(const Playground&) = delete;
+	PlayGround(Canvas& canvas);
+	PlayGround(const PlayGround&) = delete;
+	PlayGround& operator=(const PlayGround&) = delete;
 
 public:
 	void play();

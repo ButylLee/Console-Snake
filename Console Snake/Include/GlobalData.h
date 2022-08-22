@@ -8,6 +8,7 @@
 enum struct PageSelect
 {
 	GamePage,
+	DemoPage,
 	AboutPage,
 	MenuPage,
 	SettingPage,

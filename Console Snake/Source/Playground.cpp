@@ -1,4 +1,4 @@
-﻿#include "Playground.h"
+﻿#include "PlayGround.h"
 #include "Rank.h"
 #include "Console.h"
 #include "GlobalData.h"
@@ -14,13 +14,13 @@
 #include <cwctype>
 #include "WinHeader.h"
 
-Playground::Playground(Canvas& canvas) :canvas(canvas), arena(canvas)
+PlayGround::PlayGround(Canvas& canvas) :canvas(canvas), arena(canvas)
 {
 	GameData::get().score = 0;
 	game_status = GameStatus::Running;
 }
 
-void Playground::play()
+void PlayGround::play()
 {
 	using namespace std::chrono_literals;
 
@@ -109,7 +109,7 @@ void Playground::play()
 				if (arena.is_over())
 				{
 					// tell thread th_input to end
-					PostMessageW(Console::get().getConsoleHandle(), WM_KEYDOWN, VK_ESCAPE, 0);
+					ungetwch(K_Esc);
 					ending();
 					return;
 				}
@@ -138,7 +138,7 @@ void Playground::play()
 	}
 }
 
-void Playground::ending()
+void PlayGround::ending()
 {
 	auto [baseX, baseY] = canvas.getClientSize();
 	baseY = baseY / 2 - 5;
