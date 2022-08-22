@@ -8,6 +8,7 @@
 #include "ScopeGuard.h"
 
 #include <thread>
+#include <atomic>
 #include <chrono>
 #include <string>
 #include <memory>
@@ -81,14 +82,14 @@ void PlayGround::play()
 			th_input.join();
 	};
 
-	bool pause_flicker_flag = false;
-	auto timer_end = std::make_shared<bool>(false);
+	std::atomic<bool> pause_flicker_flag = false;
+	std::shared_ptr<bool> timer_loop = std::make_shared<bool>(true);
 
 	std::thread th_timer(
-		[timer_end, &pause_flicker_flag]
+		[timer_loop, &pause_flicker_flag]
 		{
 			using namespace std::chrono_literals;
-			for (; !*timer_end;)
+			for (; *timer_loop;)
 			{
 				std::this_thread::sleep_for(pause_flicker_interval);
 				pause_flicker_flag = !pause_flicker_flag;
@@ -96,7 +97,7 @@ void PlayGround::play()
 		});
 	th_timer.detach();
 	finally {
-		*timer_end = true;
+		*timer_loop = false;
 	};
 
 	while (true)

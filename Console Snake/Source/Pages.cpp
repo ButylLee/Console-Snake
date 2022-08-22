@@ -13,8 +13,6 @@
 #include "ErrorHandling.h"
 
 #include <thread>
-#include <mutex>
-#include <condition_variable>
 #include <atomic>
 #include <chrono>
 #include <memory>
@@ -109,13 +107,24 @@ void MenuPage::run()
 	canvas.setClientSize(default_size);
 	paintInterface();
 
-	bool enter_demoground = false;
-	auto enable_timer = std::make_shared<bool>(true);
+	std::atomic<bool> enter_demoground = false;
+	std::atomic<bool> reset_timer = false;
+	std::shared_ptr<bool> enable_timer = std::make_shared<bool>(true);
 	std::thread th_timer(
-		[enable_timer, &enter_demoground]
+		[&, enable_timer]
 		{
-			using namespace std::chrono_literals;
-			std::this_thread::sleep_for(15s);
+			using namespace std::chrono;
+			auto end = high_resolution_clock::now() + 15s;
+			do {
+				std::this_thread::sleep_for(1ms);
+				if (!*enable_timer)
+					return;
+				if (reset_timer)
+				{
+					reset_timer = false;
+					end = high_resolution_clock::now() + 15s;
+				}
+			} while (high_resolution_clock::now() < end);
 			if (*enable_timer)
 			{
 				enter_demoground = true;
@@ -155,6 +164,7 @@ void MenuPage::run()
 			case K_Esc:
 				exit(EXIT_SUCCESS);
 		}
+		reset_timer = true;
 	}
 }
 
@@ -481,7 +491,7 @@ void BeginPage::run()
 	paintInterface();
 
 	(void)getwch();
-	is_press = true;
+	*is_press = true;
 	GameData::get().selection = PageSelect::MenuPage;
 }
 
@@ -493,13 +503,13 @@ void BeginPage::paintInterface()
 	print(~Token::press_any_key);
 
 	std::thread th_paint(
-		[this]
+		[this, is_press = is_press]
 		{
 			using namespace std::chrono_literals;
 			if (GameData::get().colorful_title)
 				for (Color color;;)
 				{
-					if (is_press)
+					if (*is_press)
 						return;
 					canvas.setCursor(0, 0);
 					canvas.setColor(color.setNextValue());
@@ -510,7 +520,7 @@ void BeginPage::paintInterface()
 			else
 				for (bool color_flag = false;;)
 				{
-					if (is_press)
+					if (*is_press)
 						return;
 					canvas.setCursor(0, 0);
 					canvas.setColor(color_flag ? Color::Aqua : Color::LightBlue);

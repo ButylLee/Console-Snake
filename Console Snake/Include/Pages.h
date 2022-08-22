@@ -141,7 +141,7 @@ public:
 
 private:
 	void paintInterface();
-	bool is_press = false; // benign data race
+	std::shared_ptr<bool> is_press = std::make_shared<bool>(false);
 };
 
 class RankPage :public NormalPage
