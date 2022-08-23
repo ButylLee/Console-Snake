@@ -122,6 +122,9 @@
     <ClInclude Include="Include\DemoGround.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Include\Timer.h">
+      <Filter>头文件\Utility</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Include\LangENG.inl">

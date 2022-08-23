@@ -51,6 +51,7 @@
     <ClInclude Include="Include\Resource.h" />
     <ClInclude Include="Include\ScopeGuard.h" />
     <ClInclude Include="Include\Singleton.h" />
+    <ClInclude Include="Include\Timer.h" />
     <ClInclude Include="Include\wideIO.h" />
     <ClInclude Include="Include\WinHeader.h" />
   </ItemGroup>

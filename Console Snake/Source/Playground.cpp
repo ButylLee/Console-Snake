@@ -6,6 +6,7 @@
 #include "wideIO.h"
 #include "KeyMap.h"
 #include "ScopeGuard.h"
+#include "Timer.h"
 
 #include <thread>
 #include <atomic>
@@ -83,22 +84,10 @@ void PlayGround::play()
 	};
 
 	std::atomic<bool> pause_flicker_flag = false;
-	std::shared_ptr<bool> timer_loop = std::make_shared<bool>(true);
-
-	std::thread th_timer(
-		[timer_loop, &pause_flicker_flag]
-		{
-			using namespace std::chrono_literals;
-			for (; *timer_loop;)
-			{
-				std::this_thread::sleep_for(pause_flicker_interval);
-				pause_flicker_flag = !pause_flicker_flag;
-			}
-		});
-	th_timer.detach();
-	finally {
-		*timer_loop = false;
-	};
+	Timer timer([&]
+				{
+					pause_flicker_flag = !pause_flicker_flag;
+				}, pause_flicker_interval, Timer::Loop);
 
 	while (true)
 	{

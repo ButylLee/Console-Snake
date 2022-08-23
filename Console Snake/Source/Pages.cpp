@@ -6,6 +6,7 @@
 #include "GameSaving.h"
 
 #include "wideIO.h"
+#include "Timer.h"
 #include "ScopeGuard.h"
 #include "Resource.h"
 #include "KeyMap.h"
@@ -107,34 +108,13 @@ void MenuPage::run()
 	canvas.setClientSize(default_size);
 	paintInterface();
 
+	using namespace std::chrono_literals;
 	std::atomic<bool> enter_demoground = false;
-	std::atomic<bool> reset_timer = false;
-	std::shared_ptr<bool> enable_timer = std::make_shared<bool>(true);
-	std::thread th_timer(
-		[&, enable_timer]
-		{
-			using namespace std::chrono;
-			auto end = high_resolution_clock::now() + 15s;
-			do {
-				std::this_thread::sleep_for(1ms);
-				if (!*enable_timer)
-					return;
-				if (reset_timer)
+	Timer timer([&]
 				{
-					reset_timer = false;
-					end = high_resolution_clock::now() + 15s;
-				}
-			} while (high_resolution_clock::now() < end);
-			if (*enable_timer)
-			{
-				enter_demoground = true;
-				ungetwch(K_Ctrl_Home);
-			}
-		});
-	th_timer.detach();
-	finally {
-		*enable_timer = false;
-	};
+					enter_demoground = true;
+					ungetwch(K_Ctrl_Home);
+				}, 15s);
 
 	while (true)
 	{
@@ -164,7 +144,7 @@ void MenuPage::run()
 			case K_Esc:
 				exit(EXIT_SUCCESS);
 		}
-		reset_timer = true;
+		timer.reset();
 	}
 }
 
