@@ -70,7 +70,29 @@ void GamePage::run()
 ****************************************/
 void DemoPage::run()
 {
-	//TODO
+	using namespace std::chrono_literals;
+	Console::get().setTitle(~Token::press_any_key);
+	Timer timer([]
+				{
+					static bool flicker = true;
+					if (flicker = !flicker)
+						Console::get().setTitle(~Token::press_any_key);
+					else
+						Console::get().setTitle({});
+				}, 800ms, Timer::Loop,
+				[]
+				{
+					Console::get().setTitle(~Token::console_title);
+				});
+	canvas.clear();
+	auto [width2, height2] = canvas.getClientSize();
+	auto width1 = GameSetting::get().width;
+	auto height1 = GameSetting::get().height;
+	canvas.setCursorOffset((width2 - width1) / 2, (height2 - height1) / 2);
+
+	DemoGround demoground(this->canvas);
+	demoground.show();
+
 	GameData::get().selection = PageSelect::BeginPage;
 }
 
@@ -479,7 +501,7 @@ void BeginPage::paintInterface()
 {
 	auto [baseX, baseY] = canvas.getClientSize();
 	canvas.setColor(Color::LightWhite);
-	canvas.setCenteredCursor(~Token::press_any_key, baseY / 2 + 4);
+	canvas.setCursorCentered(~Token::press_any_key, baseY / 2 + 4);
 	print(~Token::press_any_key);
 
 	std::thread th_paint(
@@ -495,7 +517,7 @@ void BeginPage::paintInterface()
 					canvas.setColor(color.setNextValue());
 					print(Resource::game_title);
 					print(~Token::game_version);
-					std::this_thread::sleep_for(100ms);
+					std::this_thread::sleep_for(200ms);
 				}
 			else
 				for (bool color_flag = false;;)
@@ -551,7 +573,7 @@ void RankPage::paintInterface()
 
 	if (auto [rank, lock] = Rank::get().getRank(); rank[0].score == 0)
 	{
-		canvas.setCenteredCursor(~Token::rank_no_data, baseY);
+		canvas.setCursorCentered(~Token::rank_no_data, baseY);
 		print(~Token::rank_no_data);
 		is_no_data = true;
 	}

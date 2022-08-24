@@ -24,7 +24,12 @@ void Canvas::setCursor(short newX, short newY)
 	applyCursor();
 }
 
-void Canvas::setCenteredCursor(std::wstring_view str, short newY)
+void Canvas::setCursorOffset(short X, short Y) noexcept
+{
+	offset = { X, Y };
+}
+
+void Canvas::setCursorCentered(std::wstring_view str, short newY)
 {
 	cursor = { calCenteredCoord(str), newY };
 	applyCursor();
@@ -37,10 +42,16 @@ void Canvas::setClientSize(short width, short height) noexcept
 	applyClientSize();
 }
 
-void Canvas::setClientSize(ClientSize new_size)
+void Canvas::setClientSize(ClientSize new_size) noexcept
 {
 	size = new_size;
 	applyClientSize();
+}
+
+void Canvas::nextLine()
+{
+	cursor.y++;
+	applyCursor();
 }
 
 void Canvas::clear() noexcept
@@ -66,7 +77,7 @@ void Canvas::applyColor()
 
 void Canvas::applyCursor()
 {
-	if (!SetConsoleCursorPosition(Console::get().getOutputHandle(), cursor))
+	if (!SetConsoleCursorPosition(Console::get().getOutputHandle(), cursor + offset))
 		throw NativeException{};
 }
 

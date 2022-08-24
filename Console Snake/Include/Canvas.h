@@ -6,12 +6,11 @@
 #include "WinHeader.h"
 #include <string_view>
 
-class Cursor
+struct Cursor
 {
 public:
 	Cursor() = default;
 	constexpr Cursor(short x, short y) noexcept :x(x), y(y) {}
-public:
 	constexpr operator COORD() const noexcept
 	{
 		return COORD{
@@ -20,10 +19,11 @@ public:
 			static_cast<SHORT>(y)
 		};
 	}
+	constexpr Cursor operator+(const Cursor& offset) const noexcept
+	{
+		return { this->x + offset.x, this->y + offset.y };
+	}
 public:
-	constexpr short getX() const noexcept { return x; }
-	constexpr short getY() const noexcept { return y; }
-private:
 	short x = 0;
 	short y = 0;
 };
@@ -44,9 +44,11 @@ public:
 public:
 	void setColor(Color new_color);
 	void setCursor(short newX, short newY);
-	void setCenteredCursor(std::wstring_view str, short newY);
+	void setCursorOffset(short X, short Y) noexcept;
+	void setCursorCentered(std::wstring_view str, short newY);
 	void setClientSize(short width, short height) noexcept;
-	void setClientSize(ClientSize new_size);
+	void setClientSize(ClientSize new_size) noexcept;
+	void nextLine();
 	void clear() noexcept;
 
 public:
@@ -63,7 +65,8 @@ private:
 private:
 	Color color = Color::White;
 	Cursor cursor;
-	ClientSize size = { 60, 30 };
+	Cursor offset;
+	ClientSize size = { 45, 35 };
 };
 
 #endif // SNAKE_CANVAS_HEADER_

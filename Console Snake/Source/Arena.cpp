@@ -143,8 +143,7 @@ void Arena::setupInvariantAndPaint() noexcept
 		}
 		if (row != GameSetting::get().height - 1)
 		{
-			if (GameSetting::get().old_console_host == false)
-				print(L'\n');
+			canvas.nextLine();
 		}
 	}
 }

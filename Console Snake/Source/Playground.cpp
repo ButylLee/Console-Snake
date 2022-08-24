@@ -140,26 +140,26 @@ void PlayGround::ending()
 		Console::get().setTitle(~Token::game_congratulations);
 		canvas.setColor(Color::Green);
 
-		canvas.setCenteredCursor(~Token::game_you_win, baseY);
+		canvas.setCursorCentered(~Token::game_you_win, baseY);
 		print(~Token::game_you_win);
 	}
 	else
 	{
 		canvas.setColor(Color::LightWhite);
 
-		canvas.setCenteredCursor(~Token::game_you_died, baseY);
+		canvas.setCursorCentered(~Token::game_you_died, baseY);
 		print(~Token::game_you_died);
 	}
 	buffer = ~Token::game_show_score;
 	buffer += std::to_wstring(GameData::get().score);
-	canvas.setCenteredCursor(buffer, baseY + 1);
+	canvas.setCursorCentered(buffer, baseY + 1);
 	print(buffer);
 
 	// show info and get gamer's name
 	if (GameData::get().score != 0)
 	{
 		canvas.setColor(Color::Green);
-		canvas.setCenteredCursor(~Token::game_enter_your_name, baseY + 3);
+		canvas.setCursorCentered(~Token::game_enter_your_name, baseY + 3);
 		print(~Token::game_enter_your_name);
 
 		canvas.setColor(Color::LightAqua);
@@ -181,10 +181,10 @@ void PlayGround::ending()
 
 	// show Retry Or Return info
 	canvas.setColor(Color::LightWhite);
-	canvas.setCenteredCursor(~Token::game_Space_to_retry, baseY + 6);
+	canvas.setCursorCentered(~Token::game_Space_to_retry, baseY + 6);
 	print(~Token::game_Space_to_retry);
 
-	canvas.setCenteredCursor(~Token::game_Esc_to_return, baseY + 7);
+	canvas.setCursorCentered(~Token::game_Esc_to_return, baseY + 7);
 	print(~Token::game_Esc_to_return);
 
 	while (true)

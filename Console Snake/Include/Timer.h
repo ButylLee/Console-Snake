@@ -2,6 +2,7 @@
 #ifndef SNAKE_TIMER_HEADER_
 #define SNAKE_TIMER_HEADER_
 
+#include "ScopeGuard.h"
 #include <utility>
 #include <chrono>
 #include <thread>
@@ -11,20 +12,25 @@
 
 class Timer
 {
+	static constexpr void nocallback() noexcept {}
 public:
 	static constexpr std::chrono::milliseconds minimum_interval{ 1 };
-	static constexpr enum class _Loop { _ } Loop{};
+	enum Looping { NoLoop, Loop };
 
 public:
-	template<std::invocable F, typename Rep, typename Period>
-	Timer(F&& f, std::chrono::duration<Rep, Period> delay, _Loop loop = (_Loop)1)
+	template<std::invocable F, typename Rep, typename Period, std::invocable Callback = decltype(nocallback)>
+	Timer(F&& f, std::chrono::duration<Rep, Period> delay,
+		  Looping loop = NoLoop, Callback&& callback = nocallback)
 	{
 		if (loop == Loop)
 			timer_loop = true;
 		std::thread(
-			[this, timer_enable = timer_enable, f = std::move(f), delay]
+			[=, this, timer_enable = timer_enable, f = std::move(f), callback = std::move(callback)]
 			{
 				using namespace std::chrono;
+				finally {
+					callback();
+				};
 				do {
 					auto end = high_resolution_clock::now() + delay;
 					do {
