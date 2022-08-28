@@ -50,7 +50,7 @@ L"请输入你的大名: ",
 L"  Esc)  返回菜单",
 L"Space)  再试一次",
 
-L"第%2d名 | ",
+L"第{:2}名 | ",
 L"(匿名)",
 L"通关",
 L"设置: ",
@@ -61,7 +61,7 @@ L"  作者: James Taylor\n  特别感谢: Darack\n\n  感谢你的游玩!",
 L"关于",
 
 L"获取 Console Handle 失败 ",
-L"系统内存不足 ", // No crypto because of bad_alloc
+L"系统内存不足 ",
 L"初始化失败: ",
 L"初始化GameSaving组件失败 ",
 L"初始化Console组件失败 ",

@@ -567,49 +567,44 @@ void RankPage::paintInterface()
 	paintTitle(ShowVersion::No);
 
 	auto [baseX, baseY] = canvas.getClientSize();
-	baseX = baseX / 4 - 1;
-	baseY = baseY / 2 + 1;
 	canvas.setColor(Color::LightYellow);
 
 	if (auto [rank, lock] = Rank::get().getRank(); rank[0].score == 0)
 	{
-		canvas.setCursorCentered(~Token::rank_no_data, baseY);
+		canvas.setCursorCentered(~Token::rank_no_data, baseY * 2 / 3);
 		print(~Token::rank_no_data);
 		is_no_data = true;
 	}
 	else
 	{
-		int number = 0;
-		std::wstring buffer, name, score, speed;
+		int number = 1;
+		baseY = baseY / 2;
+		std::wstring buffer, name, speed;
 		for (const auto& item : rank)
 		{
 			if (item.score == 0)
 				break;
 			std::this_thread::sleep_for(50ms);
 
-			// no std::format, sad:-(
-			buffer = ~Token::rank_No; // arg:number
-			buffer += L"%-*ls"; // arg:name width, name.c_str
-			buffer += item.is_win ? L" %ls" : L" %4ls"; // arg:score or win
+			canvas.setCursor(0, baseY + number);
+
+			buffer = ::format(~Token::rank_No, number++);
+			name = item.name.empty() ? ~Token::rank_anonymous : item.name;
+			buffer += ::format(L"{:<{}}", name.c_str(), Rank::name_max_length);
+			buffer += ::format(L" {:>4.4}", item.is_win ? ~Token::rank_win : std::to_wstring(item.score));
 			buffer += L" | ";
 			buffer += ~Token::rank_setting;
-			buffer += L"%-*ls "; // arg:speed setting width, speed setting
-			buffer += L"%2d X %2d"; // arg:size setting
-			canvas.setCursor(baseX, baseY + number);
-			name = item.name.empty() ? ~Token::rank_anonymous : item.name;
-			score = item.is_win ? ~Token::rank_win : std::to_wstring(item.score);
 			speed = ~Speed::getNameFrom(item.speed);
+			buffer += ::format(L"{:<{}} ", speed.c_str(), 6);
+			buffer += ::format(L"{:2} X {:2}", item.width, item.height);
 
-			print(buffer, ++number,
-				  Rank::name_max_length - StrFullWidthCount(name), name.c_str(),
-				  score.c_str(),
-				  6 - StrFullWidthCount(speed), speed.c_str(),
-				  item.width, item.height);
+			buffer = ::format(L"{:^{}}", std::move(buffer), baseX * 2);
+			print(buffer);
 		}
 
 		std::this_thread::sleep_for(50ms);
 		canvas.setColor(Color::White);
-		canvas.setCursor(baseX / 2, baseY + 12);
+		canvas.setCursor(baseX / 9, baseY + 13);
 		print(~Token::rank_clear_all_records);
 	}
 	std::this_thread::sleep_for(500ms);

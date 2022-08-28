@@ -8,6 +8,7 @@
 #include <climits>
 #include <string>
 #include <string_view>
+#include <format>
 
 using wint = unsigned int;
 static_assert(sizeof(wint) == 2 * sizeof(wint_t));
@@ -86,6 +87,15 @@ inline wint getwch() noexcept
  Function: unget wide char
 ****************************************/
 void ungetwch(wint ch) noexcept;
+
+/***************************************
+ Function: wrapper of std::format
+****************************************/
+template<typename... TArgs>
+inline std::wstring format(std::wstring_view fmt, TArgs&&... args)
+{
+	return std::vformat(fmt, std::make_wformat_args(std::forward<TArgs>(args)...));
+}
 
 /***************************************
  Function: calculate the full-width length

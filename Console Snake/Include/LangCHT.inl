@@ -50,7 +50,7 @@ L"請輸入你的名稱: ",
 L"  Esc)  返回菜單",
 L"Space)  再試一次",
 
-L"第%2d名 | ",
+L"第{:2}名 | ",
 L"(匿名)",
 L"通關",
 L"設定: ",
@@ -61,7 +61,7 @@ L"  作者: James Taylor\n  特別感謝: Darack\n\n  感謝你的遊玩!",
 L"關於",
 
 L"獲取 Console Handle 失敗 ",
-L"系統記憶體不足 ", // No crypto because of bad_alloc
+L"系統記憶體不足 ",
 L"初始化失敗: ",
 L"初始化GameSaving元件失敗 ",
 L"初始化Console元件失敗 ",

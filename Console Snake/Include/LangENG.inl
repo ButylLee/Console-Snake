@@ -50,9 +50,9 @@ L"Please enter your name: ",
 L"  Esc)  Return",
 L"Space)  Retry",
 
-L"No.%2d | ",
+L"No.{:2} | ",
 L"(anonymous)",
-L" WIN",
+L"WIN",
 L"Setting: ",
 L"N o   R a n k   D a t a",
 L"Ctrl+D)  Clear All Records",
@@ -61,7 +61,7 @@ L"  Author: James Taylor\n  Special Thanks: Darack\n\n  Thanks for your playing!
 L"About",
 
 L"failed to obtain Console Handle ",
-L"Insufficient system memory ", // No crypto because of bad_alloc
+L"Insufficient system memory ",
 L"Initialization Failed: ",
 L"Init GameSaving Object Failed ",
 L"Init Console Object Failed ",

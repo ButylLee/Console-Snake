@@ -50,9 +50,9 @@ L"名前を入力してください: ",
 L"  Esc)  もどる  ",
 L"Space)  もう一回",
 
-L"No.%2d | ",
+L"No.{:2} | ",
 L"(匿名)",
-L" WIN",
+L"WIN",
 L"設定: ",
 L"N o   R a n k   D a t a",
 L"Ctrl+D)  記録を削除する",
@@ -61,7 +61,7 @@ L"  作者: James Taylor\n  特別な感謝: Darack\n\n  ご遊びありがと�
 L"関する",
 
 L"コンソールハンドルの取得に失敗しました ",
-L"システムメモリー不足 ", // No crypto because of bad_alloc
+L"システムメモリー不足 ",
 L"初期化に失敗する: ",
 L"GameSaving Objectの初期化失敗 ",
 L"Console Objectの初期化失敗 ",
