@@ -16,8 +16,13 @@ public:
 	void show();
 
 private:
+	void solveNextStep();
+
+private:
 	Canvas& canvas;
 	Arena arena;
+
+	const DynArray<MapNode, 2>& map;
 };
 
 #endif // SNAKE_DEMOGROUND_HEADER_

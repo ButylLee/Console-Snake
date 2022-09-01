@@ -590,12 +590,12 @@ void RankPage::paintInterface()
 
 			buffer = ::format(~Token::rank_No, number++);
 			name = item.name.empty() ? ~Token::rank_anonymous : item.name;
-			buffer += ::format(L"{:<{}}", name.c_str(), Rank::name_max_length);
+			buffer += ::format(L"{:<{}}", std::move(name), Rank::name_max_length);
 			buffer += ::format(L" {:>4.4}", item.is_win ? ~Token::rank_win : std::to_wstring(item.score));
 			buffer += L" | ";
 			buffer += ~Token::rank_setting;
 			speed = ~Speed::getNameFrom(item.speed);
-			buffer += ::format(L"{:<{}} ", speed.c_str(), 6);
+			buffer += ::format(L"{:<{}} ", std::move(speed), 6);
 			buffer += ::format(L"{:2} X {:2}", item.width, item.height);
 
 			buffer = ::format(L"{:^{}}", std::move(buffer), baseX * 2);

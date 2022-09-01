@@ -1,12 +1,23 @@
 ﻿#include "DemoGround.h"
 #include "wideIO.h"
 
-DemoGround::DemoGround(Canvas& canvas) :canvas(canvas), arena(canvas)
+DemoGround::DemoGround(Canvas& canvas)
+	: canvas(canvas), arena(canvas)
+	, map(arena.getCurrentMap())
 {
 
 }
 
 void DemoGround::show()
 {
-	(void)getwch();
+	while (!arena.is_over())
+	{
+
+		arena.updateFrame();
+	}
+}
+
+void DemoGround::solveNextStep()
+{
+
 }
