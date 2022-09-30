@@ -15,15 +15,14 @@ class Timer
 	static constexpr void nocallback() noexcept {}
 public:
 	static constexpr std::chrono::milliseconds minimum_interval{ 1 };
-	enum Looping { NoLoop, Loop };
+	enum Looping { NoLoop = false, Loop = true };
 
 public:
 	template<std::invocable F, typename Rep, typename Period, std::invocable Callback = decltype(nocallback)>
 	Timer(F&& f, std::chrono::duration<Rep, Period> delay,
 		  Looping loop = NoLoop, Callback&& callback = nocallback)
 	{
-		if (loop == Loop)
-			timer_loop = true;
+		timer_loop = loop;
 		std::thread(
 			[=, this, timer_enable = timer_enable, f = std::move(f), callback = std::move(callback)]
 			{
