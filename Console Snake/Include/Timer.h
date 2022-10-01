@@ -46,7 +46,7 @@ public:
 					if (*timer_enable)
 						f();
 					else
-						return;
+						[[unlikely]] return;
 				} while (timer_loop);
 			}).detach();
 	}
