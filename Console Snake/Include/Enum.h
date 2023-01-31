@@ -81,8 +81,8 @@ template<typename EnumType, typename TypeInfo>
 class EnumBase
 {
 	using Tag = typename TypeInfo::Tag;
-	using NameType = typename TypeInfo::NameType;
 	using ValueType = typename TypeInfo::ValueType;
+	using NameType = typename TypeInfo::NameType;
 
 public:
 	EnumBase() = default;
@@ -145,9 +145,9 @@ template<typename EnumInfoT, typename ValueT, typename NameT>
 struct EnumInfo :EnumInfoT // Derived for enum items
 {
 	static_assert(detail::CheckCorrectEnumInfo<EnumInfoT>, "Incorrect EnumInfo type.");
+	using Tag = typename EnumInfoT::Tag;
 	using ValueType = std::remove_cv_t<ValueT>;
 	using NameType = NameT;
-	using Tag = typename EnumInfoT::Tag;
 };
 
 // ------------------- Main Class Enum ------------------
