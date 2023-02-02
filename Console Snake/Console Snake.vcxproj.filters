@@ -125,6 +125,12 @@
     <ClInclude Include="Include\Timer.h">
       <Filter>头文件\Utility</Filter>
     </ClInclude>
+    <ClInclude Include="Include\PageInterface.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Interface.h">
+      <Filter>头文件\Utility</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Include\LangENG.inl">

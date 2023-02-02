@@ -93,26 +93,31 @@ private:
 };
 
 template<typename T>
-inline T* NewWithHandler() noexcept
+inline T* NewWithHandler()
 {
 	try {
 		return new T;
 	}
 	catch (const std::bad_alloc&) {
 		print_err(~Token::message_std_bad_alloc);
+		system("pause");
+		throw;
 	}
 	catch (const Exception& error) {
 		print_err(error.what());
+		system("pause");
+		throw;
 	}
 	catch (const std::exception& error) {
 		print_err(error.what());
+		system("pause");
+		throw;
 	}
 	catch (...) {
 		print_err(~Token::message_unknown_error);
+		system("pause");
+		throw;
 	}
-
-	system("pause");
-	exit(EXIT_FAILURE);
 }
 
 #endif // SNAKE_ERRORHANDLING_HEADER_

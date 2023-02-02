@@ -2,15 +2,14 @@
 #ifndef SNAKE_DEMOGROUND_HEADER_
 #define SNAKE_DEMOGROUND_HEADER_
 
+#include "Interface.h"
 #include "Canvas.h"
 #include "Arena.h"
 
-class DemoGround
+class DemoGround :NotCopyable
 {
 public:
 	DemoGround(Canvas& canvas);
-	DemoGround(const DemoGround&) = delete;
-	DemoGround& operator=(const DemoGround&) = delete;
 
 public:
 	void show();

@@ -1,4 +1,5 @@
-﻿#include "Pages.h"
+﻿#include "PageInterface.h"
+#include "Pages.h"
 #include "Console.h"
 #include "PlayGround.h"
 #include "DemoGround.h"
@@ -75,10 +76,10 @@ void DemoPage::run()
 	Timer timer([]
 				{
 					static bool flicker = true;
-					if (flicker = !flicker)
-						Console::get().setTitle(~Token::press_any_key);
-					else
-						Console::get().setTitle({});
+	if (flicker = !flicker)
+		Console::get().setTitle(~Token::press_any_key);
+	else
+		Console::get().setTitle({});
 				}, 800ms, Timer::Loop,
 				[]
 				{
@@ -111,7 +112,7 @@ void AboutPage::run()
 }
 
 /***************************************
- Base class NormalPage
+ abstract class NormalPage
 ****************************************/
 void NormalPage::paintTitle(ShowVersion show_version)
 {
@@ -135,7 +136,7 @@ void MenuPage::run()
 	Timer timer([&]
 				{
 					enter_demoground = true;
-					ungetwch(K_Ctrl_Home);
+	ungetwch(K_Ctrl_Home);
 				}, 15s);
 
 	while (true)
@@ -164,9 +165,10 @@ void MenuPage::run()
 					GameData::get().selection = PageSelect::BeginPage;
 				return;
 			case K_Esc:
-				exit(EXIT_SUCCESS);
+				GameData::get().exit_game = true;
+				return;
 		}
-		timer.reset();
+		timer.reset(); // press any key
 	}
 }
 
@@ -508,29 +510,29 @@ void BeginPage::paintInterface()
 		[this, is_press = is_press]
 		{
 			using namespace std::chrono_literals;
-			if (GameData::get().colorful_title)
-				for (Color color;;)
-				{
-					if (*is_press)
-						return;
-					canvas.setCursor(0, 0);
-					canvas.setColor(color.setNextValue());
-					print(Resource::game_title);
-					print(~Token::game_version);
-					std::this_thread::sleep_for(200ms);
-				}
-			else
-				for (bool color_flag = false;;)
-				{
-					if (*is_press)
-						return;
-					canvas.setCursor(0, 0);
-					canvas.setColor(color_flag ? Color::Aqua : Color::LightBlue);
-					print(Resource::game_title);
-					print(~Token::game_version);
-					color_flag = !color_flag;
-					std::this_thread::sleep_for(900ms);
-				}
+		if (GameData::get().colorful_title)
+			for (Color color;;)
+			{
+				if (*is_press)
+					return;
+				canvas.setCursor(0, 0);
+				canvas.setColor(color.setNextValue());
+				print(Resource::game_title);
+				print(~Token::game_version);
+				std::this_thread::sleep_for(200ms);
+			}
+		else
+			for (bool color_flag = false;;)
+			{
+				if (*is_press)
+					return;
+				canvas.setCursor(0, 0);
+				canvas.setColor(color_flag ? Color::Aqua : Color::LightBlue);
+				print(Resource::game_title);
+				print(~Token::game_version);
+				color_flag = !color_flag;
+				std::this_thread::sleep_for(900ms);
+			}
 		});
 	th_paint.detach();
 }

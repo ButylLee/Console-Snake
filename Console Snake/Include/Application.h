@@ -2,14 +2,13 @@
 #ifndef SNAKE_APPLICATION_HEADER_
 #define SNAKE_APPLICATION_HEADER_
 
+#include "Interface.h"
 #include "GlobalData.h"
 
-class Application
+class Application :NotCopyable
 {
 public:
 	Application(int argc, char* argv[]);
-	Application(const Application&) = delete;
-	Application& operator=(const Application&) = delete;
 
 public:
 	int run();

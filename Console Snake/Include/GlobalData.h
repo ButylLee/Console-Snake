@@ -4,23 +4,13 @@
 
 #include "Resource.h"
 #include "GlobalResourceWrapper.h"
-
-enum struct PageSelect
-{
-	GamePage,
-	DemoPage,
-	AboutPage,
-	MenuPage,
-	SettingPage,
-	CustomThemePage,
-	BeginPage,
-	RankPage
-};
+#include "PageInterface.h"
 
 struct GameDataMember
 {
 	PageSelect selection = PageSelect::BeginPage;
 	int score = 0;
+	bool exit_game = false;
 	bool retry_game = false;
 	bool colorful_title = false;
 };

@@ -8,7 +8,7 @@
 #include <random>
 #include <type_traits>
 
-#define GAME_VERSION "2.17"
+#define GAME_VERSION "2.18"
 
 namespace Resource {
 	inline constexpr const char* save_file_name = "SnakeSaved.bin";

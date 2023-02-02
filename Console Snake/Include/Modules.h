@@ -19,6 +19,7 @@ class ModuleManager
 		CreatorFunc creator = nullptr;
 		DeleterFunc deleter = nullptr;
 	};
+
 public:
 	ModuleManager()
 	{

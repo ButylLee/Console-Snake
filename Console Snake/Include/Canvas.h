@@ -4,6 +4,7 @@
 
 #include "Resource.h"
 #include "WinHeader.h"
+#include "Interface.h"
 #include <string_view>
 
 struct Cursor
@@ -34,12 +35,10 @@ struct ClientSize
 	short height;  // Y
 };
 
-class Canvas
+class Canvas :NotCopyable
 {
 public:
 	Canvas();
-	Canvas(const Canvas&) = delete;
-	Canvas& operator=(const Canvas&) = delete;
 
 public:
 	void setColor(Color new_color);

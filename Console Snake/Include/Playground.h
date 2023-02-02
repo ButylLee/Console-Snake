@@ -2,12 +2,13 @@
 #ifndef SNAKE_PLAYGROUND_HEADER_
 #define SNAKE_PLAYGROUND_HEADER_
 
+#include "Interface.h"
 #include "Canvas.h"
 #include "Arena.h"
 #include <atomic>
 #include <chrono>
 
-class PlayGround
+class PlayGround :NotCopyable
 {
 	static constexpr std::chrono::milliseconds pause_flicker_interval{ 500 };
 	enum struct GameStatus
@@ -17,8 +18,6 @@ class PlayGround
 
 public:
 	PlayGround(Canvas& canvas);
-	PlayGround(const PlayGround&) = delete;
-	PlayGround& operator=(const PlayGround&) = delete;
 
 public:
 	void play();

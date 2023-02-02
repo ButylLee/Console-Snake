@@ -75,7 +75,7 @@ static void InitConsole()
 		print_err(~Token::message_init_fail);
 		print_err(error.what());
 		system("pause");
-		exit(EXIT_FAILURE);
+		throw;
 	}
 }
 
@@ -94,6 +94,8 @@ int Application::run()
 		{
 			auto page = Page::Create();
 			page->run();
+			if (GameData::get().exit_game)
+				return EXIT_SUCCESS;
 		}
 	}
 	catch (const std::bad_alloc&) {
