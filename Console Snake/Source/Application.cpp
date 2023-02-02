@@ -11,7 +11,6 @@
 #include "WinHeader.h"
 #include <clocale>
 #include <cstdlib>
-#include <cstdlib>
 #include <string>
 
 static bool no_limit = false;
