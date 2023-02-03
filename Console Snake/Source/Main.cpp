@@ -4,6 +4,7 @@
 
 int main(int argc, char* argv[]) try
 {
+	EnsureOnlyOneInstance();
 	ModuleManager manager;
 	Application app(argc, argv);
 	return app.run();

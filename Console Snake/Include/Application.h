@@ -5,6 +5,8 @@
 #include "Interface.h"
 #include "GlobalData.h"
 
+void EnsureOnlyOneInstance() noexcept;
+
 class Application :NotCopyable
 {
 public:

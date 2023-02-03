@@ -1,4 +1,5 @@
 ﻿#include "Application.h"
+#include "Canvas.h"
 #include "Console.h"
 #include "Pages.h"
 #include "GlobalData.h"
@@ -13,71 +14,83 @@
 #include <cstdlib>
 #include <string>
 
-static bool no_limit = false;
+namespace {
+	bool no_limit = false;
 
-static void ParseCMDAndSet(int count, char* commands[])
-{
-	using namespace std;
-	if (count < 2)
-		return;
-
-	string cmd;
-	for (int i = 1; i < count; i++)
+	void ParseCMDAndSet(int count, char* commands[])
 	{
-		cmd = commands[i];
-		// Command Options:
-		// -nolimit: freely adjust the width and height of Console
-		// -oldconsole: enable the compatibility of old console host
-		// -awesome: force enable colorful title
-		// -size [width]x[height]: set user defined game size
-		if (cmd == "-nolimit")
+		using namespace std;
+		if (count < 2)
+			return;
+
+		string cmd;
+		for (int i = 1; i < count; i++)
 		{
-			no_limit = true;
-		}
-		else if (cmd == "-oldconsole")
-		{
-			GameSetting::get().old_console_host = true;
-			GameSetting::get().show_frame = true;
-		}
-		else if (cmd == "-awesome")
-		{
-			GameData::get().colorful_title = true;
-		}
-		else if (cmd == "-size")
-		{
-			cmd = commands[++i];
-			size_t place = cmd.find('x');
-			if (place == string::npos)
-				continue;
-			try {
-				GameSetting::get().width.setCustomValue(abs(stoi(cmd)));
-				cmd = cmd.substr(place + 1);
-				GameSetting::get().height.setCustomValue(abs(stoi(cmd)));
+			cmd = commands[i];
+			// Command Options:
+			// -nolimit: freely adjust the width and height of Console
+			// -oldconsole: enable the compatibility of old console host
+			// -awesome: force enable colorful title
+			// -size [width]x[height]: set user defined game size
+			if (cmd == "-nolimit")
+			{
+				no_limit = true;
 			}
-			catch (...) {
-				continue;
+			else if (cmd == "-oldconsole")
+			{
+				GameSetting::get().old_console_host = true;
+				GameSetting::get().show_frame = true;
 			}
+			else if (cmd == "-awesome")
+			{
+				GameData::get().colorful_title = true;
+			}
+			else if (cmd == "-size")
+			{
+				cmd = commands[++i];
+				size_t place = cmd.find('x');
+				if (place == string::npos)
+					continue;
+				try {
+					GameSetting::get().width.setCustomValue(abs(stoi(cmd)));
+					cmd = cmd.substr(place + 1);
+					GameSetting::get().height.setCustomValue(abs(stoi(cmd)));
+				}
+				catch (...) {
+					continue;
+				}
+			}
+		}
+	}
+
+	void InitConsole()
+	{
+		setlocale(LC_ALL, "");
+		try {
+			Canvas fake_canvas; // set default size before move
+			fake_canvas.setClientSize(fake_canvas.getClientSize());
+			Console::get().moveToScreenCenter();
+			Console::get().setConsoleWindow(no_limit ? Console::Sizable : Console::NotSizable, Console::OnlyMin);
+			Console::get().setCursorVisible(false);
+			Console::get().setTitle(~Token::console_title);
+		}
+		catch (const NativeException& error) {
+			print_err(~Token::message_init_fail);
+			print_err(error.what());
+			system("pause");
+			throw;
 		}
 	}
 }
 
-static void InitConsole()
+void EnsureOnlyOneInstance() noexcept
 {
-	setlocale(LC_ALL, "");
-	try {
-		Console::get().moveToScreenCenter();
-		Console::get().setConsoleWindow(no_limit ? Console::Sizable : Console::NotSizable, Console::OnlyMin);
-		Console::get().setCursorVisible(false);
-		Console::get().setTitle(~Token::console_title);
-	}
-	catch (const NativeException& error) {
-		print_err(~Token::message_init_fail);
-		print_err(error.what());
-		system("pause");
-		throw;
-	}
+#if !defined(_DEBUG) && defined(NDEBUG)
+	HANDLE handle = CreateMutex(NULL, FALSE, L"Local\\ConsoleSnakeButylLee23");
+	if (handle == NULL || GetLastError() == ERROR_ALREADY_EXISTS)
+		exit(EXIT_FAILURE);
+#endif
 }
-
 
 Application::Application(int argc, char* argv[])
 {
