@@ -6,7 +6,6 @@
 #include <utility>
 #include <chrono>
 #include <thread>
-#include <atomic>
 #include <memory>
 #include <concepts>
 
