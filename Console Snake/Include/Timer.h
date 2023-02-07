@@ -22,9 +22,9 @@ public:
 	Timer(F&& f, std::chrono::duration<Rep, Period> delay,
 		  Looping loop = NoLoop, Callback&& callback = nocallback)
 	{
-		timer_loop = loop;
+		*timer_loop = loop;
 		std::thread(
-			[=, this, timer_enable = timer_enable, f = std::move(f), callback = std::move(callback)]
+			[=, *this, f = std::move(f), callback = std::move(callback)]
 			{
 				using namespace std::chrono;
 				finally {
@@ -36,9 +36,9 @@ public:
 						std::this_thread::sleep_for(minimum_interval);
 						if (!*timer_enable)
 							return;
-						if (timer_reset)
+						if (*timer_reset)
 						{
-							timer_reset = false;
+							*timer_reset = false;
 							end = high_resolution_clock::now() + delay;
 						}
 					} while (high_resolution_clock::now() < end);
@@ -47,7 +47,7 @@ public:
 						f();
 					else
 						[[unlikely]] return;
-				} while (timer_loop);
+				} while (*timer_loop);
 			}).detach();
 	}
 
@@ -64,18 +64,18 @@ public:
 
 	void reset() noexcept
 	{
-		timer_reset = true;
+		*timer_reset = true;
 	}
 
 	void loop(bool looping) noexcept
 	{
-		timer_loop = looping;
+		*timer_loop = looping;
 	}
 
 private:
 	std::shared_ptr<bool> timer_enable = std::make_shared<bool>(true);
-	std::atomic<bool> timer_reset = false;
-	std::atomic<bool> timer_loop = false;
+	std::shared_ptr<bool> timer_reset = std::make_shared<bool>(false);
+	std::shared_ptr<bool> timer_loop = std::make_shared<bool>(false);
 };
 
 #endif // SNAKE_TIMER_HEADER_
