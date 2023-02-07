@@ -50,14 +50,14 @@ L"请输入你的大名: ",
 L"  Esc)  返回菜单",
 L"Space)  再试一次",
 
-L"第{:2}名 | ",
+L"第{:2}名 | "_crypt,
 L"(匿名)",
 L"通关",
 L"设置: ",
 L"暂  无  记  录",
 L"Ctrl+D)  清除所有记录",
 
-L"  作者: James Taylor\n  特别感谢: Darack\n\n  感谢你的游玩!",
+L"  作者: James Taylor\n  特别感谢: Darack\n\n  感谢你的游玩!"_crypt,
 L"关于",
 
 L"获取 Console Handle 失败 ",

@@ -4,6 +4,7 @@
 
 #include "Enum.h"
 #include "LocalizedStrings.h"
+#include "EncryptedString.h"
 #include "WinHeader.h"
 #include <random>
 #include <type_traits>

@@ -50,14 +50,14 @@ L"請輸入你的名稱: ",
 L"  Esc)  返回菜單",
 L"Space)  再試一次",
 
-L"第{:2}名 | ",
+L"第{:2}名 | "_crypt,
 L"(匿名)",
 L"通關",
 L"設定: ",
 L"暫  無  記  錄",
 L"Ctrl+D)  清除所有記錄",
 
-L"  作者: James Taylor\n  特別感謝: Darack\n\n  感謝你的遊玩!",
+L"  作者: James Taylor\n  特別感謝: Darack\n\n  感謝你的遊玩!"_crypt,
 L"關於",
 
 L"獲取 Console Handle 失敗 ",

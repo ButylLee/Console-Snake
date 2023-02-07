@@ -50,14 +50,14 @@ L"Please enter your name: ",
 L"  Esc)  Return",
 L"Space)  Retry",
 
-L"No.{:2} | ",
+L"No.{:2} | "_crypt,
 L"(anonymous)",
 L"WIN",
 L"Setting: ",
 L"N o   R a n k   D a t a",
 L"Ctrl+D)  Clear All Records",
 
-L"  Author: James Taylor\n  Special Thanks: Darack\n\n  Thanks for your playing!",
+L"  Author: James Taylor\n  Special Thanks: Darack\n\n  Thanks for your playing!"_crypt,
 L"About",
 
 L"failed to obtain Console Handle ",

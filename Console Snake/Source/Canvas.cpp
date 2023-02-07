@@ -1,6 +1,7 @@
 ﻿#include "Canvas.h"
 #include "Console.h"
 #include "ErrorHandling.h"
+#include "EncryptedString.h"
 #include <cstdio>
 #include <cstdlib>
 
@@ -84,7 +85,7 @@ void Canvas::applyCursor()
 void Canvas::applyClientSize() noexcept
 {
 	char con[32];
-	sprintf_s(con, "mode con: cols=%d lines=%d", size.width * 2, size.height);
+	sprintf_s(con, "mode con: cols=%d lines=%d"_crypt.c_str(), size.width * 2, size.height);
 	system(con); // side effect: clear screen
 }
 

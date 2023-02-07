@@ -131,6 +131,9 @@
     <ClInclude Include="Include\Interface.h">
       <Filter>头文件\Utility</Filter>
     </ClInclude>
+    <ClInclude Include="Include\EncryptedString.h">
+      <Filter>头文件\Import</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Include\LangENG.inl">

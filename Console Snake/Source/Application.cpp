@@ -4,6 +4,7 @@
 #include "Pages.h"
 #include "GlobalData.h"
 #include "GameSaving.h"
+#include "EncryptedString.h"
 
 #include "wideIO.h"
 #include "Resource.h"
@@ -32,20 +33,20 @@ namespace {
 			// -oldconsole: enable the compatibility of old console host
 			// -awesome: force enable colorful title
 			// -size [width]x[height]: set user defined game size
-			if (cmd == "-nolimit")
+			if (cmd == "-nolimit"_crypt)
 			{
 				no_limit = true;
 			}
-			else if (cmd == "-oldconsole")
+			else if (cmd == "-oldconsole"_crypt)
 			{
 				GameSetting::get().old_console_host = true;
 				GameSetting::get().show_frame = true;
 			}
-			else if (cmd == "-awesome")
+			else if (cmd == "-awesome"_crypt)
 			{
 				GameData::get().colorful_title = true;
 			}
-			else if (cmd == "-size")
+			else if (cmd == "-size"_crypt)
 			{
 				cmd = commands[++i];
 				size_t place = cmd.find('x');
@@ -86,7 +87,7 @@ namespace {
 void EnsureOnlyOneInstance() noexcept
 {
 #if !defined(_DEBUG) && defined(NDEBUG)
-	HANDLE handle = CreateMutex(NULL, FALSE, L"Local\\ConsoleSnakeButylLee23");
+	HANDLE handle = CreateMutex(NULL, FALSE, L"Local\\ConsoleSnakeButylLee23"_crypt.c_str());
 	if (handle == NULL || GetLastError() == ERROR_ALREADY_EXISTS)
 		exit(EXIT_FAILURE);
 #endif

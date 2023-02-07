@@ -50,14 +50,14 @@ L"名前を入力してください: ",
 L"  Esc)  もどる  ",
 L"Space)  もう一回",
 
-L"No.{:2} | ",
+L"No.{:2} | "_crypt,
 L"(匿名)",
 L"WIN",
 L"設定: ",
 L"N o   R a n k   D a t a",
 L"Ctrl+D)  記録を削除する",
 
-L"  作者: James Taylor\n  特別な感謝: Darack\n\n  ご遊びありがとうございました!",
+L"  作者: James Taylor\n  特別な感謝: Darack\n\n  ご遊びありがとうございました!"_crypt,
 L"関する",
 
 L"コンソールハンドルの取得に失敗しました ",

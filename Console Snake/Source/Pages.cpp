@@ -9,6 +9,7 @@
 #include "wideIO.h"
 #include "Timer.h"
 #include "ScopeGuard.h"
+#include "EncryptedString.h"
 #include "Resource.h"
 #include "KeyMap.h"
 #include "GlobalData.h"
@@ -313,7 +314,7 @@ void SettingPage::paintCurOptions()
 	print(~GameSetting::get().speed.Name());
 
 	canvas.setCursor(baseX, baseY + 2);
-	print(L"%hd X %hd", GameSetting::get().width.Value(), GameSetting::get().height.Value());
+	print(L"%d X %d"_crypt, GameSetting::get().width.Value(), GameSetting::get().height.Value());
 	print(GameSetting::get().width.Name());
 
 	canvas.setCursor(baseX, baseY + 4);
@@ -592,15 +593,15 @@ void RankPage::paintInterface()
 
 			buffer = ::format(~Token::rank_No, number++);
 			name = item.name.empty() ? ~Token::rank_anonymous : item.name;
-			buffer += ::format(L"{:<{}}", std::move(name), Rank::name_max_length);
-			buffer += ::format(L" {:>4.4}", item.is_win ? ~Token::rank_win : std::to_wstring(item.score));
-			buffer += L" | ";
+			buffer += ::format(L"{:<{}}"_crypt, std::move(name), Rank::name_max_length);
+			buffer += ::format(L" {:>4.4}"_crypt, item.is_win ? ~Token::rank_win : std::to_wstring(item.score));
+			buffer += L" | "_crypt;
 			buffer += ~Token::rank_setting;
 			speed = ~Speed::getNameFrom(item.speed);
-			buffer += ::format(L"{:<{}} ", std::move(speed), 6);
-			buffer += ::format(L"{:2} X {:2}", item.width, item.height);
+			buffer += ::format(L"{:<{}} "_crypt, std::move(speed), 6);
+			buffer += ::format(L"{:2} X {:2}"_crypt, item.width, item.height);
 
-			buffer = ::format(L"{:^{}}", std::move(buffer), baseX * 2);
+			buffer = ::format(L"{:^{}}"_crypt, std::move(buffer), baseX * 2);
 			print(buffer);
 		}
 
