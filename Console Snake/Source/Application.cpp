@@ -95,7 +95,7 @@ void EnsureOnlyOneInstance() noexcept
 
 Application::Application(int argc, char* argv[])
 {
-	GameSaving::get().convertFromBinaryData();
+	GameSaving::get().convertFromSaveData();
 	ParseCMDAndSet(argc, argv);
 	InitConsole();
 }

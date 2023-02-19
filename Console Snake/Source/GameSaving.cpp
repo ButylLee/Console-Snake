@@ -105,6 +105,10 @@ GameSavingBase::GameSavingBase() try
 		return; // The save file is invalid
 	std::copy_n(binary_pool.c_str(), sizeof bin_data, reinterpret_cast<unsigned char*>(&bin_data));
 
+	// Check the magic number
+	if (bin_data.magic.number != Magic{}.number)
+		return;
+
 	no_save_file = false;
 }
 catch (...)
@@ -113,8 +117,8 @@ catch (...)
 	throw;
 }
 
-// convert fixed width binary data To game data
-void GameSavingBase::convertFromBinaryData() noexcept
+// convert fixed width save data To game data
+void GameSavingBase::convertFromSaveData() noexcept
 {
 	if (no_save_file)
 		return;
@@ -124,7 +128,7 @@ void GameSavingBase::convertFromBinaryData() noexcept
 
 		decltype(gs.theme.Value()) theme_temp;
 		auto& elements = theme_temp.elements;
-		for (int i = 0; i < std::extent_v<decltype(theme_temp.elements)>; i++)
+		for (size_t i = 0; i < std::extent_v<decltype(theme_temp.elements)>; i++)
 		{
 			elements[i].facade.convertFrom(bin_data.setting.theme[i][0]);
 			elements[i].color.convertFrom(bin_data.setting.theme[i][1]);
@@ -140,9 +144,9 @@ void GameSavingBase::convertFromBinaryData() noexcept
 		gs.show_frame = Convert{ bin_data.setting.show_frame };
 	}
 	// rank data
-	wchar_t buffer[Rank::name_max_length + 1] = {};
+	wchar_t name[Rank::name_max_length + 1] = {};
 	auto [rank, lock] = Rank::get().modifyRank();
-	for (int i = 0; i < Rank::rank_count; i++)
+	for (size_t i = 0; i < Rank::rank_count; i++)
 	{
 		auto& save_item = bin_data.rank_list[i];
 		auto& rank_item = rank[i];
@@ -151,16 +155,16 @@ void GameSavingBase::convertFromBinaryData() noexcept
 		rank_item.height = Convert{ save_item.height };
 		rank_item.speed = Convert{ save_item.speed };
 		rank_item.is_win = Convert{ save_item.is_win };
-		std::copy_n(save_item.name, Rank::name_max_length, buffer);
-		rank_item.name = buffer;
+		std::copy_n(save_item.name, Rank::name_max_length, name);
+		rank_item.name = name;
 
 		if (rank_item.is_win)
 			GameData::get().colorful_title = true;
 	}
 }
 
-// convert game data To fixed width binary data For saving
-void GameSavingBase::convertToBinaryData() noexcept
+// convert game data To fixed width save data
+void GameSavingBase::convertToSaveData() noexcept
 {
 	// setting data
 	{
@@ -168,7 +172,7 @@ void GameSavingBase::convertToBinaryData() noexcept
 
 		auto theme_temp = gs.theme.Value();
 		auto& elements = theme_temp.elements;
-		for (int i = 0; i < std::extent_v<decltype(theme_temp.elements)>; i++)
+		for (size_t i = 0; i < std::extent_v<decltype(theme_temp.elements)>; i++)
 		{
 			bin_data.setting.theme[i][0] = Convert{ elements[i].facade };
 			bin_data.setting.theme[i][1] = Convert{ elements[i].color };
@@ -182,7 +186,7 @@ void GameSavingBase::convertToBinaryData() noexcept
 	}
 	// rank data
 	auto [rank, lock] = Rank::get().getRank();
-	for (int i = 0; i < Rank::rank_count; i++)
+	for (size_t i = 0; i < Rank::rank_count; i++)
 	{
 		auto& save_item = bin_data.rank_list[i];
 		auto& rank_item = rank[i];
@@ -201,13 +205,13 @@ void GameSavingBase::save()
 	if (done.valid()) // wait for last time saving
 		done.get();
 
-	convertToBinaryData();
+	convertToSaveData();
 
 	done = std::async(std::launch::async,
 					  [this]() noexcept
 					  {
 						  // Dump bin_data to binary_pool for processing
-						  static unsigned char binary_pool[sizeof(SettingSavingItem) + sizeof(RankSavingItem) * Rank::rank_count] = {};
+						  static unsigned char binary_pool[sizeof bin_data] = {};
 						  std::copy_n(reinterpret_cast<unsigned char*>(&bin_data), sizeof binary_pool, binary_pool);
 
 						  try {

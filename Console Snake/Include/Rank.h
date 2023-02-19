@@ -22,8 +22,8 @@ public:
 		Size::ValueType height = {};
 		bool is_win = false;
 	};
-	static constexpr auto rank_count = 10;
-	static constexpr auto name_max_length = 12;
+	static constexpr size_t rank_count = 10;
+	static constexpr size_t name_max_length = 12;
 
 protected:
 	RankBase() noexcept;
