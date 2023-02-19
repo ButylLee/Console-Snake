@@ -3,7 +3,7 @@
 #include "Console.h"
 #include "GlobalData.h"
 #include "Resource.h"
-#include "wideIO.h"
+#include "WideIO.h"
 #include "KeyMap.h"
 #include "ScopeGuard.h"
 #include "Timer.h"

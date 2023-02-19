@@ -3,7 +3,7 @@
 #include "Resource.h"
 #include "GlobalData.h"
 #include "ErrorHandling.h"
-#include "wideIO.h"
+#include "WideIO.h"
 #include <algorithm>
 #include <fstream>
 #include <filesystem>

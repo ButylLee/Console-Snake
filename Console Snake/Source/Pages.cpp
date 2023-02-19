@@ -6,8 +6,9 @@
 #include "Rank.h"
 #include "GameSaving.h"
 
-#include "wideIO.h"
+#include "WideIO.h"
 #include "Timer.h"
+#include "Random.h"
 #include "ScopeGuard.h"
 #include "EncryptedString.h"
 #include "Resource.h"
@@ -338,7 +339,13 @@ CustomThemePage::CustomThemePage() noexcept
 	if (custom_theme)
 		theme_temp = *custom_theme;
 	else
-		theme_temp = Theme{ Theme::A };
+	{
+		for (size_t i = 0; i < static_cast<size_t>(Element::Mask); i++)
+		{
+			theme_temp[i].facade = static_cast<Facade::Tag>(GetRandom(0, static_cast<int>(Facade::Mask) - 1));
+			theme_temp[i].color = static_cast<Color::Tag>(GetRandom(0, static_cast<int>(Color::Mask) - 1));
+		}
+	}
 }
 
 void CustomThemePage::run()
@@ -383,9 +390,10 @@ void CustomThemePage::run()
 				return;
 
 			case K_Enter:
+				GameSetting::get().theme = Theme::Custom;
+				[[fallthrough]];
 			case K_Esc:
 				GameSetting::get().theme.setCustomValue(theme_temp);
-				GameSetting::get().theme = Theme::Custom;
 				GameData::get().selection = PageSelect::SettingPage;
 				return;
 		}

@@ -2,7 +2,7 @@
 #ifndef SNAKE_KEYMAP_HEADER_
 #define SNAKE_KEYMAP_HEADER_
 
-#include "wideIO.h"
+#include "WideIO.h"
 #include <climits>
 
 // Some keys like function key return 2 values by _getwch().

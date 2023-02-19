@@ -9,7 +9,7 @@
 #include <random>
 #include <type_traits>
 
-#define GAME_VERSION "2.18"
+#define GAME_VERSION "2.19"
 
 namespace Resource {
 	inline constexpr const char* save_file_name = "SnakeSaved.bin";
@@ -277,6 +277,7 @@ struct ColorInfo {
 		Purple, LightPurple,
 		Yellow, LightYellow,
 		White , LightWhite,
+		Mask,
 		DefaultValue = White
 	};
 };
@@ -298,6 +299,7 @@ struct FacadeInfo {
 	enum Tag {
 		FullStar, FullCircle, FullRect, FullDiamond,
 		Star, Circle, Rect, Diamond,
+		Mask,
 		DefaultValue = FullStar
 	};
 };
@@ -336,11 +338,8 @@ struct ElementSet
 		operator==(const Appearance&, const Appearance&) = default;
 	}elements[static_cast<size_t>(Element::Mask)];
 
-	constexpr const auto& operator[](Element which) const noexcept
-	{
-		return elements[static_cast<size_t>(which)];
-	}
-	constexpr auto& operator[](Element which) noexcept
+	template<typename T>
+	constexpr auto& operator[](T which) noexcept
 	{
 		return elements[static_cast<size_t>(which)];
 	}

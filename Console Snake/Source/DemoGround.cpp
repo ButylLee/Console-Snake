@@ -1,5 +1,5 @@
 ﻿#include "DemoGround.h"
-#include "wideIO.h"
+#include "WideIO.h"
 
 DemoGround::DemoGround(Canvas& canvas)
 	: canvas(canvas), arena(canvas)

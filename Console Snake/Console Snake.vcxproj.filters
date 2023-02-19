@@ -86,7 +86,7 @@
     <ClInclude Include="Include\Singleton.h">
       <Filter>头文件\Utility</Filter>
     </ClInclude>
-    <ClInclude Include="Include\wideIO.h">
+    <ClInclude Include="Include\WideIO.h">
       <Filter>头文件\Utility</Filter>
     </ClInclude>
     <ClInclude Include="Include\WinHeader.h">
@@ -133,6 +133,9 @@
     </ClInclude>
     <ClInclude Include="Include\EncryptedString.h">
       <Filter>头文件\Import</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Random.h">
+      <Filter>头文件\Utility</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

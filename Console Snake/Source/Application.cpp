@@ -6,7 +6,7 @@
 #include "GameSaving.h"
 #include "EncryptedString.h"
 
-#include "wideIO.h"
+#include "WideIO.h"
 #include "Resource.h"
 #include "ErrorHandling.h"
 

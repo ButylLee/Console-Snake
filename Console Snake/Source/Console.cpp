@@ -1,6 +1,6 @@
 ﻿#include "Console.h"
 #include "ErrorHandling.h"
-#include "wideIO.h"
+#include "WideIO.h"
 #include "Resource.h"
 #include "WinHeader.h"
 #include <utility>

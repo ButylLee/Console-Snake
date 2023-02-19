@@ -2,7 +2,7 @@
 #ifndef SNAKE_ERRORHANDLING_HEADER_
 #define SNAKE_ERRORHANDLING_HEADER_
 
-#include "wideIO.h"
+#include "WideIO.h"
 #include "Resource.h"
 #include <string_view>
 #include <stdexcept>

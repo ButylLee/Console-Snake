@@ -1,35 +1,15 @@
 ﻿#include "Arena.h"
 #include "GlobalData.h"
-#include "wideIO.h"
+#include "WideIO.h"
+#include "Random.h"
 
-#include <random>
 #include <utility>
 #include <type_traits>
-#include <concepts>
-#include <cassert>
 
-namespace {
-	auto& GetRandomEngine()
-	{
-		static std::minstd_rand engine(std::random_device{}());
-		return engine;
-	}
-
-	// random interval: [min,max]
-	template<std::integral T>
-	T GetRandom(T min, T max)
-	{
-		static std::uniform_int_distribution<T> dis;
-		using param_type = typename decltype(dis)::param_type;
-		assert(min <= max);
-		return dis(GetRandomEngine(), param_type{ min,max });
-	}
-
-	bool IsConflictDirection(Direction d1, Direction d2) noexcept
-	{
-		using type = std::underlying_type_t<Direction>;
-		return static_cast<type>(d1) + static_cast<type>(d2) == static_cast<type>(Direction::Conflict);
-	}
+bool IsConflictDirection(Direction d1, Direction d2) noexcept
+{
+	using type = std::underlying_type_t<Direction>;
+	return static_cast<type>(d1) + static_cast<type>(d2) == static_cast<type>(Direction::Conflict);
 }
 
 Arena::Arena(Canvas& canvas)
