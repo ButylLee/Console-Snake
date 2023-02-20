@@ -5,6 +5,7 @@
 #include <random>
 #include <concepts>
 #include <cassert>
+#include <type_traits>
 
 inline auto& GetRandomEngine()
 {
@@ -18,23 +19,27 @@ inline void ReSeed()
 }
 
 // random interval: [min,max]
-template<std::integral T>
-inline T GetRandom(T min, T max)
+template<std::integral T1, std::integral T2>
+inline std::common_type_t<T1, T2> GetRandom(T1 min, T2 max)
 {
-	static std::uniform_int_distribution<T> dis;
+	using int_type = std::common_type_t<T1, T2>;
+	static std::uniform_int_distribution<int_type> dis;
 	using param_type = typename decltype(dis)::param_type;
-	assert(min <= max);
-	return dis(GetRandomEngine(), param_type{ min,max });
+	assert(static_cast<int_type>(min) <= static_cast<int_type>(max));
+	return dis(GetRandomEngine(),
+			   param_type{ static_cast<int_type>(min), static_cast<int_type>(max) });
 }
 
 // random interval: [min,max)
-template<std::floating_point T>
-inline T GetRandom(T min, T max)
+template<std::floating_point T1, std::floating_point T2>
+inline std::common_type_t<T1, T2> GetRandom(T1 min, T2 max)
 {
-	static std::uniform_real_distribution<T> dis;
+	using float_type = std::common_type_t<T1, T2>;
+	static std::uniform_real_distribution<float_type> dis;
 	using param_type = typename decltype(dis)::param_type;
-	assert(min < max);
-	return dis(GetRandomEngine(), param_type{ min,max });
+	assert(static_cast<float_type>(min) < static_cast<float_type>(max));
+	return dis(GetRandomEngine(),
+			   param_type{ static_cast<float_type>(min), static_cast<float_type>(max) });
 }
 
 #endif // SNAKE_RANDOM_HEADER_

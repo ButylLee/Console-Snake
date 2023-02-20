@@ -84,6 +84,7 @@ public:
 private:
 	void paintInterface();
 	void paintCurOptions();
+	void generateRandomTheme();
 	ElementSet theme_temp;
 };
 

@@ -16,11 +16,11 @@
     <Filter Include="头文件\Utility">
       <UniqueIdentifier>{e176600d-3329-41b1-aee5-e01dee2bd617}</UniqueIdentifier>
     </Filter>
-    <Filter Include="头文件\Resource">
-      <UniqueIdentifier>{83834f95-1f58-42d9-8bb9-b225bb3ded8d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="头文件\Import">
       <UniqueIdentifier>{07a1b2f2-09f4-43af-a069-ae1d8f39119d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\Resources">
+      <UniqueIdentifier>{83834f95-1f58-42d9-8bb9-b225bb3ded8d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -69,10 +69,10 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="Include\KeyMap.h">
-      <Filter>头文件\Resource</Filter>
+      <Filter>头文件\Resources</Filter>
     </ClInclude>
     <ClInclude Include="Include\Resource.h">
-      <Filter>头文件\Resource</Filter>
+      <Filter>头文件\Resources</Filter>
     </ClInclude>
     <ClInclude Include="Include\DynArray.h">
       <Filter>头文件\Import</Filter>
@@ -105,7 +105,7 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="Include\GlobalData.h">
-      <Filter>头文件\Resource</Filter>
+      <Filter>头文件\Resources</Filter>
     </ClInclude>
     <ClInclude Include="Include\Application.h">
       <Filter>头文件</Filter>
@@ -140,16 +140,16 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Include\LangENG.inl">
-      <Filter>头文件\Resource</Filter>
+      <Filter>头文件\Resources</Filter>
     </None>
     <None Include="Include\LangCHS.inl">
-      <Filter>头文件\Resource</Filter>
+      <Filter>头文件\Resources</Filter>
     </None>
     <None Include="Include\LangCHT.inl">
-      <Filter>头文件\Resource</Filter>
+      <Filter>头文件\Resources</Filter>
     </None>
     <None Include="Include\LangJPN.inl">
-      <Filter>头文件\Resource</Filter>
+      <Filter>头文件\Resources</Filter>
     </None>
   </ItemGroup>
 </Project>

@@ -196,7 +196,7 @@ void Arena::createFood()
 		return;
 
 	// pick random position of food
-	random_index = GetRandom({ 1 }, range) + snake_tail;
+	random_index = GetRandom(1, range) + snake_tail;
 	if (random_index >= snake_body.total_size())
 		random_index -= snake_body.total_size();
 

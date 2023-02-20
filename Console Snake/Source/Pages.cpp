@@ -21,6 +21,9 @@
 #include <chrono>
 #include <memory>
 #include <string>
+#include <vector>
+#include <numeric>
+#include <algorithm>
 #include <cassert>
 #include "WinHeader.h"
 
@@ -339,13 +342,7 @@ CustomThemePage::CustomThemePage() noexcept
 	if (custom_theme)
 		theme_temp = *custom_theme;
 	else
-	{
-		for (size_t i = 0; i < static_cast<size_t>(Element::Mask); i++)
-		{
-			theme_temp[i].facade = static_cast<Facade::Tag>(GetRandom(0, static_cast<int>(Facade::Mask) - 1));
-			theme_temp[i].color = static_cast<Color::Tag>(GetRandom(0, static_cast<int>(Color::Mask) - 1));
-		}
-	}
+		generateRandomTheme();
 }
 
 void CustomThemePage::run()
@@ -492,6 +489,23 @@ void CustomThemePage::paintCurOptions()
 		print(theme_temp[Element::barrier].color.Name());
 		canvas.setCursor(nextX, baseY + 6);
 		print(theme_temp[Element::barrier].facade.Value());
+	}
+}
+
+void CustomThemePage::generateRandomTheme()
+{
+	// generate distinct colors(no black)
+	std::vector<int> color_candidate(Color::Mask);
+	std::iota(color_candidate.begin(), color_candidate.end(), 0);
+	color_candidate.erase(std::find(color_candidate.cbegin(),
+									color_candidate.cend(),
+									static_cast<int>(Color::Black)));
+	for (size_t i = 0; i < static_cast<size_t>(Element::Mask); i++)
+	{
+		theme_temp[i].facade = static_cast<Facade::Tag>(GetRandom(0, static_cast<int>(Facade::Mask) - 1));
+		size_t index = GetRandom(0, color_candidate.size() - 1);
+		theme_temp[i].color = static_cast<Color::Tag>(color_candidate[index]);
+		color_candidate.erase(color_candidate.cbegin() + index);
 	}
 }
 
