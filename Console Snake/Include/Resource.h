@@ -211,13 +211,13 @@ MAKE_LOCALIZED_STRS
 };
 
 // --------------- Enum Lang Resource ---------------
-struct LangInfo {
+struct LangEnum {
 	enum Tag {
 		ENG, CHS, CHT, JPN,
 		DefaultValue = ENG
 	};
 };
-using Lang = Enum<LangInfo, Locale::Lang>;
+using Lang = Enum<LangEnum, Locale::Lang>;
 ENUM_DEFINE(Lang)
 {
 	{ Locale::en_US, L"English" },
@@ -227,13 +227,13 @@ ENUM_DEFINE(Lang)
 };
 
 // --------------- Enum Size Resource ---------------
-struct SizeInfo {
+struct SizeEnum {
 	enum Tag {
 		XS, S, M, L, XL,
 		DefaultValue = S
 	};
 };
-using Size = CustomEnum<SizeInfo, short>;
+using Size = CustomEnum<SizeEnum, short>;
 ENUM_DEFINE(Size)
 {
 	{ 13, L"(XS)" },
@@ -248,13 +248,13 @@ ENUM_CUSTOM(Size)
 };
 
 // --------------- Enum Speed Resource ---------------
-struct SpeedInfo {
+struct SpeedEnum {
 	enum Tag {
 		SLOW, NORMAL, FAST,
 		DefaultValue = NORMAL
 	};
 };
-using Speed = CustomEnum<SpeedInfo, short, Token::StringName>;
+using Speed = CustomEnum<SpeedEnum, short, Token::StringName>;
 ENUM_DEFINE(Speed)
 {
 	{ 1, Token::setting_speed_slow },
@@ -267,7 +267,7 @@ ENUM_CUSTOM(Speed)
 };
 
 // --------------- Enum Color Resource ---------------
-struct ColorInfo {
+struct ColorEnum {
 	enum Tag {
 		Black,  Gray,
 		Blue,   LightBlue,
@@ -281,7 +281,7 @@ struct ColorInfo {
 		DefaultValue = White
 	};
 };
-using Color = Enum<ColorInfo, WORD>;
+using Color = Enum<ColorEnum, WORD>;
 ENUM_DEFINE(Color)
 {
 	{ 0x00, L"Black      " }, { 0x08, L"Gray       " },
@@ -295,7 +295,7 @@ ENUM_DEFINE(Color)
 };
 
 // --------------- Enum Facade Resource ---------------
-struct FacadeInfo {
+struct FacadeEnum {
 	enum Tag {
 		FullStar, FullCircle, FullRect, FullDiamond,
 		Star, Circle, Rect, Diamond,
@@ -303,7 +303,7 @@ struct FacadeInfo {
 		DefaultValue = FullStar
 	};
 };
-using Facade = Enum<FacadeInfo, wchar_t>;
+using Facade = Enum<FacadeEnum, wchar_t>;
 ENUM_DEFINE(Facade)
 {
 	{ L'★', L"" },
@@ -347,13 +347,13 @@ struct ElementSet
 	operator==(const ElementSet&, const ElementSet&) = default;
 };
 
-struct ThemeInfo {
+struct ThemeEnum {
 	enum Tag {
 		A, B, C, D, E,
 		DefaultValue = A
 	};
 };
-using Theme = CustomEnum<ThemeInfo, ElementSet, Token::StringName>;
+using Theme = CustomEnum<ThemeEnum, ElementSet, Token::StringName>;
 ENUM_DEFINE(Theme)
 {
 	{

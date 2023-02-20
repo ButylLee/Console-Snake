@@ -21,13 +21,13 @@
  * transfrom it like below:
  *             ||
  *             vv
- *     struct SizeInfo {
+ *     struct SizeEnum {
  *         enum Tag {
  *             S, M, L,
  *             DefaultValue = S
  *         };
  *     };
- *     using Size = CustomEnum<SizeInfo, short, std::string>; // last two args are optional
+ *     using Size = CustomEnum<SizeEnum, short, std::string>; // last two args are optional
  *     ENUM_DEFINE(Size)
  *     {
  *        { 10, L"S" },
@@ -40,7 +40,7 @@
  *     };
  *
  * Note: The enum "Tag" and "DefaultValue" value must be defined.
- *       The macro "ENUM_CUSTOM" is optional if using Enum<...>.
+ *       The macro "ENUM_CUSTOM" is only used for CustomEnum<...>.
  *
  * To use an Enum:
  *     Size size = Size::L;
@@ -48,14 +48,18 @@
  *     size.setDefaultValue();
  *     size.convertFrom(20);
  *
+ * To get current Name or Value:
  *     auto name = size.Name();
  *     auto value1 = size.Value();
- *     short value2 = size;
+ *     short value2 = size; // implicitly convert
  *
- *     size::setCustomValue(50);
- *     size = Size::Custom;
+ * To use an CustomEnum:
+ *     std::optional<short> pre_custom = Size::getCustomValue();
+ *     Size::clearCustomValue();
+ *     Size::setCustomValue(50);
+ *     size = Size::Custom; // if now has no custom value, fallback to default value
  *
- * To inquire key-value:
+ * To inquire key or value:
  *     auto nameOfS = Size::getNameFrom(10);
  *     auto valueOfL = Size::getValueFrom(Size::L);
  */
@@ -111,6 +115,15 @@ public:
 	{
 		return static_cast<EnumType*>(this)->setNextValue();
 	}
+	constexpr const EnumType& setDefaultValue() noexcept
+	{
+		current_value_index = EnumTag::DefaultValue;
+		return static_cast<const EnumType&>(*this);
+	}
+	constexpr ValueType convertFrom(ValueType val) noexcept
+	{
+		return static_cast<EnumType*>(this)->convertFrom(val);
+	}
 	constexpr NameType Name() const noexcept
 	{
 		return static_cast<const EnumType*>(this)->Name();
@@ -118,16 +131,6 @@ public:
 	constexpr operator ValueType() const noexcept
 	{
 		return static_cast<const EnumType*>(this)->operator ValueType();
-	}
-	constexpr ValueType convertFrom(ValueType val) noexcept
-	{
-		return static_cast<EnumType*>(this)->convertFrom(val);
-	}
-
-	constexpr const EnumType& setDefaultValue() noexcept
-	{
-		current_value_index = EnumTag::DefaultValue;
-		return static_cast<const EnumType&>(*this);
 	}
 	constexpr ValueType Value() const noexcept
 	{
@@ -148,6 +151,26 @@ public:
 	friend constexpr bool operator==(const EnumBase& lhs, const EnumBase& rhs) noexcept
 	{
 		return lhs.current_value_index == rhs.current_value_index;
+	}
+	friend constexpr bool operator!=(const EnumBase& lhs, const EnumBase& rhs) noexcept
+	{
+		return !(lhs == rhs);
+	}
+	friend constexpr bool operator<(const EnumBase& lhs, const EnumBase& rhs) noexcept
+	{
+		return lhs.current_value_index < rhs.current_value_index;
+	}
+	friend constexpr bool operator>(const EnumBase& lhs, const EnumBase& rhs) noexcept
+	{
+		return rhs < lhs;
+	}
+	friend constexpr bool operator<=(const EnumBase& lhs, const EnumBase& rhs) noexcept
+	{
+		return !(lhs > rhs);
+	}
+	friend constexpr bool operator>=(const EnumBase& lhs, const EnumBase& rhs) noexcept
+	{
+		return !(lhs < rhs);
 	}
 
 protected:
@@ -187,14 +210,6 @@ public:
 		}
 		return *this;
 	}
-	constexpr NameType Name() const noexcept
-	{
-		return enum_list[this->current_value_index].second;
-	}
-	constexpr operator ValueType() const noexcept
-	{
-		return enum_list[this->current_value_index].first;
-	}
 	constexpr ValueType convertFrom(ValueType val) noexcept
 	{
 		for (size_t i = 0; i < enum_list.size(); i++)
@@ -207,6 +222,14 @@ public:
 		}
 		this->setDefaultValue();
 		return *this;
+	}
+	constexpr NameType Name() const noexcept
+	{
+		return enum_list[this->current_value_index].second;
+	}
+	constexpr operator ValueType() const noexcept
+	{
+		return enum_list[this->current_value_index].first;
 	}
 
 public:
@@ -276,6 +299,20 @@ public:
 		}
 		return *this;
 	}
+	constexpr ValueType convertFrom(ValueType val) noexcept
+	{
+		for (size_t i = 0; i < enum_list.size(); i++)
+		{
+			if (val == enum_list[i].first)
+			{
+				this->current_value_index = i;
+				return val;
+			}
+		}
+		setCustomValue(val);
+		this->current_value_index = CustomTag::Custom;
+		return val;
+	}
 	constexpr NameType Name() const noexcept
 	{
 		if (this->current_value_index == CustomTag::Custom)
@@ -297,20 +334,6 @@ public:
 				setDefaultValue_force();
 		}
 		return enum_list[this->current_value_index].first;
-	}
-	constexpr ValueType convertFrom(ValueType val) noexcept
-	{
-		for (size_t i = 0; i < enum_list.size(); i++)
-		{
-			if (val == enum_list[i].first)
-			{
-				this->current_value_index = i;
-				return val;
-			}
-		}
-		setCustomValue(val);
-		this->current_value_index = CustomTag::Custom;
-		return val;
 	}
 
 public:

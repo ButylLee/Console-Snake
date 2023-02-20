@@ -502,9 +502,9 @@ void CustomThemePage::generateRandomTheme()
 									static_cast<int>(Color::Black)));
 	for (size_t i = 0; i < static_cast<size_t>(Element::Mask); i++)
 	{
-		theme_temp[i].facade = static_cast<Facade::Tag>(GetRandom(0, static_cast<int>(Facade::Mask) - 1));
+		theme_temp[i].facade = static_cast<Facade::EnumTag>(GetRandom(0, static_cast<int>(Facade::Mask) - 1));
 		size_t index = GetRandom(0, color_candidate.size() - 1);
-		theme_temp[i].color = static_cast<Color::Tag>(color_candidate[index]);
+		theme_temp[i].color = static_cast<Color::EnumTag>(color_candidate[index]);
 		color_candidate.erase(color_candidate.cbegin() + index);
 	}
 }
