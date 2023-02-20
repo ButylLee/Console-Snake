@@ -76,18 +76,32 @@ namespace detail {
 		std::void_t<decltype(Base::DefaultValue)>> = true;
 }
 
-// ----------------- Base Class EnumBase ----------------
-template<typename EnumType, typename TypeInfo>
-class EnumBase
+// ---------------- Helper Class EnumInfo ---------------
+template<typename EnumInfoT, typename ValueT, typename NameT>
+struct EnumInfo :EnumInfoT // Derived for enum Tag items
 {
-	using Tag = typename TypeInfo::Tag;
-	using ValueType = typename TypeInfo::ValueType;
-	using NameType = typename TypeInfo::NameType;
+	static_assert(detail::CheckCorrectEnumInfo<EnumInfoT>, "Incorrect EnumInfo type.");
+	using EnumTag = typename EnumInfoT::Tag;
+	using ValueType = std::remove_cv_t<ValueT>;
+	using NameType = NameT;
+};
+
+// ----------------- Base Class EnumBase ----------------
+template<template<typename, typename, typename> typename EnumT,
+	typename EnumInfoT, typename ValueT, typename NameT>
+class EnumBase :public EnumInfo<EnumInfoT, ValueT, NameT>
+{
+	using EnumType = EnumT<EnumInfoT, ValueT, NameT>;
+	using InfoType = EnumInfo<EnumInfoT, ValueT, NameT>;
+public:
+	using EnumTag = typename InfoType::EnumTag;
+	using ValueType = typename InfoType::ValueType;
+	using NameType = typename InfoType::NameType;
 
 public:
 	EnumBase() = default;
-	// Tag literals could implicitly cast to CustomEnum
-	constexpr EnumBase(Tag tag) noexcept
+	// EnumTag literals could implicitly cast to CustomEnum
+	constexpr EnumBase(EnumTag tag) noexcept
 	{
 		current_value_index = static_cast<size_t>(tag);
 	}
@@ -112,7 +126,7 @@ public:
 
 	constexpr const EnumType& setDefaultValue() noexcept
 	{
-		current_value_index = TypeInfo::DefaultValue;
+		current_value_index = EnumTag::DefaultValue;
 		return static_cast<const EnumType&>(*this);
 	}
 	constexpr ValueType Value() const noexcept
@@ -137,38 +151,26 @@ public:
 	}
 
 protected:
-	std::make_signed_t<size_t> current_value_index = TypeInfo::DefaultValue;
-};
-
-// ---------------- Helper Class EnumInfo ---------------
-template<typename EnumInfoT, typename ValueT, typename NameT>
-struct EnumInfo :EnumInfoT // Derived for enum items
-{
-	static_assert(detail::CheckCorrectEnumInfo<EnumInfoT>, "Incorrect EnumInfo type.");
-	using Tag = typename EnumInfoT::Tag;
-	using ValueType = std::remove_cv_t<ValueT>;
-	using NameType = NameT;
+	std::make_signed_t<size_t> current_value_index = EnumTag::DefaultValue;
 };
 
 // ------------------- Main Class Enum ------------------
 template<typename EnumInfoT, typename ValueT = int, typename NameT = std::wstring>
 class Enum :
-	public EnumInfo<EnumInfoT, ValueT, NameT>,
-	public EnumBase<Enum<EnumInfoT, ValueT, NameT>, EnumInfo<EnumInfoT, ValueT, NameT>>
+	public EnumBase<Enum, EnumInfoT, ValueT, NameT>
 {
-	using Base = EnumBase<Enum<EnumInfoT, ValueT, NameT>, EnumInfo<EnumInfoT, ValueT, NameT>>;
-	using Info = EnumInfo<EnumInfoT, ValueT, NameT>;
+	using Base = EnumBase<Enum, EnumInfoT, ValueT, NameT>;
 public:
-	using Tag = typename Info::Tag;
-	using ValueType = typename Info::ValueType;
-	using NameType = typename Info::NameType;
+	using typename Base::EnumTag;
+	using typename Base::ValueType;
+	using typename Base::NameType;
 private:
 	using pair_type = std::pair<ValueType, std::add_const_t<NameType>>;
 	using list_type = std::vector<pair_type>;
 
 public:
 	Enum() = default;
-	constexpr Enum(Tag tag) noexcept
+	constexpr Enum(EnumTag tag) noexcept
 		:Base(tag)
 	{}
 
@@ -232,16 +234,14 @@ struct CustomInfo
 
 template<typename EnumInfoT, typename ValueT = int, typename NameT = std::wstring>
 class CustomEnum :
-	public EnumInfo<EnumInfoT, ValueT, NameT>,
 	public CustomInfo,
-	public EnumBase<CustomEnum<EnumInfoT, ValueT, NameT>, EnumInfo<EnumInfoT, ValueT, NameT>>
+	public EnumBase<CustomEnum, EnumInfoT, ValueT, NameT>
 {
-	using Base = EnumBase<CustomEnum<EnumInfoT, ValueT, NameT>, EnumInfo<EnumInfoT, ValueT, NameT>>;
-	using Info = EnumInfo<EnumInfoT, ValueT, NameT>;
+	using Base = EnumBase<CustomEnum, EnumInfoT, ValueT, NameT>;
 public:
-	using Tag = typename Info::Tag;
-	using ValueType = typename Info::ValueType;
-	using NameType = typename Info::NameType;
+	using typename Base::EnumTag;
+	using typename Base::ValueType;
+	using typename Base::NameType;
 private:
 	using pair_type = std::pair<ValueType, std::add_const_t<NameType>>;
 	using custom_pair_type = std::pair<std::optional<ValueType>, std::add_const_t<NameType>>;
@@ -249,11 +249,11 @@ private:
 
 public:
 	CustomEnum() = default;
-	constexpr CustomEnum(Tag tag) noexcept
+	constexpr CustomEnum(EnumTag tag) noexcept
 		:Base(tag)
 	{}
 	constexpr CustomEnum(CustomTag tag) noexcept
-		:Base(static_cast<Tag>(tag))
+		:Base(static_cast<EnumTag>(tag))
 	{}
 
 public:
