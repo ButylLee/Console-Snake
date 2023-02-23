@@ -43,16 +43,11 @@ std::unique_ptr<Page> Page::Create()
 ****************************************/
 void GamePage::run()
 {
-	auto sg_title = sg::MakeScopeGuard([] { Console::get().setTitle(~Token::console_title); });
+	Console::get().setTitle(~Token::title_gaming);
 	if (GameSetting::get().show_frame)
-	{
-		Console::get().setTitle(~Token::title_gaming);
-	}
+		Console::get().setConsoleWindow(Console::UseFrame);
 	else
-	{
 		Console::get().setConsoleWindow(Console::NoFrame);
-		sg_title.dismiss();
-	}
 	auto width = GameSetting::get().width;
 	auto height = GameSetting::get().height;
 	canvas.setClientSize(width, height);
@@ -132,6 +127,7 @@ void NormalPage::paintTitle(ShowVersion show_version)
 ****************************************/
 void MenuPage::run()
 {
+	Console::get().setTitle(~Token::console_title);
 	Console::get().setConsoleWindow(Console::UseFrame);
 	canvas.setClientSize(default_size);
 	paintInterface();
@@ -273,7 +269,6 @@ void SettingPage::run()
 					GameSetting::get().theme.setCustomValue(*custom_theme_backup);
 				else
 					GameSetting::get().theme.clearCustomValue();
-				Console::get().setTitle(~Token::console_title);
 			}
 			return;
 		}

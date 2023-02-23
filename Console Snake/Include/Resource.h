@@ -9,7 +9,7 @@
 #include <random>
 #include <type_traits>
 
-#define GAME_VERSION "2.19"
+#define GAME_VERSION "2.20"
 
 namespace Resource {
 	inline constexpr const char* save_file_name = "SnakeSaved.bin";
@@ -385,10 +385,10 @@ ENUM_DEFINE(Theme)
 	},
 	{
 		{{
-			{ Facade::Rect, Color::LightBlue },
-			{ Facade::FullStar, Color::LightYellow },
-			{ Facade::FullCircle, Color::LightPurple },
-			{ Facade::FullRect, Color::LightWhite }
+			{ Facade::FullDiamond, Color::Gray },
+			{ Facade::FullCircle, Color::Yellow },
+			{ Facade::FullCircle, Color::White },
+			{ Facade::Rect, Color::LightBlue }
 		}},
 		Token::setting_theme_D
 	},
