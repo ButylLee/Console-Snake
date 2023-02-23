@@ -11,19 +11,19 @@
 
 class Timer
 {
-	static constexpr void nocallback() noexcept {}
+	static constexpr void NoCallback() noexcept {}
 public:
 	static constexpr std::chrono::milliseconds minimum_interval{ 1 };
-	enum Looping { NoLoop = false, Loop = true };
+	enum Looping :bool { NoLoop = false, Loop = true };
 
 public:
-	template<std::invocable F, typename Rep, typename Period, std::invocable Callback = decltype(nocallback)>
+	template<std::invocable F, typename Rep, typename Period, std::invocable Callback = decltype(NoCallback)>
 	Timer(F&& f, std::chrono::duration<Rep, Period> delay,
-		  Looping loop = NoLoop, Callback&& callback = nocallback)
+		  Looping looping = NoLoop, Callback&& callback = NoCallback)
 	{
-		*timer_loop = loop;
+		*control.timer_loop = looping;
 		std::thread(
-			[=, *this, f = std::move(f), callback = std::move(callback)]
+			[=, control = control, f = std::move(f), callback = std::move(callback)]
 			{
 				using namespace std::chrono;
 				finally {
@@ -33,48 +33,53 @@ public:
 					auto end = high_resolution_clock::now() + delay;
 					do {
 						std::this_thread::sleep_for(minimum_interval);
-						if (!*timer_enable)
+						if (!*control.timer_enable)
 							return;
-						if (*timer_reset)
+						if (*control.timer_reset)
 						{
-							*timer_reset = false;
+							*control.timer_reset = false;
 							end = high_resolution_clock::now() + delay;
 						}
 					} while (high_resolution_clock::now() < end);
 
-					if (*timer_enable)
+					if (*control.timer_enable)
 						f();
 					else
 						[[unlikely]] return;
-				} while (*timer_loop);
+				} while (*control.timer_loop);
 			}).detach();
 	}
 
 	~Timer() noexcept
 	{
-		*timer_enable = false;
+		disable();
 	}
+
+	Timer(const Timer&) = delete;
+	Timer& operator=(const Timer&) = delete;
 
 public:
 	void disable() noexcept
 	{
-		*timer_enable = false;
+		*control.timer_enable = false;
 	}
 
 	void reset() noexcept
 	{
-		*timer_reset = true;
+		*control.timer_reset = true;
 	}
 
 	void loop(bool looping) noexcept
 	{
-		*timer_loop = looping;
+		*control.timer_loop = looping;
 	}
 
 private:
-	std::shared_ptr<bool> timer_enable = std::make_shared<bool>(true);
-	std::shared_ptr<bool> timer_reset = std::make_shared<bool>(false);
-	std::shared_ptr<bool> timer_loop = std::make_shared<bool>(false);
+	struct Control {
+		std::shared_ptr<bool> timer_enable = std::make_shared<bool>(true);
+		std::shared_ptr<bool> timer_reset = std::make_shared<bool>(false);
+		std::shared_ptr<bool> timer_loop = std::make_shared<bool>(false);
+	}control;
 };
 
 #endif // SNAKE_TIMER_HEADER_
