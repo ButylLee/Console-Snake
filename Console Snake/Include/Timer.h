@@ -23,7 +23,7 @@ public:
 	{
 		*control.timer_loop = looping;
 		std::thread(
-			[=, control = control, f = std::move(f), callback = std::move(callback)]
+			[=, control = control, f = std::move(f), callback = std::move(callback)]() noexcept
 			{
 				using namespace std::chrono;
 				finally {
