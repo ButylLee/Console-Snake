@@ -10,7 +10,7 @@ DemoGround::DemoGround(Canvas& canvas)
 
 void DemoGround::show()
 {
-	while (!arena.is_over())
+	while (!arena.isOver())
 	{
 
 		arena.updateFrame();

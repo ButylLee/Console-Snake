@@ -41,8 +41,7 @@ void Arena::updateFrame()
 
 	// process snake head and rebind data
 	map[head_x][head_y].type = Element::snake;
-	canvas.setCursor(head_x, head_y);
-	paintElement(Element::snake);
+	paintElement(Element::snake, head_x, head_y);
 	rebindData(snake_head, head_x, head_y);
 
 	// process snake tail
@@ -56,25 +55,30 @@ void Arena::updateFrame()
 		auto [tail_x, tail_y] = snake_body[snake_tail];
 		forwardIndex(snake_tail);
 		map[tail_x][tail_y].type = Element::blank;
-		canvas.setCursor(tail_x, tail_y);
-		paintElement(Element::blank);
+		paintElement(Element::blank, tail_x, tail_y);
 	}
-}
-
-bool Arena::is_over() noexcept
-{
-	return game_over;
-}
-
-bool Arena::is_win() noexcept
-{
-	return GameData::get().score + snake_begin_length == snake_body.size();
 }
 
 void Arena::paintElement(Element which) noexcept
 {
 	canvas.setColor(GameSetting::get().theme.Value()[which].color);
 	print(GameSetting::get().theme.Value()[which].facade);
+}
+
+void Arena::paintElement(Element which, short x, short y) noexcept
+{
+	canvas.setCursor(x, y);
+	paintElement(which);
+}
+
+bool Arena::isOver() const noexcept
+{
+	return game_over;
+}
+
+bool Arena::isWin() const noexcept
+{
+	return GameData::get().score + snake_begin_length == snake_body.size();
 }
 
 SnakeNode Arena::getNextPosition() const noexcept
@@ -159,8 +163,7 @@ void Arena::createSnake()
 	for (size_t i = 0; i < snake_begin_length; i++)
 	{
 		map[begin_head_x][begin_head_y].type = Element::snake;
-		canvas.setCursor(begin_head_x, begin_head_y);
-		paintElement(Element::snake);
+		paintElement(Element::snake, begin_head_x, begin_head_y);
 		rebindData(snake_tail, begin_head_x, begin_head_y);
 
 		if (i == snake_begin_length - 1)
@@ -203,8 +206,7 @@ void Arena::createFood()
 	// generate food on the map
 	auto [x, y] = snake_body[random_index];
 	map[x][y].type = Element::food;
-	canvas.setCursor(x, y);
-	paintElement(Element::food);
+	paintElement(Element::food, x, y);
 }
 
 void Arena::rebindData(int16_t index, int8_t x, int8_t y) noexcept

@@ -31,7 +31,7 @@ void PlayGround::play()
 		{
 			while (true)
 			{
-				if (arena.is_over())
+				if (arena.isOver())
 					return;
 				if (arena.input_key != Direction::None)
 					continue;
@@ -96,7 +96,7 @@ void PlayGround::play()
 			case GameStatus::Running:
 			{
 				arena.updateFrame();
-				if (arena.is_over())
+				if (arena.isOver())
 				{
 					// tell thread th_input to end
 					ungetwch(K_Esc);
@@ -114,11 +114,10 @@ void PlayGround::play()
 			case GameStatus::Pausing:
 			{
 				auto [x, y] = arena.getNextPosition();
-				canvas.setCursor(x, y);
 				if (pause_flicker_flag)
-					arena.paintElement(Element::snake);
+					arena.paintElement(Element::snake, x, y);
 				else
-					arena.paintElement(arena.getPositionType(x, y));
+					arena.paintElement(arena.getPositionType(x, y), x, y);
 			}
 			break;
 
@@ -135,7 +134,7 @@ void PlayGround::ending()
 	std::wstring buffer;
 
 	// show gameover info
-	if (arena.is_win())
+	if (arena.isWin())
 	{
 		Console::get().setTitle(~Token::game_congratulations);
 		canvas.setColor(Color::Green);
@@ -176,7 +175,7 @@ void PlayGround::ending()
 			name.clear(); // clear if only has spaces
 		if (name.length() > Rank::name_max_length)
 			name.resize(Rank::name_max_length);
-		Rank::get().newResult(name, GameData::get().score, arena.is_win());
+		Rank::get().newResult(name, GameData::get().score, arena.isWin());
 	}
 
 	// show Retry Or Return info

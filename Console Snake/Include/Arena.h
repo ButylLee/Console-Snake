@@ -38,9 +38,10 @@ public:
 
 public:
 	void updateFrame();
-	bool is_over() noexcept;
-	bool is_win() noexcept;
 	void paintElement(Element which) noexcept;
+	void paintElement(Element which, short x, short y) noexcept;
+	bool isOver() const noexcept;
+	bool isWin() const noexcept;
 	SnakeNode getNextPosition() const noexcept;
 	Element getPositionType(uint8_t x, uint8_t y) const noexcept;
 	const DynArray<MapNode, 2>& getCurrentMap() const noexcept;
