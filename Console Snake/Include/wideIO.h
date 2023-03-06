@@ -22,18 +22,6 @@ inline auto print(wchar_t ch) noexcept
 }
 
 template<typename... TArgs>
-inline auto print(const wchar_t* format, TArgs&&... args) noexcept
-{
-	return wprintf_s(format, std::forward<TArgs>(args)...);
-}
-
-template<typename... TArgs>
-inline auto print(std::wstring format, TArgs&&... args) noexcept
-{
-	return wprintf_s(format.c_str(), std::forward<TArgs>(args)...);
-}
-
-template<typename... TArgs>
 inline auto print(std::wstring_view format, TArgs&&... args) noexcept
 {
 	return wprintf_s(format.data(), std::forward<TArgs>(args)...);
@@ -43,18 +31,6 @@ inline auto print(std::wstring_view format, TArgs&&... args) noexcept
  Function: print error message
 ****************************************/
 template<typename... TArgs>
-inline auto print_err(const wchar_t* format, TArgs&&... args) noexcept
-{
-	return fwprintf_s(stderr, format, std::forward<TArgs>(args)...);
-}
-
-template<typename... TArgs>
-inline auto print_err(std::wstring format, TArgs&&... args) noexcept
-{
-	return fwprintf_s(stderr, format.c_str(), std::forward<TArgs>(args)...);
-}
-
-template<typename... TArgs>
 inline auto print_err(std::wstring_view format, TArgs&&... args) noexcept
 {
 	return fwprintf_s(stderr, format.data(), std::forward<TArgs>(args)...);
@@ -62,9 +38,9 @@ inline auto print_err(std::wstring_view format, TArgs&&... args) noexcept
 
 // print_err ASCII verion for std::exception
 template<typename... TArgs>
-inline auto print_err(const char* format, TArgs&&... args) noexcept
+inline auto print_err(std::string_view format, TArgs&&... args) noexcept
 {
-	return fprintf_s(stderr, format, std::forward<TArgs>(args)...);
+	return fprintf_s(stderr, format.data(), std::forward<TArgs>(args)...);
 }
 
 /***************************************
