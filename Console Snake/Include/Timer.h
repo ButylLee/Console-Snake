@@ -21,7 +21,7 @@ public:
 	Timer(F&& f, std::chrono::duration<Rep, Period> delay,
 		  Looping looping = NoLoop, Callback&& callback = NoCallback)
 	{
-		*control.timer_loop = looping;
+		control->timer_loop = looping;
 		std::thread(
 			[=, control = control, f = std::move(f), callback = std::move(callback)]() noexcept
 			{
@@ -33,20 +33,20 @@ public:
 					auto end = high_resolution_clock::now() + delay;
 					do {
 						std::this_thread::sleep_for(minimum_interval);
-						if (!*control.timer_enable)
+						if (!control->timer_enable)
 							return;
-						if (*control.timer_reset)
+						if (control->timer_reset)
 						{
-							*control.timer_reset = false;
+							control->timer_reset = false;
 							end = high_resolution_clock::now() + delay;
 						}
 					} while (high_resolution_clock::now() < end);
 
-					if (*control.timer_enable)
+					if (control->timer_enable)
 						f();
 					else
 						[[unlikely]] return;
-				} while (*control.timer_loop);
+				} while (control->timer_loop);
 			}).detach();
 	}
 
@@ -61,25 +61,26 @@ public:
 public:
 	void disable() noexcept
 	{
-		*control.timer_enable = false;
+		control->timer_enable = false;
 	}
 
 	void reset() noexcept
 	{
-		*control.timer_reset = true;
+		control->timer_reset = true;
 	}
 
 	void loop(bool looping) noexcept
 	{
-		*control.timer_loop = looping;
+		control->timer_loop = looping;
 	}
 
 private:
 	struct Control {
-		std::shared_ptr<bool> timer_enable = std::make_shared<bool>(true);
-		std::shared_ptr<bool> timer_reset = std::make_shared<bool>(false);
-		std::shared_ptr<bool> timer_loop = std::make_shared<bool>(false);
-	}control;
+		bool timer_enable = true;
+		bool timer_reset = false;
+		bool timer_loop = false;
+	};
+	std::shared_ptr<Control> control = std::make_shared<Control>();
 };
 
 #endif // SNAKE_TIMER_HEADER_
