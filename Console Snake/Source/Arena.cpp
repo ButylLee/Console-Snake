@@ -31,7 +31,7 @@ void Arena::updateFrame()
 		snake_direct = key;
 	nextPosition(head_x, head_y);
 
-	// check is dashing againest barrier or body
+	// check is dashing against barrier or body
 	auto previous_type = map[head_x][head_y].type;
 	if (previous_type == Element::barrier || previous_type == Element::snake)
 	{

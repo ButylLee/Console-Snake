@@ -59,7 +59,7 @@ public:
 
 private:
 	Canvas& canvas;
-	std::atomic<Direction> snake_direct;
+	Direction snake_direct;
 	bool game_over = false;
 
 	// The invariant of this class is that ALL map nodes except barrier

@@ -133,7 +133,7 @@ void PlayGround::ending()
 	baseY = baseY / 2 - 5;
 	std::wstring buffer;
 
-	// show gameover info
+	// show game over info
 	if (arena.isWin())
 	{
 		Console::get().setTitle(~Token::game_congratulations);
