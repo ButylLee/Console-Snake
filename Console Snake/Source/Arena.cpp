@@ -6,12 +6,6 @@
 #include <utility>
 #include <type_traits>
 
-bool IsConflictDirection(Direction d1, Direction d2) noexcept
-{
-	using type = std::underlying_type_t<Direction>;
-	return static_cast<type>(d1) + static_cast<type>(d2) == static_cast<type>(Direction::Conflict);
-}
-
 Arena::Arena(Canvas& canvas)
 	: canvas(canvas), map(GameSetting::get().height, GameSetting::get().width)
 	, snake_body((GameSetting::get().height - 2) * (GameSetting::get().width - 2))
@@ -27,7 +21,7 @@ void Arena::updateFrame()
 	auto [head_x, head_y] = snake_body[snake_head];
 	forwardIndex(snake_head);
 	Direction key = input_key.exchange(Direction::None);
-	if (key != Direction::None && !IsConflictDirection(key, snake_direct))
+	if (key != Direction::None && !key.isConflictWith(snake_direct))
 		snake_direct = key;
 	nextPosition(head_x, head_y);
 
@@ -168,7 +162,7 @@ void Arena::createSnake()
 
 		if (i == snake_begin_length - 1)
 			break;
-		switch (snake_direct)
+		switch (+snake_direct)
 		{
 			case Direction::Up:
 				begin_head_y++; break;
@@ -228,7 +222,7 @@ void Arena::forwardIndex(int16_t& index) const noexcept
 
 void Arena::nextPosition(uint8_t& x, uint8_t& y) const noexcept
 {
-	switch (snake_direct)
+	switch (+snake_direct)
 	{
 		case Direction::Up:
 			y == 0 ? y = GameSetting::get().height - 1 : y--;

@@ -40,19 +40,19 @@ void PlayGround::play()
 					switch (ch)
 					{
 						case K_UP: case K_W: case K_w:
-							arena.input_key = Direction::Up;
+							arena.input_key = +Direction::Up;
 							break;
 
 						case K_DOWN: case K_S: case K_s:
-							arena.input_key = Direction::Down;
+							arena.input_key = +Direction::Down;
 							break;
 
 						case K_LEFT: case K_A: case K_a:
-							arena.input_key = Direction::Left;
+							arena.input_key = +Direction::Left;
 							break;
 
 						case K_RIGHT: case K_D: case K_d:
-							arena.input_key = Direction::Right;
+							arena.input_key = +Direction::Right;
 							break;
 					}
 				switch (ch)

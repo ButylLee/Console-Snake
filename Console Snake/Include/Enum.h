@@ -18,7 +18,7 @@
  *         L = 30
  *     };
  *             ||
- * transfrom it like below:
+ * transform it like below:
  *             ||
  *             vv
  *     struct SizeEnum {

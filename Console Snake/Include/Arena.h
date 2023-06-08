@@ -8,14 +8,38 @@
 #include <atomic>
 #include <cstdint>
 
-enum struct Direction
+struct Direction
 {
-	None = 0,
-	Up = 1,
-	Left = 2,
-	Right = 3,
-	Down = 4,
-	Conflict = 5,
+	enum Tags
+	{
+		None = 0,
+		Up = 1,
+		Left = 2,
+		Right = 3,
+		Down = 4,
+		Conflict = 5,
+	};
+
+	constexpr Direction() noexcept :value(None) {}
+	constexpr Direction(Tags tag) noexcept :value(tag) {}
+
+	friend constexpr bool operator==(Direction, Direction) = default;
+	friend constexpr Tags operator+(Direction direction) noexcept // for 2 times type conversion
+	{
+		return direction.value;
+	}
+	friend constexpr Direction operator+(Tags tag) noexcept // for 2 times type conversion
+	{
+		return tag;
+	}
+
+	constexpr bool isConflictWith(Direction other) noexcept
+	{
+		return this->value + other.value == Conflict;
+	}
+
+private:
+	Tags value;
 };
 
 struct MapNode
@@ -55,7 +79,7 @@ private:
 	void nextPosition(uint8_t& x, uint8_t& y) const noexcept;
 
 public:
-	std::atomic<Direction> input_key = Direction::None;
+	std::atomic<Direction> input_key = +Direction::None;
 
 private:
 	Canvas& canvas;
