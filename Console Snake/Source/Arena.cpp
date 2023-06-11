@@ -5,51 +5,252 @@
 
 #include <utility>
 #include <type_traits>
+#include <cassert>
+
+namespace
+{
+	DynArray<MapNode, 2> GenerateMap()
+	{
+		DynArray<MapNode, 2> map(GameSetting::get().height, GameSetting::get().width);
+		for (size_t row = 0; auto & columns : map)
+		{
+			for (size_t column = 0; auto & node : columns)
+			{
+				if (row == 0 || row == map.size(0) - 1 ||
+					column == 0 || column == map.size(1) - 1)
+				{
+					node.type = Element::barrier;
+				}
+				else
+				{
+					node.type = Element::blank;
+				}
+				column++;
+			}
+			row++;
+		}
+		return map;
+	}
+
+	size_t GetMapBlankCount(const DynArray<MapNode, 2>& map)
+	{
+		size_t count = 0;
+		for (auto& node : map.iter_all())
+		{
+			if (node.type == Element::blank)
+				count++;
+		}
+		return count;
+	}
+} // namespace
+
+Venue::Venue(DynArray<MapNode, 2> map_, void (Venue::* create_snake_func)())
+	: map(std::move(map_)), snake_body(GetMapBlankCount(map))
+{
+	setupInvariant();
+	(this->*create_snake_func)();
+	generateFood();
+}
+
+PosNode Venue::getNextPosition() const noexcept
+{
+	auto [x, y] = snake_body[snake_head_index];
+	nextPosition(x, y);
+	return { x, y };
+}
+
+Element Venue::getPositionType(uint8_t x, uint8_t y) const noexcept
+{
+	return map[y][x].type;
+}
+
+const DynArray<MapNode, 2>& Venue::getCurrentMap() const noexcept
+{
+	return map;
+}
+
+void Venue::addSnakeBody(Direction head_direct, uint8_t head_x, uint8_t head_y) noexcept
+{
+	assert(snake_head_index == -1 && snake_tail_index == -1 &&
+		   snake_direct == Direction::None);
+	snake_direct = head_direct;
+	map[head_y][head_x].type = Element::snake;
+	snake_tail_index = snake_head_index = map[head_y][head_x].snake_index;
+	rebindData(snake_head_index, head_x, head_y);
+}
+
+void Venue::addSnakeBody(Direction tail_direct) noexcept
+{
+	assert(snake_head_index != -1 && snake_tail_index != -1);
+	if (tail_direct == snake_direct)
+		return;
+	auto [tail_x, tail_y] = snake_body[snake_tail_index];
+	backwardIndex(snake_tail_index);
+	switch (+tail_direct)
+	{
+		case Direction::Up:
+			tail_y--; break;
+		case Direction::Down:
+			tail_y++; break;
+		case Direction::Left:
+			tail_x--; break;
+		case Direction::Right:
+			tail_x++; break;
+	}
+	map[tail_y][tail_x].type = Element::snake;
+	rebindData(snake_tail_index, tail_x, tail_y);
+}
+
+std::optional<PosNode> Venue::generateFood()
+{
+	size_t range;
+	// get usable range for food generating
+	if (snake_head_index > snake_tail_index)
+	{
+		range = snake_head_index - snake_tail_index - 1;
+	}
+	else
+	{
+		range = snake_body.total_size() - (snake_tail_index - snake_head_index + 1);
+	}
+	if (range == 0)
+		return {};
+
+	// pick random position of food
+	size_t random_index = GetRandom(1, range) + snake_tail_index;
+	if (random_index >= snake_body.total_size())
+		random_index -= snake_body.total_size();
+
+	// generate food on the map
+	auto [x, y] = snake_body[random_index];
+	map[y][x].type = Element::food;
+	return PosNode{ x, y };
+}
+
+void Venue::orderDirection(Direction input) noexcept
+{
+	assert(snake_head_index != -1 && snake_tail_index != -1);
+	if (input != Direction::None && !input.isConflictWith(snake_direct))
+		snake_direct = input;
+}
+
+PosNodeGroup Venue::updateFrame() noexcept
+{
+	auto [head_x, head_y] = snake_body[snake_head_index];
+	nextPosition(head_x, head_y);
+
+	auto previous_type = map[head_y][head_x].type;
+	if (previous_type == Element::barrier || previous_type == Element::snake)
+		return { 0 };
+
+	map[head_y][head_x].type = Element::snake;
+	forwardIndex(snake_head_index);
+	rebindData(snake_head_index, head_x, head_y);
+
+	if (previous_type == Element::food)
+		return { 1, { head_x, head_y } };
+
+	auto [tail_x, tail_y] = snake_body[snake_tail_index];
+	map[tail_y][tail_x].type = Element::blank;
+	forwardIndex(snake_tail_index);
+	// no need to rebind
+	return { 2, { head_x, head_y }, { tail_x, tail_y } };
+}
+
+bool Venue::isWin(size_t score, size_t snake_init_length) const noexcept
+{
+	return score + snake_init_length == snake_body.size();
+}
+
+void Venue::setupInvariant() noexcept
+{
+	int16_t index = 0;
+	for (uint8_t row = 0; row < map.size(0); row++)
+	{
+		for (uint8_t column = 0; column < map.size(1); column++)
+		{
+			if (map[row][column].type == Element::blank)
+			{
+				map[row][column].snake_index = index;
+				snake_body[index].x = column;
+				snake_body[index].y = row;
+				index++;
+			}
+		}
+	}
+}
+
+void Venue::rebindData(int16_t index, int8_t x, int8_t y) noexcept
+{
+	// maintain class invariant
+	int16_t temp_index = map[y][x].snake_index;
+	uint8_t temp_x = snake_body[index].x;
+	uint8_t temp_y = snake_body[index].y;
+	std::swap(map[y][x].snake_index, map[temp_y][temp_x].snake_index);
+	std::swap(snake_body[index], snake_body[temp_index]);
+}
+
+void Venue::forwardIndex(int16_t& index) const noexcept
+{
+	index = index == 0
+		? static_cast<int16_t>(snake_body.total_size() - 1)
+		: index - 1;
+}
+
+void Venue::backwardIndex(int16_t& index) const noexcept
+{
+	index = index == static_cast<int16_t>(snake_body.total_size() - 1)
+		? 0
+		: index + 1;
+}
+
+void Venue::nextPosition(uint8_t& x, uint8_t& y) const noexcept
+{
+	uint8_t height = static_cast<uint8_t>(map.size(0));
+	uint8_t width = static_cast<uint8_t>(map.size(1));
+	switch (+snake_direct)
+	{
+		case Direction::Up:
+			y == 0 ? y = height - 1 : y--;
+			break;
+		case Direction::Down:
+			y == height - 1 ? y = 0 : y++;
+			break;
+		case Direction::Left:
+			x == 0 ? x = width - 1 : x--;
+			break;
+		case Direction::Right:
+			x == width - 1 ? x = 0 : x++;
+			break;
+	}
+}
 
 Arena::Arena(Canvas& canvas)
-	: canvas(canvas), map(GameSetting::get().height, GameSetting::get().width)
-	, snake_body((GameSetting::get().height - 2) * (GameSetting::get().width - 2))
+	: Venue(GenerateMap(), static_cast<void(Venue::*)()>(&Arena::createSnake))
+	, canvas(canvas)
 {
-	setupInvariantAndPaint();
-	createSnake();
-	createFood();
+	paintVenue();
 }
 
 void Arena::updateFrame()
 {
-	// get new snake head position
-	auto [head_x, head_y] = snake_body[snake_head];
-	forwardIndex(snake_head);
-	Direction key = input_key.exchange(Direction::None);
-	if (key != Direction::None && !key.isConflictWith(snake_direct))
-		snake_direct = key;
-	nextPosition(head_x, head_y);
-
-	// check is dashing against barrier or body
-	auto previous_type = map[head_x][head_y].type;
-	if (previous_type == Element::barrier || previous_type == Element::snake)
+	orderDirection(input_key.exchange(Direction::None));
+	PosNodeGroup nodes_updated = Venue::updateFrame();
+	assert(nodes_updated.count <= 2);
+	switch (nodes_updated.count)
 	{
-		game_over = true;
-		return;
-	}
-
-	// process snake head and rebind data
-	map[head_x][head_y].type = Element::snake;
-	paintElement(Element::snake, head_x, head_y);
-	rebindData(snake_head, head_x, head_y);
-
-	// process snake tail
-	if (previous_type == Element::food)
-	{
-		createFood();
-		GameData::get().score++;
-	}
-	else
-	{
-		auto [tail_x, tail_y] = snake_body[snake_tail];
-		forwardIndex(snake_tail);
-		map[tail_x][tail_y].type = Element::blank;
-		paintElement(Element::blank, tail_x, tail_y);
+		case 0: // dead
+			game_over = true;
+			break;
+		case 1: // food
+			paintElement(Element::snake, nodes_updated.head_pos.x, nodes_updated.head_pos.y);
+			generateFood();
+			GameData::get().score++;
+			break;
+		case 2: // nothing
+			paintElement(Element::snake, nodes_updated.head_pos.x, nodes_updated.head_pos.y);
+			paintElement(Element::blank, nodes_updated.tail_pos.x, nodes_updated.tail_pos.y);
+			break;
 	}
 }
 
@@ -59,7 +260,7 @@ void Arena::paintElement(Element which) noexcept
 	print(GameSetting::get().theme.Value()[which].facade);
 }
 
-void Arena::paintElement(Element which, short x, short y) noexcept
+void Arena::paintElement(Element which, uint8_t x, uint8_t y) noexcept
 {
 	canvas.setCursor(x, y);
 	paintElement(which);
@@ -72,169 +273,58 @@ bool Arena::isOver() const noexcept
 
 bool Arena::isWin() const noexcept
 {
-	return GameData::get().score + snake_begin_length == snake_body.size();
+	return Venue::isWin(GameData::get().score, snake_init_length);
 }
 
-SnakeNode Arena::getNextPosition() const noexcept
-{
-	auto [x, y] = snake_body[snake_head];
-	nextPosition(x, y);
-	return { x,y };
-}
-
-Element Arena::getPositionType(uint8_t x, uint8_t y) const noexcept
-{
-	return map[x][y].type;
-}
-
-const DynArray<MapNode, 2>& Arena::getCurrentMap() const noexcept
-{
-	return map;
-}
-
-void Arena::setupInvariantAndPaint() noexcept
+void Arena::paintVenue() noexcept
 {
 	canvas.setCursor(0, 0);
-	for (int index = 0, row = 0; row < GameSetting::get().height; row++)
+	auto& map = getCurrentMap();
+	for (size_t index = 0; auto& node : map.iter_all())
 	{
-		for (int column = 0; column < GameSetting::get().width; column++)
-		{
-			if (row == 0 || row == GameSetting::get().height - 1 ||
-				column == 0 || column == GameSetting::get().width - 1)
-			{
-				map[column][row].type = Element::barrier;
-				map[column][row].snake_index = -1;
-				if (!(GameSetting::get().old_console_host &&
-					  row == GameSetting::get().height - 1 &&
-					  column == GameSetting::get().width - 1))
-					paintElement(Element::barrier);
-			}
-			else
-			{
-				map[column][row].type = Element::blank;
-				map[column][row].snake_index = index;
-				snake_body[index].x = column;
-				snake_body[index].y = row;
-				paintElement(Element::blank);
-				index++;
-			}
-		}
-		if (row != GameSetting::get().height - 1)
-		{
-			canvas.nextLine();
-		}
+		if (not(GameSetting::get().old_console_host && index++ == map.total_size() - 1))
+			paintElement(node.type);
 	}
 }
 
 void Arena::createSnake()
 {
 	// random snake initial postion
-	auto x_range = GameSetting::get().width - 2 * (1 + snake_begin_length);
-	auto y_range = GameSetting::get().height - 2 * (1 + snake_begin_length);
+	auto x_range = GameSetting::get().width - 2 * (1 + snake_init_length);
+	auto y_range = GameSetting::get().height - 2 * (1 + snake_init_length);
 	auto begin_head_x = GetRandom(0, x_range);
 	auto begin_head_y = GetRandom(0, y_range);
+	Direction direction;
 
-	// select direction
-	if (bool use_x = GetRandom(0, 1))
+	// select initial direction
+	if (bool select_x_axis = GetRandom(0, 1))
 	{
 		if (begin_head_x < x_range / 2)
-			snake_direct = Direction::Right;
+			direction = Direction::Right;
 		else
-			snake_direct = Direction::Left;
+			direction = Direction::Left;
 	}
 	else
 	{
 		if (begin_head_y < y_range / 2)
-			snake_direct = Direction::Down;
+			direction = Direction::Down;
 		else
-			snake_direct = Direction::Up;
+			direction = Direction::Up;
 	}
+	begin_head_x += 1 + snake_init_length;
+	begin_head_y += 1 + snake_init_length;
 
 	// place initial snake body
-	begin_head_x += 1 + snake_begin_length;
-	begin_head_y += 1 + snake_begin_length;
-	snake_tail = snake_head = map[begin_head_x][begin_head_y].snake_index;
-	for (size_t i = 0; i < snake_begin_length; i++)
-	{
-		map[begin_head_x][begin_head_y].type = Element::snake;
-		paintElement(Element::snake, begin_head_x, begin_head_y);
-		rebindData(snake_tail, begin_head_x, begin_head_y);
-
-		if (i == snake_begin_length - 1)
-			break;
-		switch (+snake_direct)
-		{
-			case Direction::Up:
-				begin_head_y++; break;
-			case Direction::Down:
-				begin_head_y--; break;
-			case Direction::Left:
-				begin_head_x++; break;
-			case Direction::Right:
-				begin_head_x--; break;
-		}
-		snake_tail++;
-	}
+	addSnakeBody(direction, begin_head_x, begin_head_y);
+	for (size_t i = 0; i < snake_init_length - 1; i++)
+		addSnakeBody(-direction);
 }
 
-void Arena::createFood()
+void Arena::generateFood()
 {
-	size_t range, random_index;
-	// get usable range for generating food
-	if (snake_head > snake_tail)
+	if (auto pos = Venue::generateFood())
 	{
-		range = snake_head - snake_tail - 1;
-	}
-	else
-	{
-		range = snake_body.total_size() - (snake_tail - snake_head + 1);
-	}
-	if (range == 0)
-		return;
-
-	// pick random position of food
-	random_index = GetRandom(1, range) + snake_tail;
-	if (random_index >= snake_body.total_size())
-		random_index -= snake_body.total_size();
-
-	// generate food on the map
-	auto [x, y] = snake_body[random_index];
-	map[x][y].type = Element::food;
-	paintElement(Element::food, x, y);
-}
-
-void Arena::rebindData(int16_t index, int8_t x, int8_t y) noexcept
-{
-	// maintain class invariant
-	int16_t temp_index = map[x][y].snake_index;
-	std::swap(map[snake_body[index].x][snake_body[index].y].snake_index,
-			  map[x][y].snake_index);
-	std::swap(snake_body[index].x, snake_body[temp_index].x);
-	std::swap(snake_body[index].y, snake_body[temp_index].y);
-}
-
-void Arena::forwardIndex(int16_t& index) const noexcept
-{
-	index = index == 0
-		? static_cast<int16_t>(snake_body.total_size() - 1)
-		: index - 1;
-}
-
-void Arena::nextPosition(uint8_t& x, uint8_t& y) const noexcept
-{
-	switch (+snake_direct)
-	{
-		case Direction::Up:
-			y == 0 ? y = GameSetting::get().height - 1 : y--;
-			break;
-		case Direction::Down:
-			y == GameSetting::get().height - 1 ? y = 0 : y++;
-			break;
-		case Direction::Left:
-			x == 0 ? x = GameSetting::get().width - 1 : x--;
-			break;
-		case Direction::Right:
-			x == GameSetting::get().width - 1 ? x = 0 : x++;
-			break;
+		auto [x, y] = pos.value();
+		paintElement(Element::food, x, y);
 	}
 }
