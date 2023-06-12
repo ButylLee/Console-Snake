@@ -254,13 +254,13 @@ void Arena::updateFrame()
 	}
 }
 
-void Arena::paintElement(Element which) noexcept
+void Arena::paintElement(Element which)
 {
 	canvas.setColor(GameSetting::get().theme.Value()[which].color);
 	print(GameSetting::get().theme.Value()[which].facade);
 }
 
-void Arena::paintElement(Element which, uint8_t x, uint8_t y) noexcept
+void Arena::paintElement(Element which, uint8_t x, uint8_t y)
 {
 	canvas.setCursor(x, y);
 	paintElement(which);
@@ -276,7 +276,7 @@ bool Arena::isWin() const noexcept
 	return Venue::isWin(GameData::get().score, snake_init_length);
 }
 
-void Arena::paintVenue() noexcept
+void Arena::paintVenue()
 {
 	canvas.setCursor(0, 0);
 	auto& map = getCurrentMap();
