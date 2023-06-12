@@ -113,12 +113,12 @@ public:
 
 public:
 	void updateFrame();
-	void paintElement(Element);
 	void paintElement(Element, uint8_t x, uint8_t y);
 	bool isOver() const noexcept;
 	bool isWin() const noexcept;
 
 private:
+	void paintElement(Element);
 	void paintVenue();
 	void createSnake();
 	void generateFood();

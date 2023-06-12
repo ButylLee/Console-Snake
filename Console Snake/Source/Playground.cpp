@@ -118,6 +118,7 @@ void PlayGround::play()
 					arena.paintElement(Element::snake, x, y);
 				else
 					arena.paintElement(arena.getPositionType(x, y), x, y);
+				std::this_thread::sleep_for(1us);
 			}
 			break;
 

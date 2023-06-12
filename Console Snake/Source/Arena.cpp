@@ -254,12 +254,6 @@ void Arena::updateFrame()
 	}
 }
 
-void Arena::paintElement(Element which)
-{
-	canvas.setColor(GameSetting::get().theme.Value()[which].color);
-	print(GameSetting::get().theme.Value()[which].facade);
-}
-
 void Arena::paintElement(Element which, uint8_t x, uint8_t y)
 {
 	canvas.setCursor(x, y);
@@ -274,6 +268,12 @@ bool Arena::isOver() const noexcept
 bool Arena::isWin() const noexcept
 {
 	return Venue::isWin(GameData::get().score, snake_init_length);
+}
+
+void Arena::paintElement(Element which)
+{
+	canvas.setColor(GameSetting::get().theme.Value()[which].color);
+	print(GameSetting::get().theme.Value()[which].facade);
 }
 
 void Arena::paintVenue()
