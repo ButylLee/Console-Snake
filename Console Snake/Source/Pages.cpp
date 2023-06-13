@@ -218,6 +218,16 @@ void SettingPage::run()
 			}
 			break;
 
+			case K_F2:
+			{
+				GameData::get().selection = PageSelect::CustomMapPage;
+				auto page = Page::Create();
+				page->run();
+				canvas.setClientSize(default_size);
+				paintInterface();
+			}
+			break;
+
 			case K_3:
 			{
 				if (!GameSetting::get().old_console_host)
@@ -502,6 +512,15 @@ void CustomThemePage::generateRandomTheme()
 		theme_temp[i].color = static_cast<Color::EnumTag>(color_candidate[index]);
 		color_candidate.erase(color_candidate.cbegin() + index);
 	}
+}
+
+/***************************************
+ class CustomMapPage
+****************************************/
+void CustomMapPage::run()
+{
+	canvas.setClientSize(default_size);
+
 }
 
 /***************************************

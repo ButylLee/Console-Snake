@@ -48,6 +48,7 @@ enum struct PageSelect
 	MenuPage,
 	SettingPage,
 	CustomThemePage,
+	CustomMapPage,
 	BeginPage,
 	RankPage
 };

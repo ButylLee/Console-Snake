@@ -88,6 +88,16 @@ private:
 	ElementSet theme_temp;
 };
 
+class CustomMapPage :public NormalPage
+{
+	FACTORY_MAP_REGISTER(CustomMapPage);
+public:
+	void run() override;
+
+private:
+
+};
+
 class BeginPage :public NormalPage
 {
 	FACTORY_MAP_REGISTER(BeginPage);
