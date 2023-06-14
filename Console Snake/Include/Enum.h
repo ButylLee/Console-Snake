@@ -27,7 +27,7 @@
  *             DefaultValue = S
  *         };
  *     };
- *     using Size = CustomEnum<SizeEnum, short, std::string>; // last two args are optional
+ *     using Size = CustomEnum<SizeEnum, short, std::wstring>; // last two args are optional
  *     ENUM_DEFINE(Size)
  *     {
  *        { 10, L"S" },
@@ -54,14 +54,14 @@
  *     short value2 = size; // implicitly convert
  *
  * To use an CustomEnum:
- *     std::optional<short> pre_custom = Size::getCustomValue();
- *     Size::clearCustomValue();
- *     Size::setCustomValue(50);
+ *     std::optional<short> pre_custom = Size::GetCustomValue();
+ *     Size::ClearCustomValue();
+ *     Size::SetCustomValue(50);
  *     size = Size::Custom; // if now has no custom value, fallback to default value
  *
  * To inquire key or value:
- *     auto nameOfS = Size::getNameFrom(10);
- *     auto valueOfL = Size::getValueFrom(Size::L);
+ *     auto nameOfS = Size::GetNameFrom(10);
+ *     auto valueOfL = Size::GetValueFrom(Size::L);
  */
 
 #include <utility>
@@ -69,6 +69,8 @@
 #include <optional>
 #include <type_traits>
 #include <string>
+#include <algorithm>
+#include <cassert>
 
 namespace detail {
 	template<typename, typename = void, typename = void>
@@ -111,7 +113,7 @@ public:
 	}
 
 public:
-	constexpr const EnumType& setNextValue() noexcept
+	constexpr const EnumType& setNextValue() noexcept /* virtual */
 	{
 		return static_cast<EnumType*>(this)->setNextValue();
 	}
@@ -120,15 +122,15 @@ public:
 		current_value_index = EnumTag::DefaultValue;
 		return static_cast<const EnumType&>(*this);
 	}
-	constexpr ValueType convertFrom(ValueType val) noexcept
+	constexpr bool convertFrom(ValueType val) noexcept /* virtual */
 	{
 		return static_cast<EnumType*>(this)->convertFrom(val);
 	}
-	constexpr NameType Name() const noexcept
+	constexpr NameType Name() const noexcept /* virtual */
 	{
 		return static_cast<const EnumType*>(this)->Name();
 	}
-	constexpr operator ValueType() const noexcept
+	constexpr operator ValueType() const noexcept /* virtual */
 	{
 		return static_cast<const EnumType*>(this)->operator ValueType();
 	}
@@ -138,11 +140,11 @@ public:
 	}
 
 public:
-	static constexpr NameType getNameFrom(ValueType val) noexcept
+	static constexpr NameType GetNameFrom(ValueType val) noexcept /* virtual */
 	{
-		return EnumType::getNameFrom(val);
+		return EnumType::GetNameFrom(val);
 	}
-	static constexpr ValueType getValueFrom(const EnumBase& tag_or_var) noexcept
+	static constexpr ValueType GetValueFrom(const EnumBase& tag_or_var) noexcept
 	{
 		return tag_or_var;
 	}
@@ -189,7 +191,7 @@ public:
 	using typename Base::NameType;
 private:
 	using pair_type = std::pair<ValueType, std::add_const_t<NameType>>;
-	using list_type = std::vector<pair_type>;
+	using list_type = const std::vector<pair_type>;
 
 public:
 	Enum() = default;
@@ -210,18 +212,17 @@ public:
 		}
 		return *this;
 	}
-	constexpr ValueType convertFrom(ValueType val) noexcept
+	constexpr bool convertFrom(ValueType val) noexcept
 	{
 		for (size_t i = 0; i < enum_list.size(); i++)
 		{
 			if (val == enum_list[i].first)
 			{
 				this->current_value_index = i;
-				return val;
+				return true;
 			}
 		}
-		this->setDefaultValue();
-		return *this;
+		return false;
 	}
 	constexpr NameType Name() const noexcept
 	{
@@ -233,7 +234,7 @@ public:
 	}
 
 public:
-	static constexpr NameType getNameFrom(ValueType val) noexcept
+	static constexpr NameType GetNameFrom(ValueType val) noexcept
 	{
 		for (size_t i = 0; i < enum_list.size(); i++)
 		{
@@ -267,8 +268,8 @@ public:
 	using typename Base::NameType;
 private:
 	using pair_type = std::pair<ValueType, std::add_const_t<NameType>>;
+	using list_type = const std::vector<pair_type>;
 	using custom_pair_type = std::pair<std::optional<ValueType>, std::add_const_t<NameType>>;
-	using list_type = std::vector<pair_type>;
 
 public:
 	CustomEnum() = default;
@@ -299,19 +300,19 @@ public:
 		}
 		return *this;
 	}
-	constexpr ValueType convertFrom(ValueType val) noexcept
+	constexpr bool convertFrom(ValueType val) noexcept
 	{
 		for (size_t i = 0; i < enum_list.size(); i++)
 		{
 			if (val == enum_list[i].first)
 			{
 				this->current_value_index = i;
-				return val;
+				return true;
 			}
 		}
-		setCustomValue(val);
+		SetCustomValue(val);
 		this->current_value_index = CustomTag::Custom;
-		return val;
+		return true;
 	}
 	constexpr NameType Name() const noexcept
 	{
@@ -337,7 +338,7 @@ public:
 	}
 
 public:
-	static constexpr NameType getNameFrom(ValueType val) noexcept
+	static constexpr NameType GetNameFrom(ValueType val) noexcept
 	{
 		for (size_t i = 0; i < enum_list.size(); i++)
 		{
@@ -349,15 +350,15 @@ public:
 		return {};
 	}
 
-	static constexpr void setCustomValue(ValueType custom)
+	static constexpr void SetCustomValue(ValueType custom)
 	{
 		enum_custom.first = std::move(custom);
 	}
-	static constexpr std::optional<ValueType> getCustomValue() noexcept
+	static constexpr std::optional<ValueType> GetCustomValue() noexcept
 	{
 		return enum_custom.first;
 	}
-	static constexpr void clearCustomValue() noexcept
+	static constexpr void ClearCustomValue() noexcept
 	{
 		enum_custom.first = std::nullopt;
 	}
@@ -372,6 +373,142 @@ private:
 private:
 	static list_type enum_list;
 	static custom_pair_type enum_custom;
+};
+
+// ------------- Main Class MultiCustomEnum -------------
+template<typename EnumInfoT, typename ValueT = int, typename NameT = std::wstring>
+class MultiCustomEnum :
+	public EnumBase<MultiCustomEnum, EnumInfoT, ValueT, NameT>
+{
+	using Base = EnumBase<MultiCustomEnum, EnumInfoT, ValueT, NameT>;
+public:
+	using typename Base::EnumTag;
+	using typename Base::ValueType;
+	using typename Base::NameType;
+private:
+	using pair_type = std::pair<ValueType, std::add_const_t<NameType>>;
+	using list_type = const std::vector<pair_type>;
+	using custom_list_type = std::vector<pair_type>;
+	using notify_list_type = std::vector<MultiCustomEnum*>;
+
+public:
+	MultiCustomEnum()
+	{
+		notify_list.push_back(this);
+	}
+	constexpr MultiCustomEnum(EnumTag tag)
+		:Base(tag)
+	{
+		notify_list.push_back(this);
+	}
+	~MultiCustomEnum() noexcept
+	{
+		auto iter = std::find(notify_list.crbegin(), notify_list.crend(), this);
+		assert(iter != notify_list.crend());
+		notify_list.erase(iter);
+	}
+
+public:
+	constexpr const MultiCustomEnum& setNextValue() noexcept
+	{
+		if (this->current_value_index == enum_list.size() + custom_list.size() - 1)
+		{
+			this->current_value_index = 0;
+		}
+		else
+		{
+			this->current_value_index++;
+		}
+		return *this;
+	}
+	constexpr bool convertFrom(ValueType val) noexcept
+	{
+		for (size_t i = 0; i < enum_list.size(); i++)
+		{
+			if (val == enum_list[i].first)
+			{
+				this->current_value_index = i;
+				return true;
+			}
+		}
+		for (size_t i = 0; i < custom_list.size(); i++)
+		{
+			if (val == custom_list[i].first)
+			{
+				this->current_value_index = i + enum_list.size();
+				return true;
+			}
+		}
+		return false;
+	}
+	constexpr NameType Name() const noexcept
+	{
+		pair_type& item = FetchEnumItem(this->current_value_index);
+		return item.second;
+	}
+	constexpr operator ValueType() const noexcept
+	{
+		pair_type& item = FetchEnumItem(this->current_value_index);
+		return item.first;
+	}
+
+public:
+	static constexpr NameType GetNameFrom(ValueType val) noexcept
+	{
+		return {};//redesign the interface
+	}
+	using Base::GetValueFrom;
+	static ValueType GetValueFrom() noexcept
+	{
+		return {};//redesign the interface
+	}
+
+	static constexpr void AddCustomItem(ValueType val, NameType name)
+	{
+		custom_list.emplace_back(val, name);
+	}
+	static constexpr void RemoveCustomItem(NameType name) noexcept
+	{
+		auto iter = std::find_if(custom_list.cbegin(), custom_list.cend(),
+								 [&](const pair_type& item)
+								 {
+									 return item.second == name;
+								 });
+		if (iter == custom_list.cend())
+			return;
+		size_t index = iter - custom_list.cbegin() + enum_list.size();
+		custom_list.erase(iter);
+		NotifyAllObject(index);
+	}
+
+private:
+	static constexpr pair_type& FetchEnumItem(size_t index) noexcept
+	{
+		assert(index < enum_list.size() + custom_list.size());
+		if (index < enum_list.size())
+			return enum_list[index];
+		else
+			return custom_list[index - enum_list.size()];
+	}
+	static void NotifyAllObject(size_t removed_index) noexcept
+	{
+		for (auto& obj : notify_list)
+		{
+			if (obj->current_value_index == removed_index)
+			{
+				obj->setDefaultValue();
+			}
+			else if (obj->current_value_index > removed_index)
+			{
+				obj->current_value_index--;
+			}
+		}
+	}
+
+private:
+	static list_type enum_list;
+	static custom_list_type custom_list;
+	static notify_list_type notify_list;
 };
 
 #define ENUM_DEFINE(name) \

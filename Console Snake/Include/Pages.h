@@ -71,7 +71,7 @@ private:
 	void paintInterface();
 	void paintCurOptions();
 	GameSetting setting_backup = GameSetting::get();
-	std::optional<ElementSet> custom_theme_backup = GameSetting::get().theme.getCustomValue();
+	std::optional<ElementSet> custom_theme_backup = GameSetting::get().theme.GetCustomValue();
 };
 
 class CustomThemePage :public NormalPage

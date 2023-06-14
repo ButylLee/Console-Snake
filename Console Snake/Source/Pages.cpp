@@ -276,9 +276,9 @@ void SettingPage::run()
 				GameSetting::get() = setting_backup;
 				LocalizedStrings::setLang(setting_backup.lang);
 				if (custom_theme_backup)
-					GameSetting::get().theme.setCustomValue(*custom_theme_backup);
+					GameSetting::get().theme.SetCustomValue(*custom_theme_backup);
 				else
-					GameSetting::get().theme.clearCustomValue();
+					GameSetting::get().theme.ClearCustomValue();
 			}
 			return;
 		}
@@ -343,7 +343,7 @@ void SettingPage::paintCurOptions()
 ****************************************/
 CustomThemePage::CustomThemePage() noexcept
 {
-	auto custom_theme = GameSetting::get().theme.getCustomValue();
+	auto custom_theme = GameSetting::get().theme.GetCustomValue();
 	if (custom_theme)
 		theme_temp = *custom_theme;
 	else
@@ -387,7 +387,7 @@ void CustomThemePage::run()
 				break;
 
 			case K_Ctrl_Dd:
-				GameSetting::get().theme.clearCustomValue();
+				GameSetting::get().theme.ClearCustomValue();
 				GameData::get().selection = PageSelect::SettingPage;
 				return;
 
@@ -395,7 +395,7 @@ void CustomThemePage::run()
 				GameSetting::get().theme = Theme::Custom;
 				[[fallthrough]];
 			case K_Esc:
-				GameSetting::get().theme.setCustomValue(theme_temp);
+				GameSetting::get().theme.SetCustomValue(theme_temp);
 				GameData::get().selection = PageSelect::SettingPage;
 				return;
 		}
@@ -633,7 +633,7 @@ void RankPage::paintInterface()
 			buffer += ::format(L" {:>4.4}"_crypt, item.is_win ? ~Token::rank_win : std::to_wstring(item.score));
 			buffer += L" | "_crypt;
 			buffer += ~Token::rank_setting;
-			speed = ~Speed::getNameFrom(item.speed);
+			speed = ~Speed::GetNameFrom(item.speed);
 			buffer += ::format(L"{:<{}} "_crypt, std::move(speed), 6);
 			buffer += ::format(L"{:2} X {:2}"_crypt, item.width, item.height);
 

@@ -53,9 +53,9 @@ namespace {
 				if (place == string::npos)
 					continue;
 				try {
-					GameSetting::get().width.setCustomValue(abs(stoi(cmd)));
+					GameSetting::get().width.SetCustomValue(abs(stoi(cmd)));
 					cmd = cmd.substr(place + 1);
-					GameSetting::get().height.setCustomValue(abs(stoi(cmd)));
+					GameSetting::get().height.SetCustomValue(abs(stoi(cmd)));
 				}
 				catch (...) {
 					continue;

@@ -138,9 +138,8 @@ void GameSavingBase::convertFromSaveData() noexcept
 		gs.speed.convertFrom(bin_data.setting.speed);
 		gs.width.convertFrom(bin_data.setting.width);
 		gs.height.convertFrom(bin_data.setting.height);
-		LocalizedStrings::setLang(
-			gs.lang.convertFrom(Convert{ bin_data.setting.lang })
-		);
+		gs.lang.convertFrom(Convert{ bin_data.setting.lang });
+		LocalizedStrings::setLang(gs.lang);
 		gs.show_frame = Convert{ bin_data.setting.show_frame };
 	}
 	// rank data
