@@ -203,13 +203,9 @@ public:
 	constexpr const Enum& setNextValue() noexcept
 	{
 		if (this->current_value_index == enum_list.size() - 1)
-		{
 			this->current_value_index = 0;
-		}
 		else
-		{
 			this->current_value_index++;
-		}
 		return *this;
 	}
 	constexpr bool convertFrom(ValueType val) noexcept
@@ -392,7 +388,7 @@ private:
 	using notify_list_type = std::vector<MultiCustomEnum*>;
 
 public:
-	MultiCustomEnum()
+	constexpr MultiCustomEnum()
 	{
 		notify_list.push_back(this);
 	}
@@ -401,7 +397,7 @@ public:
 	{
 		notify_list.push_back(this);
 	}
-	~MultiCustomEnum() noexcept
+	constexpr ~MultiCustomEnum() noexcept
 	{
 		auto iter = std::find(notify_list.crbegin(), notify_list.crend(), this);
 		assert(iter != notify_list.crend());
@@ -412,13 +408,9 @@ public:
 	constexpr const MultiCustomEnum& setNextValue() noexcept
 	{
 		if (this->current_value_index == enum_list.size() + custom_list.size() - 1)
-		{
 			this->current_value_index = 0;
-		}
 		else
-		{
 			this->current_value_index++;
-		}
 		return *this;
 	}
 	constexpr bool convertFrom(ValueType val) noexcept
@@ -458,7 +450,7 @@ public:
 		return {};//redesign the interface
 	}
 	using Base::GetValueFrom;
-	static ValueType GetValueFrom() noexcept
+	static constexpr ValueType GetValueFrom() noexcept
 	{
 		return {};//redesign the interface
 	}
@@ -490,18 +482,14 @@ private:
 		else
 			return custom_list[index - enum_list.size()];
 	}
-	static void NotifyAllObject(size_t removed_index) noexcept
+	static constexpr void NotifyAllObject(size_t removed_index) noexcept
 	{
 		for (auto& obj : notify_list)
 		{
 			if (obj->current_value_index == removed_index)
-			{
 				obj->setDefaultValue();
-			}
 			else if (obj->current_value_index > removed_index)
-			{
 				obj->current_value_index--;
-			}
 		}
 	}
 
