@@ -144,9 +144,9 @@ public:
 	{
 		return EnumType::GetNameFrom(val);
 	}
-	static constexpr ValueType GetValueFrom(const EnumBase& tag_or_var) noexcept
+	static constexpr ValueType GetValueFrom(NameType name) noexcept /* virtual */
 	{
-		return tag_or_var;
+		return EnumType::GetValueFrom(name);
 	}
 
 public:
@@ -210,13 +210,15 @@ public:
 	}
 	constexpr bool convertFrom(ValueType val) noexcept
 	{
-		for (size_t i = 0; i < enum_list.size(); i++)
+		auto iter = std::find_if(enum_list.cbegin(), enum_list.cend(),
+								 [&](const pair_type& item)
+								 {
+									 return val == item.first;
+								 });
+		if (iter != enum_list.cend())
 		{
-			if (val == enum_list[i].first)
-			{
-				this->current_value_index = i;
-				return true;
-			}
+			this->current_value_index = iter - enum_list.cbegin();
+			return true;
 		}
 		return false;
 	}
@@ -232,11 +234,24 @@ public:
 public:
 	static constexpr NameType GetNameFrom(ValueType val) noexcept
 	{
-		for (size_t i = 0; i < enum_list.size(); i++)
-		{
-			if (val == enum_list[i].first)
-				return enum_list[i].second;
-		}
+		auto iter = std::find_if(enum_list.cbegin(), enum_list.cend(),
+								 [&](const pair_type& item)
+								 {
+									 return val == item.first;
+								 });
+		if (iter != enum_list.cend())
+			return (*iter).second;
+		return {};
+	}
+	static constexpr ValueType GetValueFrom(NameType name) noexcept
+	{
+		auto iter = std::find_if(enum_list.cbegin(), enum_list.cend(),
+								 [&](const pair_type& item)
+								 {
+									 return name == item.second;
+								 });
+		if (iter != enum_list.cend())
+			return (*iter).first;
 		return {};
 	}
 
@@ -298,13 +313,15 @@ public:
 	}
 	constexpr bool convertFrom(ValueType val) noexcept
 	{
-		for (size_t i = 0; i < enum_list.size(); i++)
+		auto iter = std::find_if(enum_list.cbegin(), enum_list.cend(),
+								 [&](const pair_type& item)
+								 {
+									 return val == item.first;
+								 });
+		if (iter != enum_list.cend())
 		{
-			if (val == enum_list[i].first)
-			{
-				this->current_value_index = i;
-				return true;
-			}
+			this->current_value_index = iter - enum_list.cbegin();
+			return true;
 		}
 		SetCustomValue(val);
 		this->current_value_index = CustomTag::Custom;
@@ -336,13 +353,28 @@ public:
 public:
 	static constexpr NameType GetNameFrom(ValueType val) noexcept
 	{
-		for (size_t i = 0; i < enum_list.size(); i++)
-		{
-			if (val == enum_list[i].first)
-				return enum_list[i].second;
-		}
 		if (val == enum_custom.first)
 			return enum_custom.second;
+		auto iter = std::find_if(enum_list.cbegin(), enum_list.cend(),
+								 [&](const pair_type& item)
+								 {
+									 return val == item.first;
+								 });
+		if (iter != enum_list.cend())
+			return (*iter).second;
+		return {};
+	}
+	static constexpr ValueType GetValueFrom(NameType name) noexcept
+	{
+		if (name == enum_custom.second)
+			return enum_custom.first;
+		auto iter = std::find_if(enum_list.cbegin(), enum_list.cend(),
+								 [&](const pair_type& item)
+								 {
+									 return name == item.second;
+								 });
+		if (iter != enum_list.cend())
+			return (*iter).first;
 		return {};
 	}
 
@@ -415,21 +447,20 @@ public:
 	}
 	constexpr bool convertFrom(ValueType val) noexcept
 	{
-		for (size_t i = 0; i < enum_list.size(); i++)
+		auto pred = [&](const pair_type& item) {
+			return val == item.first;
+		};
+		auto iter = std::find_if(enum_list.cbegin(), enum_list.cend(), pred);
+		if (iter != enum_list.cend())
 		{
-			if (val == enum_list[i].first)
-			{
-				this->current_value_index = i;
-				return true;
-			}
+			this->current_value_index = iter - enum_list.cbegin();
+			return true;
 		}
-		for (size_t i = 0; i < custom_list.size(); i++)
+		iter = std::find_if(custom_list.cbegin(), custom_list.cend(), pred);
+		if (iter != custom_list.cend())
 		{
-			if (val == custom_list[i].first)
-			{
-				this->current_value_index = i + enum_list.size();
-				return true;
-			}
+			this->current_value_index = iter - custom_list.cbegin() + enum_list.size();
+			return true;
 		}
 		return false;
 	}
@@ -447,12 +478,29 @@ public:
 public:
 	static constexpr NameType GetNameFrom(ValueType val) noexcept
 	{
-		return {};//redesign the interface
+		auto pred = [&](const pair_type& item) {
+			return val == item.first;
+		};
+		auto iter = std::find_if(enum_list.cbegin(), enum_list.cend(), pred);
+		if (iter != enum_list.cend())
+			return (*iter).second;
+		iter = std::find_if(custom_list.cbegin(), custom_list.cend(), pred);
+		if (iter != custom_list.cend())
+			return (*iter).second;
+		return {};
 	}
-	using Base::GetValueFrom;
-	static constexpr ValueType GetValueFrom() noexcept
+	static constexpr ValueType GetValueFrom(NameType name) noexcept
 	{
-		return {};//redesign the interface
+		auto pred = [&](const pair_type& item) {
+			return name == item.second;
+		};
+		auto iter = std::find_if(enum_list.cbegin(), enum_list.cend(), pred);
+		if (iter != enum_list.cend())
+			return (*iter).first;
+		iter = std::find_if(custom_list.cbegin(), custom_list.cend(), pred);
+		if (iter != custom_list.cend())
+			return (*iter).first;
+		return {};
 	}
 
 	static constexpr void AddCustomItem(ValueType val, NameType name)
