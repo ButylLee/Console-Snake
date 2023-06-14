@@ -210,11 +210,11 @@ public:
 	}
 	constexpr bool convertFrom(ValueType val) noexcept
 	{
-		auto iter = std::find_if(enum_list.cbegin(), enum_list.cend(),
-								 [&](const pair_type& item)
-								 {
-									 return val == item.first;
-								 });
+		auto iter = std::ranges::find_if(enum_list,
+										 [&](const pair_type& item)
+										 {
+											 return val == item.first;
+										 });
 		if (iter != enum_list.cend())
 		{
 			this->current_value_index = iter - enum_list.cbegin();
@@ -234,22 +234,22 @@ public:
 public:
 	static constexpr NameType GetNameFrom(ValueType val) noexcept
 	{
-		auto iter = std::find_if(enum_list.cbegin(), enum_list.cend(),
-								 [&](const pair_type& item)
-								 {
-									 return val == item.first;
-								 });
+		auto iter = std::ranges::find_if(enum_list,
+										 [&](const pair_type& item)
+										 {
+											 return val == item.first;
+										 });
 		if (iter != enum_list.cend())
 			return (*iter).second;
 		return {};
 	}
 	static constexpr ValueType GetValueFrom(NameType name) noexcept
 	{
-		auto iter = std::find_if(enum_list.cbegin(), enum_list.cend(),
-								 [&](const pair_type& item)
-								 {
-									 return name == item.second;
-								 });
+		auto iter = std::ranges::find_if(enum_list,
+										 [&](const pair_type& item)
+										 {
+											 return name == item.second;
+										 });
 		if (iter != enum_list.cend())
 			return (*iter).first;
 		return {};
@@ -313,11 +313,11 @@ public:
 	}
 	constexpr bool convertFrom(ValueType val) noexcept
 	{
-		auto iter = std::find_if(enum_list.cbegin(), enum_list.cend(),
-								 [&](const pair_type& item)
-								 {
-									 return val == item.first;
-								 });
+		auto iter = std::ranges::find_if(enum_list,
+										 [&](const pair_type& item)
+										 {
+											 return val == item.first;
+										 });
 		if (iter != enum_list.cend())
 		{
 			this->current_value_index = iter - enum_list.cbegin();
@@ -355,11 +355,11 @@ public:
 	{
 		if (val == enum_custom.first)
 			return enum_custom.second;
-		auto iter = std::find_if(enum_list.cbegin(), enum_list.cend(),
-								 [&](const pair_type& item)
-								 {
-									 return val == item.first;
-								 });
+		auto iter = std::ranges::find_if(enum_list,
+										 [&](const pair_type& item)
+										 {
+											 return val == item.first;
+										 });
 		if (iter != enum_list.cend())
 			return (*iter).second;
 		return {};
@@ -368,11 +368,11 @@ public:
 	{
 		if (name == enum_custom.second)
 			return enum_custom.first;
-		auto iter = std::find_if(enum_list.cbegin(), enum_list.cend(),
-								 [&](const pair_type& item)
-								 {
-									 return name == item.second;
-								 });
+		auto iter = std::ranges::find_if(enum_list,
+										 [&](const pair_type& item)
+										 {
+											 return name == item.second;
+										 });
 		if (iter != enum_list.cend())
 			return (*iter).first;
 		return {};
@@ -431,7 +431,7 @@ public:
 	}
 	constexpr ~MultiCustomEnum() noexcept
 	{
-		auto iter = std::find(notify_list.crbegin(), notify_list.crend(), this);
+		auto iter = std::ranges::find(notify_list, this);
 		assert(iter != notify_list.crend());
 		notify_list.erase(iter);
 	}
@@ -450,13 +450,13 @@ public:
 		auto pred = [&](const pair_type& item) {
 			return val == item.first;
 		};
-		auto iter = std::find_if(enum_list.cbegin(), enum_list.cend(), pred);
+		auto iter = std::ranges::find_if(enum_list, pred);
 		if (iter != enum_list.cend())
 		{
 			this->current_value_index = iter - enum_list.cbegin();
 			return true;
 		}
-		iter = std::find_if(custom_list.cbegin(), custom_list.cend(), pred);
+		iter = std::ranges::find_if(custom_list, pred);
 		if (iter != custom_list.cend())
 		{
 			this->current_value_index = iter - custom_list.cbegin() + enum_list.size();
@@ -481,10 +481,10 @@ public:
 		auto pred = [&](const pair_type& item) {
 			return val == item.first;
 		};
-		auto iter = std::find_if(enum_list.cbegin(), enum_list.cend(), pred);
+		auto iter = std::ranges::find_if(enum_list, pred);
 		if (iter != enum_list.cend())
 			return (*iter).second;
-		iter = std::find_if(custom_list.cbegin(), custom_list.cend(), pred);
+		iter = std::ranges::find_if(custom_list, pred);
 		if (iter != custom_list.cend())
 			return (*iter).second;
 		return {};
@@ -494,10 +494,10 @@ public:
 		auto pred = [&](const pair_type& item) {
 			return name == item.second;
 		};
-		auto iter = std::find_if(enum_list.cbegin(), enum_list.cend(), pred);
+		auto iter = std::ranges::find_if(enum_list, pred);
 		if (iter != enum_list.cend())
 			return (*iter).first;
-		iter = std::find_if(custom_list.cbegin(), custom_list.cend(), pred);
+		iter = std::ranges::find_if(custom_list, pred);
 		if (iter != custom_list.cend())
 			return (*iter).first;
 		return {};
@@ -509,11 +509,11 @@ public:
 	}
 	static constexpr void RemoveCustomItem(NameType name) noexcept
 	{
-		auto iter = std::find_if(custom_list.cbegin(), custom_list.cend(),
-								 [&](const pair_type& item)
-								 {
-									 return item.second == name;
-								 });
+		auto iter = std::ranges::find_if(custom_list,
+										 [&](const pair_type& item)
+										 {
+											 return item.second == name;
+										 });
 		if (iter == custom_list.cend())
 			return;
 		size_t index = iter - custom_list.cbegin() + enum_list.size();
