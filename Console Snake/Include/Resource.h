@@ -229,22 +229,16 @@ ENUM_DEFINE(Lang)
 // --------------- Enum Size Resource ---------------
 struct SizeEnum {
 	enum Tag {
-		XS, S, M, L, XL,
+		S, M, L,
 		DefaultValue = S
 	};
 };
-using Size = CustomEnum<SizeEnum, short>;
+using Size = Enum<SizeEnum, short>;
 ENUM_DEFINE(Size)
 {
-	{ 13, L"(XS)" },
-	{ 17, L"(S) " },
-	{ 21, L"(M) " },
-	{ 24, L"(L) " },
-	{ 27, L"(XL)" }
-};
-ENUM_CUSTOM(Size)
-{
-	{}, L"(Custom)"
+	{ 15, L"(S) " },
+	{ 20, L"(M) " },
+	{ 24, L"(L) " }
 };
 
 // --------------- Enum Speed Resource ---------------
