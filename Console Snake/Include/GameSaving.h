@@ -27,7 +27,7 @@ class GameSavingBase
 
 	struct SettingSavingItem
 	{
-		int16_t theme[static_cast<size_t>(Element::Mask)][2] = {};
+		int16_t theme[static_cast<size_t>(Element::Mask_)][2] = {};
 		int16_t speed = 0;
 		int16_t width = 0;
 		int16_t height = 0;

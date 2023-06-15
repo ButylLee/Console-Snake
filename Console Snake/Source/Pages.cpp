@@ -361,29 +361,29 @@ void CustomThemePage::run()
 		switch (getwch())
 		{
 			case K_Q: case K_q:
-				theme_temp[Element::blank].facade.setNextValue();
+				theme_temp[Element::Blank].facade.setNextValue();
 				break;
 			case K_W: case K_w:
-				theme_temp[Element::food].facade.setNextValue();
+				theme_temp[Element::Food].facade.setNextValue();
 				break;
 			case K_E: case K_e:
-				theme_temp[Element::snake].facade.setNextValue();
+				theme_temp[Element::Snake].facade.setNextValue();
 				break;
 			case K_R: case K_r:
-				theme_temp[Element::barrier].facade.setNextValue();
+				theme_temp[Element::Barrier].facade.setNextValue();
 				break;
 
 			case K_A: case K_a:
-				theme_temp[Element::blank].color.setNextValue();
+				theme_temp[Element::Blank].color.setNextValue();
 				break;
 			case K_S: case K_s:
-				theme_temp[Element::food].color.setNextValue();
+				theme_temp[Element::Food].color.setNextValue();
 				break;
 			case K_D: case K_d:
-				theme_temp[Element::snake].color.setNextValue();
+				theme_temp[Element::Snake].color.setNextValue();
 				break;
 			case K_F: case K_f:
-				theme_temp[Element::barrier].color.setNextValue();
+				theme_temp[Element::Barrier].color.setNextValue();
 				break;
 
 			case K_Ctrl_Dd:
@@ -448,27 +448,27 @@ void CustomThemePage::paintCurOptions()
 			{
 				if (row == origin_row + 5 && column == origin_col + 3)
 				{
-					canvas.setColor(theme_temp[Element::snake].color);
-					print(theme_temp[Element::snake].facade);
-					print(theme_temp[Element::snake].facade);
-					print(theme_temp[Element::snake].facade);
+					canvas.setColor(theme_temp[Element::Snake].color);
+					print(theme_temp[Element::Snake].facade);
+					print(theme_temp[Element::Snake].facade);
+					print(theme_temp[Element::Snake].facade);
 					column += 2;
 				}
 				else if (row == origin_row + 11 && column == origin_col + 10)
 				{
-					canvas.setColor(theme_temp[Element::food].color);
-					print(theme_temp[Element::food].facade);
+					canvas.setColor(theme_temp[Element::Food].color);
+					print(theme_temp[Element::Food].facade);
 				}
 				else if (row == origin_row || row == origin_row + height - 1 ||
 						 column == origin_col || column == origin_col + width - 1)
 				{
-					canvas.setColor(theme_temp[Element::barrier].color);
-					print(theme_temp[Element::barrier].facade);
+					canvas.setColor(theme_temp[Element::Barrier].color);
+					print(theme_temp[Element::Barrier].facade);
 				}
 				else
 				{
-					canvas.setColor(theme_temp[Element::blank].color);
-					print(theme_temp[Element::blank].facade);
+					canvas.setColor(theme_temp[Element::Blank].color);
+					print(theme_temp[Element::Blank].facade);
 				}
 			}
 		}
@@ -479,35 +479,35 @@ void CustomThemePage::paintCurOptions()
 		canvas.setColor(Color::White);
 
 		canvas.setCursor(baseX, baseY);
-		print(theme_temp[Element::blank].color.Name());
+		print(theme_temp[Element::Blank].color.Name());
 		canvas.setCursor(nextX, baseY);
-		print(theme_temp[Element::blank].facade.Value());
+		print(theme_temp[Element::Blank].facade.Value());
 		canvas.setCursor(baseX, baseY + 2);
-		print(theme_temp[Element::food].color.Name());
+		print(theme_temp[Element::Food].color.Name());
 		canvas.setCursor(nextX, baseY + 2);
-		print(theme_temp[Element::food].facade.Value());
+		print(theme_temp[Element::Food].facade.Value());
 		canvas.setCursor(baseX, baseY + 4);
-		print(theme_temp[Element::snake].color.Name());
+		print(theme_temp[Element::Snake].color.Name());
 		canvas.setCursor(nextX, baseY + 4);
-		print(theme_temp[Element::snake].facade.Value());
+		print(theme_temp[Element::Snake].facade.Value());
 		canvas.setCursor(baseX, baseY + 6);
-		print(theme_temp[Element::barrier].color.Name());
+		print(theme_temp[Element::Barrier].color.Name());
 		canvas.setCursor(nextX, baseY + 6);
-		print(theme_temp[Element::barrier].facade.Value());
+		print(theme_temp[Element::Barrier].facade.Value());
 	}
 }
 
 void CustomThemePage::generateRandomTheme()
 {
 	// generate distinct colors(no black)
-	std::vector<int> color_candidate(Color::Mask);
+	std::vector<int> color_candidate(Color::Mask_);
 	std::iota(color_candidate.begin(), color_candidate.end(), 0);
 	color_candidate.erase(std::find(color_candidate.cbegin(),
 									color_candidate.cend(),
 									static_cast<int>(Color::Black)));
-	for (size_t i = 0; i < static_cast<size_t>(Element::Mask); i++)
+	for (size_t i = 0; i < static_cast<size_t>(Element::Mask_); i++)
 	{
-		theme_temp[i].facade = static_cast<Facade::EnumTag>(GetRandom(0, static_cast<int>(Facade::Mask) - 1));
+		theme_temp[i].facade = static_cast<Facade::EnumTag>(GetRandom(0, static_cast<int>(Facade::Mask_) - 1));
 		size_t index = GetRandom(0, color_candidate.size() - 1);
 		theme_temp[i].color = static_cast<Color::EnumTag>(color_candidate[index]);
 		color_candidate.erase(color_candidate.cbegin() + index);

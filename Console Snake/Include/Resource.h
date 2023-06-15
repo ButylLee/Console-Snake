@@ -244,8 +244,8 @@ ENUM_DEFINE(Size)
 // --------------- Enum Speed Resource ---------------
 struct SpeedEnum {
 	enum Tag {
-		SLOW, NORMAL, FAST,
-		DefaultValue = NORMAL
+		Slow, Normal, Fast,
+		DefaultValue = Normal
 	};
 };
 using Speed = CustomEnum<SpeedEnum, short, Token::StringName>;
@@ -271,7 +271,7 @@ struct ColorEnum {
 		Purple, LightPurple,
 		Yellow, LightYellow,
 		White , LightWhite,
-		Mask,
+		Mask_,
 		DefaultValue = White
 	};
 };
@@ -293,7 +293,7 @@ struct FacadeEnum {
 	enum Tag {
 		FullStar, FullCircle, FullRect, FullDiamond,
 		Star, Circle, Rect, Diamond,
-		Mask,
+		Mask_,
 		DefaultValue = FullStar
 	};
 };
@@ -313,12 +313,12 @@ ENUM_DEFINE(Facade)
 // --------------- Theme Resource ---------------
 enum struct Element :size_t
 {
-	blank = 0,
-	food,
-	snake,
-	barrier,
+	Blank = 0,
+	Food,
+	Snake,
+	Barrier,
 
-	Mask
+	Mask_
 };
 
 struct ElementSet
@@ -330,7 +330,7 @@ struct ElementSet
 
 		friend constexpr bool
 		operator==(const Appearance&, const Appearance&) = default;
-	}elements[static_cast<size_t>(Element::Mask)];
+	}elements[static_cast<size_t>(Element::Mask_)];
 
 	template<typename T>
 	constexpr auto& operator[](T which) noexcept

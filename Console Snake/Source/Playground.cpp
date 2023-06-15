@@ -115,7 +115,7 @@ void PlayGround::play()
 			{
 				auto [x, y] = arena.getNextPosition();
 				if (pause_flicker_flag)
-					arena.paintElement(Element::snake, x, y);
+					arena.paintElement(Element::Snake, x, y);
 				else
 					arena.paintElement(arena.getPositionType(x, y), x, y);
 				std::this_thread::sleep_for(1us);

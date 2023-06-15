@@ -19,11 +19,11 @@ namespace
 				if (row == 0 || row == map.size(0) - 1 ||
 					column == 0 || column == map.size(1) - 1)
 				{
-					node.type = Element::barrier;
+					node.type = Element::Barrier;
 				}
 				else
 				{
-					node.type = Element::blank;
+					node.type = Element::Blank;
 				}
 				column++;
 			}
@@ -37,7 +37,7 @@ namespace
 		size_t count = 0;
 		for (auto& node : map.iter_all())
 		{
-			if (node.type == Element::blank)
+			if (node.type == Element::Blank)
 				count++;
 		}
 		return count;
@@ -74,7 +74,7 @@ void Venue::addSnakeBody(Direction head_direct, uint8_t head_x, uint8_t head_y) 
 	assert(snake_head_index == -1 && snake_tail_index == -1 &&
 		   snake_direct == Direction::None);
 	snake_direct = head_direct;
-	map[head_y][head_x].type = Element::snake;
+	map[head_y][head_x].type = Element::Snake;
 	snake_tail_index = snake_head_index = map[head_y][head_x].snake_index;
 	rebindData(snake_head_index, head_x, head_y);
 }
@@ -97,7 +97,7 @@ void Venue::addSnakeBody(Direction tail_direct) noexcept
 		case Direction::Right:
 			tail_x++; break;
 	}
-	map[tail_y][tail_x].type = Element::snake;
+	map[tail_y][tail_x].type = Element::Snake;
 	rebindData(snake_tail_index, tail_x, tail_y);
 }
 
@@ -123,7 +123,7 @@ std::optional<PosNode> Venue::generateFood()
 
 	// generate food on the map
 	auto [x, y] = snake_body[random_index];
-	map[y][x].type = Element::food;
+	map[y][x].type = Element::Food;
 	return PosNode{ x, y };
 }
 
@@ -140,18 +140,18 @@ PosNodeGroup Venue::updateFrame() noexcept
 	nextPosition(head_x, head_y);
 
 	auto previous_type = map[head_y][head_x].type;
-	if (previous_type == Element::barrier || previous_type == Element::snake)
+	if (previous_type == Element::Barrier || previous_type == Element::Snake)
 		return { 0 };
 
-	map[head_y][head_x].type = Element::snake;
+	map[head_y][head_x].type = Element::Snake;
 	forwardIndex(snake_head_index);
 	rebindData(snake_head_index, head_x, head_y);
 
-	if (previous_type == Element::food)
+	if (previous_type == Element::Food)
 		return { 1, { head_x, head_y } };
 
 	auto [tail_x, tail_y] = snake_body[snake_tail_index];
-	map[tail_y][tail_x].type = Element::blank;
+	map[tail_y][tail_x].type = Element::Blank;
 	forwardIndex(snake_tail_index);
 	// no need to rebind
 	return { 2, { head_x, head_y }, { tail_x, tail_y } };
@@ -169,7 +169,7 @@ void Venue::setupInvariant() noexcept
 	{
 		for (uint8_t column = 0; column < map.size(1); column++)
 		{
-			if (map[row][column].type == Element::blank)
+			if (map[row][column].type == Element::Blank)
 			{
 				map[row][column].snake_index = index;
 				snake_body[index].x = column;
@@ -243,13 +243,13 @@ void Arena::updateFrame()
 			game_over = true;
 			break;
 		case 1: // food
-			paintElement(Element::snake, nodes_updated.head_pos.x, nodes_updated.head_pos.y);
+			paintElement(Element::Snake, nodes_updated.head_pos.x, nodes_updated.head_pos.y);
 			generateFood();
 			GameData::get().score++;
 			break;
 		case 2: // nothing
-			paintElement(Element::snake, nodes_updated.head_pos.x, nodes_updated.head_pos.y);
-			paintElement(Element::blank, nodes_updated.tail_pos.x, nodes_updated.tail_pos.y);
+			paintElement(Element::Snake, nodes_updated.head_pos.x, nodes_updated.head_pos.y);
+			paintElement(Element::Blank, nodes_updated.tail_pos.x, nodes_updated.tail_pos.y);
 			break;
 	}
 }
@@ -325,6 +325,6 @@ void Arena::generateFood()
 	if (auto pos = Venue::generateFood())
 	{
 		auto [x, y] = pos.value();
-		paintElement(Element::food, x, y);
+		paintElement(Element::Food, x, y);
 	}
 }
