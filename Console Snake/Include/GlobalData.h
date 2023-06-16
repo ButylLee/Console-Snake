@@ -20,8 +20,10 @@ struct GameSettingMember
 {
 	Speed speed;
 	Lang lang;
-	Size width;
-	Size height;
+	Size width;//to be deleted
+	Size height;//to be deleted
+	Size map_size;
+	Map map;
 	Theme theme;
 	bool show_frame = false;
 	// The old console host automatically Line Feed when printing the last character of line.
