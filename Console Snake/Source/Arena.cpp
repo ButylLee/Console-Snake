@@ -6,28 +6,35 @@
 #include <utility>
 #include <type_traits>
 #include <cassert>
+#include <algorithm>
 
 namespace
 {
-	DynArray<MapNode, 2> GenerateMap()
+	DynArray<MapNode, 2> GetMap()
 	{
-		DynArray<MapNode, 2> map(GameSetting::get().height, GameSetting::get().width);
-		for (size_t row = 0; auto & columns : map)
+		DynArray<MapNode, 2> map(GameSetting::get().map_size.Value(),
+								 GameSetting::get().map_size.Value());
+		auto f = [&](auto m)
 		{
-			for (size_t column = 0; auto & node : columns)
-			{
-				if (row == 0 || row == map.size(0) - 1 ||
-					column == 0 || column == map.size(1) - 1)
-				{
-					node.type = Element::Barrier;
-				}
-				else
-				{
-					node.type = Element::Blank;
-				}
-				column++;
-			}
-			row++;
+			std::transform(m.begin(), m.end(), map.iter_all().begin(),
+						   [](Element type)
+						   {
+							   MapNode node;
+							   node.type = type;
+							   return node;
+						   });
+		};
+		switch (+GameSetting::get().map_size)
+		{
+			case Size::S:
+				f(GameSetting::get().map.Value().map_small);
+				break;
+			case Size::M:
+				f(GameSetting::get().map.Value().map_middle);
+				break;
+			case Size::L:
+				f(GameSetting::get().map.Value().map_large);
+				break;
 		}
 		return map;
 	}
@@ -226,7 +233,7 @@ void Venue::nextPosition(uint8_t& x, uint8_t& y) const noexcept
 }
 
 Arena::Arena(Canvas& canvas)
-	: Venue(GenerateMap(), static_cast<void(Venue::*)()>(&Arena::createSnake))
+	: Venue(GetMap(), static_cast<void(Venue::*)()>(&Arena::createSnake))
 	, canvas(canvas)
 {
 	paintVenue();
@@ -273,7 +280,7 @@ bool Arena::isWin() const noexcept
 void Arena::paintElement(Element which)
 {
 	canvas.setColor(GameSetting::get().theme.Value()[which].color);
-	print(GameSetting::get().theme.Value()[which].facade);
+	print(GameSetting::get().theme.Value()[which].facade.Value());
 }
 
 void Arena::paintVenue()
@@ -290,8 +297,8 @@ void Arena::paintVenue()
 void Arena::createSnake()
 {
 	// random snake initial postion
-	auto x_range = GameSetting::get().width - 2 * (1 + snake_init_length);
-	auto y_range = GameSetting::get().height - 2 * (1 + snake_init_length);
+	auto x_range = GameSetting::get().map_size.Value() - 2 * (1 + snake_init_length);
+	auto y_range = GameSetting::get().map_size.Value() - 2 * (1 + snake_init_length);
 	auto begin_head_x = GetRandom(0, x_range);
 	auto begin_head_y = GetRandom(0, y_range);
 	Direction direction;

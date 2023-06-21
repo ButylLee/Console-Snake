@@ -48,8 +48,8 @@ void GamePage::run()
 		Console::get().setConsoleWindow(Console::UseFrame);
 	else
 		Console::get().setConsoleWindow(Console::NoFrame);
-	auto width = GameSetting::get().width;
-	auto height = GameSetting::get().height;
+	auto width = GameSetting::get().map_size.Value();
+	auto height = GameSetting::get().map_size.Value();
 	canvas.setClientSize(width, height);
 
 	PlayGround playground(this->canvas);
@@ -87,8 +87,8 @@ void DemoPage::run()
 				});
 	canvas.clear();
 	auto [width2, height2] = canvas.getClientSize();
-	auto width1 = GameSetting::get().width;
-	auto height1 = GameSetting::get().height;
+	auto width1 = GameSetting::get().map_size.Value();
+	auto height1 = GameSetting::get().map_size.Value();
 	canvas.setCursorOffset((width2 - width1) / 2, (height2 - height1) / 2);
 
 	DemoGround demoground(this->canvas);
@@ -213,8 +213,7 @@ void SettingPage::run()
 
 			case K_2:
 			{
-				GameSetting::get().width.setNextValue();
-				GameSetting::get().height.setNextValue();
+				GameSetting::get().map_size.setNextValue();
 			}
 			break;
 
@@ -254,7 +253,7 @@ void SettingPage::run()
 			case K_5:
 			{
 				LocalizedStrings::setLang(
-					GameSetting::get().lang.setNextValue()
+					GameSetting::get().lang.setNextValue().Value()
 				);
 				Console::get().setTitle(~Token::console_title);
 				canvas.clear();
@@ -274,7 +273,7 @@ void SettingPage::run()
 				GameData::get().selection = PageSelect::MenuPage;
 				// restore
 				GameSetting::get() = setting_backup;
-				LocalizedStrings::setLang(setting_backup.lang);
+				LocalizedStrings::setLang(setting_backup.lang.Value());
 				if (custom_theme_backup)
 					GameSetting::get().theme.SetCustomValue(*custom_theme_backup);
 				else
@@ -323,8 +322,8 @@ void SettingPage::paintCurOptions()
 	print(~GameSetting::get().speed.Name());
 
 	canvas.setCursor(baseX, baseY + 2);
-	print(L"%d X %d"_crypt, GameSetting::get().width.Value(), GameSetting::get().height.Value());
-	print(GameSetting::get().width.Name());
+	print(L"%d X %d"_crypt, GameSetting::get().map_size.Value(), GameSetting::get().map_size.Value());
+	print(GameSetting::get().map_size.Name());
 
 	canvas.setCursor(baseX, baseY + 4);
 	print(GameSetting::get().show_frame
@@ -449,26 +448,26 @@ void CustomThemePage::paintCurOptions()
 				if (row == origin_row + 5 && column == origin_col + 3)
 				{
 					canvas.setColor(theme_temp[Element::Snake].color);
-					print(theme_temp[Element::Snake].facade);
-					print(theme_temp[Element::Snake].facade);
-					print(theme_temp[Element::Snake].facade);
+					print(theme_temp[Element::Snake].facade.Value());
+					print(theme_temp[Element::Snake].facade.Value());
+					print(theme_temp[Element::Snake].facade.Value());
 					column += 2;
 				}
 				else if (row == origin_row + 11 && column == origin_col + 10)
 				{
 					canvas.setColor(theme_temp[Element::Food].color);
-					print(theme_temp[Element::Food].facade);
+					print(theme_temp[Element::Food].facade.Value());
 				}
 				else if (row == origin_row || row == origin_row + height - 1 ||
 						 column == origin_col || column == origin_col + width - 1)
 				{
 					canvas.setColor(theme_temp[Element::Barrier].color);
-					print(theme_temp[Element::Barrier].facade);
+					print(theme_temp[Element::Barrier].facade.Value());
 				}
 				else
 				{
 					canvas.setColor(theme_temp[Element::Blank].color);
-					print(theme_temp[Element::Blank].facade);
+					print(theme_temp[Element::Blank].facade.Value());
 				}
 			}
 		}

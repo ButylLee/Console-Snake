@@ -20,8 +20,6 @@ struct GameSettingMember
 {
 	Speed speed;
 	Lang lang;
-	Size width;//to be deleted
-	Size height;//to be deleted
 	Size map_size;
 	Map map;
 	Theme theme;

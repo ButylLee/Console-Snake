@@ -51,7 +51,6 @@
  * To get current Name or Value:
  *     auto name = size.Name();
  *     auto value1 = size.Value();
- *     short value2 = size; // implicitly convert
  *
  * To use an CustomEnum:
  *     std::optional<short> pre_custom = Size::GetCustomValue();
@@ -70,6 +69,7 @@
 #include <type_traits>
 #include <string>
 #include <algorithm>
+#include <iterator>
 #include <cassert>
 
 namespace detail {
@@ -130,13 +130,13 @@ public:
 	{
 		return static_cast<const EnumType*>(this)->Name();
 	}
-	operator ValueType() const noexcept /* virtual */
+	ValueType Value() const noexcept /* virtual */
 	{
-		return static_cast<const EnumType*>(this)->operator ValueType();
+		return static_cast<const EnumType*>(this)->Value();
 	}
-	ValueType Value() const noexcept
+	EnumTag operator+() const noexcept
 	{
-		return static_cast<ValueType>(*this); // invoke operator value_type
+		return static_cast<EnumTag>(current_value_index);
 	}
 
 public:
@@ -226,7 +226,7 @@ public:
 	{
 		return enum_list[this->current_value_index].second;
 	}
-	operator ValueType() const noexcept
+	ValueType Value() const noexcept
 	{
 		return enum_list[this->current_value_index].first;
 	}
@@ -338,7 +338,7 @@ public:
 		}
 		return enum_list[this->current_value_index].second;
 	}
-	operator ValueType() const noexcept
+	ValueType Value() const noexcept
 	{
 		if (this->current_value_index == CustomTag::Custom)
 		{
@@ -429,11 +429,22 @@ public:
 	{
 		notify_list.push_back(this);
 	}
+	MultiCustomEnum(const MultiCustomEnum& other)
+		:Base(other)
+	{
+		notify_list.push_back(this);
+	}
+	MultiCustomEnum& operator=(const MultiCustomEnum& other)
+	{
+		this->current_value_index = other.current_value_index;
+		notify_list.push_back(this);
+		return *this;
+	}
 	~MultiCustomEnum() noexcept
 	{
-		auto iter = std::ranges::find(notify_list, this);
+		auto iter = std::find(notify_list.crbegin(), notify_list.crend(), this);
 		assert(iter != notify_list.crend());
-		notify_list.erase(iter);
+		notify_list.erase(std::next(iter).base());
 	}
 
 public:
@@ -466,12 +477,12 @@ public:
 	}
 	NameType Name() const noexcept
 	{
-		pair_type& item = FetchEnumItem(this->current_value_index);
+		const pair_type& item = FetchEnumItem(this->current_value_index);
 		return item.second;
 	}
-	operator ValueType() const noexcept
+	ValueType Value() const noexcept
 	{
-		pair_type& item = FetchEnumItem(this->current_value_index);
+		const pair_type& item = FetchEnumItem(this->current_value_index);
 		return item.first;
 	}
 
@@ -522,7 +533,7 @@ public:
 	}
 
 private:
-	static pair_type& FetchEnumItem(size_t index) noexcept
+	static const pair_type& FetchEnumItem(size_t index) noexcept
 	{
 		assert(index < enum_list.size() + custom_list.size());
 		if (index < enum_list.size())
@@ -543,8 +554,8 @@ private:
 
 private:
 	static list_type enum_list;
-	static custom_list_type custom_list;
-	static notify_list_type notify_list;
+	inline static custom_list_type custom_list;
+	inline static notify_list_type notify_list;
 };
 
 #define ENUM_DEFINE(name) \

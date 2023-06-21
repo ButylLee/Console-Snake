@@ -403,17 +403,53 @@ ENUM_CUSTOM(Theme)
 };
 
 // --------------- Enum Map Resource ---------------
+struct MapShapeIterator
+{
+	MapShapeIterator(const std::byte* data, size_t count) noexcept
+		:data(data), count(count)
+	{}
+	Element operator*() noexcept
+	{
+		switch (std::to_integer<int>(*data >> count & std::byte{0b1}))
+		{
+			case 0b0:
+				return Element::Blank;
+			case 0b1:
+				return Element::Barrier;
+		}
+		[[unlikely]] return Element::Blank;
+	}
+	MapShapeIterator& operator++() noexcept
+	{
+		if (++count == 8)
+		{
+			data++;
+			count = 0;
+		}
+		return *this;
+	}
+	MapShapeIterator operator++(int) noexcept
+	{
+		MapShapeIterator tmp = *this;
+		++*this;
+		return tmp;
+	}
+	bool operator==(const MapShapeIterator&) const = default;
+private:
+	const std::byte* data;
+	size_t count;
+};
 template<size_t N>
 class MapShape
 {
-	static constexpr size_t Size = N * N + N;
-	static constexpr size_t CompressedSize = Size * 2 / 8;
-	static_assert(CompressedSize * 8 / 2 == Size, "Need aligned bit count.");
+	static constexpr size_t Size = N * N;
+	static constexpr size_t RemainCount = Size % 8;
+	static constexpr size_t CompressedSize = Size / 8 + (RemainCount == 0 ? 0 : 1);
 public:
 	template<size_t Count>
 	constexpr MapShape(const wchar_t(&str)[Count]) noexcept
 	{
-		static_assert(Count - 1 == Size);
+		static_assert(Count - 1 == Size + N); // - 1'\0', + N'\n'
 		size_t index = 0;
 		for (unsigned char count = 0, byte = 0; auto ch : str)
 		{
@@ -422,23 +458,27 @@ public:
 			switch (ch)
 			{
 				case L'□':
-					byte |= 0b00 << count; break;
+					byte |= 0b0 << count; break;
 				case L'■':
-					byte |= 0b01 << count; break;
+					byte |= 0b1 << count; break;
 				case L'\n':
-					byte |= 0b11 << count; break;
+					continue;
 				case L'\0':
-					byte |= 0b11 << count;
 					data[index] = std::byte{ byte };
 					return;
 			}
-			if (++count == 4)
+			if (++count == 8)
 			{
 				count = 0;
 				data[index++] = std::byte{ byte };
 				byte = 0;
 			}
 		}
+	}
+	MapShapeIterator begin() const noexcept { return MapShapeIterator(data, 0); }
+	MapShapeIterator end() const noexcept
+	{
+		return MapShapeIterator(data + CompressedSize - (RemainCount == 0 ? 0 : 1), RemainCount);
 	}
 
 private:

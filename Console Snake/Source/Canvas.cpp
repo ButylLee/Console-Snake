@@ -72,7 +72,7 @@ Color Canvas::getColor() const noexcept
 
 void Canvas::applyColor()
 {
-	if (!SetConsoleTextAttribute(Console::get().getOutputHandle(), static_cast<WORD>(color)))
+	if (!SetConsoleTextAttribute(Console::get().getOutputHandle(), static_cast<WORD>(color.Value())))
 		throw NativeException{};
 }
 
