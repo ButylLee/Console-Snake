@@ -334,8 +334,11 @@ struct ElementSet
 		operator==(const Appearance&, const Appearance&) = default;
 	}elements[static_cast<size_t>(Element::Mask_)];
 
-	template<typename T>
-	constexpr auto& operator[](T which) noexcept
+	constexpr auto& operator[](auto which) noexcept
+	{
+		return elements[static_cast<size_t>(which)];
+	}
+	constexpr auto& operator[](auto which) const noexcept
 	{
 		return elements[static_cast<size_t>(which)];
 	}

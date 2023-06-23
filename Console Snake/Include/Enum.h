@@ -126,7 +126,7 @@ public:
 	{
 		return static_cast<EnumType*>(this)->convertFrom(val);
 	}
-	const NameType& Name() const noexcept /* virtual */
+	NameType Name() const noexcept /* virtual */
 	{
 		return static_cast<const EnumType*>(this)->Name();
 	}
@@ -140,7 +140,7 @@ public:
 	}
 
 public:
-	static const NameType& GetNameFrom(const ValueType& val) noexcept /* virtual */
+	static NameType GetNameFrom(const ValueType& val) noexcept /* virtual */
 	{
 		return EnumType::GetNameFrom(val);
 	}
@@ -222,7 +222,7 @@ public:
 		}
 		return false;
 	}
-	const NameType& Name() const noexcept
+	NameType Name() const noexcept
 	{
 		return enum_list[this->current_value_index].second;
 	}
@@ -232,7 +232,7 @@ public:
 	}
 
 public:
-	static const NameType& GetNameFrom(const ValueType& val) noexcept
+	static NameType GetNameFrom(const ValueType& val) noexcept
 	{
 		auto iter = std::ranges::find_if(enum_list,
 										 [&](const pair_type& item)
@@ -327,7 +327,7 @@ public:
 		this->current_value_index = CustomTag::Custom;
 		return true;
 	}
-	const NameType& Name() const noexcept
+	NameType Name() const noexcept
 	{
 		if (this->current_value_index == CustomTag::Custom)
 		{
@@ -351,7 +351,7 @@ public:
 	}
 
 public:
-	static const NameType& GetNameFrom(const ValueType& val) noexcept
+	static NameType GetNameFrom(const ValueType& val) noexcept
 	{
 		if (val == enum_custom.first)
 			return enum_custom.second;
@@ -475,7 +475,7 @@ public:
 		}
 		return false;
 	}
-	const NameType& Name() const noexcept
+	NameType Name() const noexcept
 	{
 		const pair_type& item = FetchEnumItem(this->current_value_index);
 		return item.second;
@@ -487,7 +487,7 @@ public:
 	}
 
 public:
-	static const NameType& GetNameFrom(const ValueType& val) noexcept
+	static NameType GetNameFrom(const ValueType& val) noexcept
 	{
 		auto pred = [&](const pair_type& item) {
 			return val == item.first;

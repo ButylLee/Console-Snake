@@ -126,7 +126,7 @@ void GameSavingBase::convertFromSaveData() noexcept
 	{
 		auto& gs = GameSetting::get();
 
-		decltype(gs.theme.Value()) theme_temp;
+		Theme::ValueType theme_temp;
 		auto& elements = theme_temp.elements;
 		for (size_t i = 0; i < std::extent_v<decltype(theme_temp.elements)>; i++)
 		{
