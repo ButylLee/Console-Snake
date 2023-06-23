@@ -122,15 +122,15 @@ public:
 		current_value_index = EnumTag::DefaultValue;
 		return static_cast<const EnumType&>(*this);
 	}
-	bool convertFrom(ValueType val) noexcept /* virtual */
+	bool convertFrom(const ValueType& val) noexcept /* virtual */
 	{
 		return static_cast<EnumType*>(this)->convertFrom(val);
 	}
-	NameType Name() const noexcept /* virtual */
+	const NameType& Name() const noexcept /* virtual */
 	{
 		return static_cast<const EnumType*>(this)->Name();
 	}
-	ValueType Value() const noexcept /* virtual */
+	const ValueType& Value() const noexcept /* virtual */
 	{
 		return static_cast<const EnumType*>(this)->Value();
 	}
@@ -140,11 +140,11 @@ public:
 	}
 
 public:
-	static NameType GetNameFrom(ValueType val) noexcept /* virtual */
+	static const NameType& GetNameFrom(const ValueType& val) noexcept /* virtual */
 	{
 		return EnumType::GetNameFrom(val);
 	}
-	static ValueType GetValueFrom(NameType name) noexcept /* virtual */
+	static const ValueType& GetValueFrom(const NameType& name) noexcept /* virtual */
 	{
 		return EnumType::GetValueFrom(name);
 	}
@@ -208,7 +208,7 @@ public:
 			this->current_value_index++;
 		return *this;
 	}
-	bool convertFrom(ValueType val) noexcept
+	bool convertFrom(const ValueType& val) noexcept
 	{
 		auto iter = std::ranges::find_if(enum_list,
 										 [&](const pair_type& item)
@@ -222,17 +222,17 @@ public:
 		}
 		return false;
 	}
-	NameType Name() const noexcept
+	const NameType& Name() const noexcept
 	{
 		return enum_list[this->current_value_index].second;
 	}
-	ValueType Value() const noexcept
+	const ValueType& Value() const noexcept
 	{
 		return enum_list[this->current_value_index].first;
 	}
 
 public:
-	static NameType GetNameFrom(ValueType val) noexcept
+	static const NameType& GetNameFrom(const ValueType& val) noexcept
 	{
 		auto iter = std::ranges::find_if(enum_list,
 										 [&](const pair_type& item)
@@ -243,7 +243,7 @@ public:
 			return (*iter).second;
 		return {};
 	}
-	static ValueType GetValueFrom(NameType name) noexcept
+	static const ValueType& GetValueFrom(const NameType& name) noexcept
 	{
 		auto iter = std::ranges::find_if(enum_list,
 										 [&](const pair_type& item)
@@ -311,7 +311,7 @@ public:
 		}
 		return *this;
 	}
-	bool convertFrom(ValueType val) noexcept
+	bool convertFrom(const ValueType& val) noexcept
 	{
 		auto iter = std::ranges::find_if(enum_list,
 										 [&](const pair_type& item)
@@ -327,7 +327,7 @@ public:
 		this->current_value_index = CustomTag::Custom;
 		return true;
 	}
-	NameType Name() const noexcept
+	const NameType& Name() const noexcept
 	{
 		if (this->current_value_index == CustomTag::Custom)
 		{
@@ -338,7 +338,7 @@ public:
 		}
 		return enum_list[this->current_value_index].second;
 	}
-	ValueType Value() const noexcept
+	const ValueType& Value() const noexcept
 	{
 		if (this->current_value_index == CustomTag::Custom)
 		{
@@ -351,7 +351,7 @@ public:
 	}
 
 public:
-	static NameType GetNameFrom(ValueType val) noexcept
+	static const NameType& GetNameFrom(const ValueType& val) noexcept
 	{
 		if (val == enum_custom.first)
 			return enum_custom.second;
@@ -364,7 +364,7 @@ public:
 			return (*iter).second;
 		return {};
 	}
-	static ValueType GetValueFrom(NameType name) noexcept
+	static const ValueType& GetValueFrom(const NameType& name) noexcept
 	{
 		if (name == enum_custom.second)
 			return enum_custom.first;
@@ -456,7 +456,7 @@ public:
 			this->current_value_index++;
 		return *this;
 	}
-	bool convertFrom(ValueType val) noexcept
+	bool convertFrom(const ValueType& val) noexcept
 	{
 		auto pred = [&](const pair_type& item) {
 			return val == item.first;
@@ -475,19 +475,19 @@ public:
 		}
 		return false;
 	}
-	NameType Name() const noexcept
+	const NameType& Name() const noexcept
 	{
 		const pair_type& item = FetchEnumItem(this->current_value_index);
 		return item.second;
 	}
-	ValueType Value() const noexcept
+	const ValueType& Value() const noexcept
 	{
 		const pair_type& item = FetchEnumItem(this->current_value_index);
 		return item.first;
 	}
 
 public:
-	static NameType GetNameFrom(ValueType val) noexcept
+	static const NameType& GetNameFrom(const ValueType& val) noexcept
 	{
 		auto pred = [&](const pair_type& item) {
 			return val == item.first;
@@ -500,7 +500,7 @@ public:
 			return (*iter).second;
 		return {};
 	}
-	static ValueType GetValueFrom(NameType name) noexcept
+	static const ValueType& GetValueFrom(const NameType& name) noexcept
 	{
 		auto pred = [&](const pair_type& item) {
 			return name == item.second;
@@ -516,9 +516,9 @@ public:
 
 	static void AddCustomItem(ValueType val, NameType name)
 	{
-		custom_list.emplace_back(val, name);
+		custom_list.emplace_back(std::move(val), std::move(name));
 	}
-	static void RemoveCustomItem(NameType name) noexcept
+	static void RemoveCustomItem(const NameType& name) noexcept
 	{
 		auto iter = std::ranges::find_if(custom_list,
 										 [&](const pair_type& item)
