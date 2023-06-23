@@ -17,6 +17,7 @@ L"Esc)  Exit",
 
 L"1)  Speed: ",
 L"2)  Map Size: ",
+L"  [F2] Customize",
 L"3)  Show Frame: ",
 L"4)  Theme: ",
 L"  [F4] Customize",

@@ -297,6 +297,8 @@ void SettingPage::paintInterface()
 	print(~Token::setting_speed);
 	canvas.setCursor(baseX, baseY + 2);
 	print(~Token::setting_map_size);
+	canvas.setCursor(baseX - 9, baseY + 2);
+	print(~Token::setting_customize_map);
 	canvas.setCursor(baseX, baseY + 4);
 	print(~Token::setting_show_frame);
 	canvas.setCursor(baseX, baseY + 6);

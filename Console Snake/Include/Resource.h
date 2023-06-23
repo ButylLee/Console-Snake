@@ -130,6 +130,7 @@ TOKEN_DEF(
 
 	setting_speed,
 	setting_map_size,
+	setting_customize_map,
 	setting_show_frame,
 	setting_theme,
 	setting_customize_theme,
