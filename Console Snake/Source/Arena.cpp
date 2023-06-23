@@ -14,7 +14,7 @@ namespace
 	{
 		DynArray<MapNode, 2> map(GameSetting::get().map_size.Value(),
 								 GameSetting::get().map_size.Value());
-		auto f = [&](auto m)
+		auto f = [&](auto&& m)
 		{
 			std::transform(m.begin(), m.end(), map.iter_all().begin(),
 						   [](Element type)

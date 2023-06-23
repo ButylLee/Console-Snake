@@ -214,6 +214,7 @@ void SettingPage::run()
 			case K_2:
 			{
 				GameSetting::get().map_size.setNextValue();
+				GameSetting::get().map.setNextValue();
 			}
 			break;
 
@@ -324,7 +325,8 @@ void SettingPage::paintCurOptions()
 	print(~GameSetting::get().speed.Name());
 
 	canvas.setCursor(baseX, baseY + 2);
-	print(L"%d X %d"_crypt, GameSetting::get().map_size.Value(), GameSetting::get().map_size.Value());
+	print(GameSetting::get().map.Name());
+	print(L" - ");
 	print(GameSetting::get().map_size.Name());
 
 	canvas.setCursor(baseX, baseY + 4);
@@ -411,7 +413,7 @@ void CustomThemePage::paintInterface()
           / /   / / / / ___/ __/ __ \/ __ `__ \     / / / __ \/ _ \/ __ `__ \/ _ \
          / /___/ /_/ (__  ) /_/ /_/ / / / / / /    / / / / / /  __/ / / / / /  __/
          \____/\__,_/____/\__/\____/_/ /_/ /_/    /_/ /_/ /_/\___/_/ /_/ /_/\___/ 
-                                                                                  )title";
+                                                                                  )title"; // Slant
 	canvas.setColor(Color::LightAqua);
 	print(custom_theme_title);
 
@@ -521,6 +523,37 @@ void CustomThemePage::generateRandomTheme()
 void CustomMapPage::run()
 {
 	canvas.setClientSize(default_size);
+	paintInterface();
+
+	while (true)
+	{
+		paintCurOptions();
+		switch (getwch())
+		{
+			case K_Enter:
+				[[fallthrough]];
+			case K_Esc:
+				GameData::get().selection = PageSelect::SettingPage;
+				return;
+		}
+	}
+}
+
+void CustomMapPage::paintInterface()
+{
+	static constexpr auto custom_map_title = LR"title(
+                  ______           __                     __  ___          
+                 / ____/_  _______/ /_____  ____ ___     /  |/  /___ _____ 
+                / /   / / / / ___/ __/ __ \/ __ `__ \   / /|_/ / __ `/ __ \
+               / /___/ /_/ (__  ) /_/ /_/ / / / / / /  / /  / / /_/ / /_/ /
+               \____/\__,_/____/\__/\____/_/ /_/ /_/  /_/  /_/\__,_/ .___/ 
+                                                                  /_/      )title"; // Slant
+	canvas.setColor(Color::LightAqua);
+	print(custom_map_title);
+}
+
+void CustomMapPage::paintCurOptions()
+{
 
 }
 

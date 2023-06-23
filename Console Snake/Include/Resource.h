@@ -238,9 +238,9 @@ struct SizeEnum {
 using Size = Enum<SizeEnum, short>;
 ENUM_DEFINE(Size)
 {
-	{ 15, L"(S) " },
-	{ 20, L"(M) " },
-	{ 24, L"(L) " }
+	{ 15, L"Small  " },
+	{ 20, L"Middle " },
+	{ 24, L"Large  " }
 };
 
 // --------------- Enum Speed Resource ---------------

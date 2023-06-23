@@ -95,7 +95,8 @@ public:
 	void run() override;
 
 private:
-
+	void paintInterface();
+	void paintCurOptions();
 };
 
 class BeginPage :public NormalPage
