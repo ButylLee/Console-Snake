@@ -12,9 +12,9 @@ namespace
 {
 	DynArray<MapNode, 2> GetMap()
 	{
-		DynArray<MapNode, 2> map(GameSetting::get().map_size.Value(),
-								 GameSetting::get().map_size.Value());
-		auto f = [&](auto&& m)
+		DynArray<MapNode, 2> map(GameSetting::get().map.size.Value(),
+								 GameSetting::get().map.size.Value());
+		auto f = [&](const auto& m)
 		{
 			std::transform(m.begin(), m.end(), map.iter_all().begin(),
 						   [](Element type)
@@ -24,18 +24,7 @@ namespace
 							   return node;
 						   });
 		};
-		switch (+GameSetting::get().map_size)
-		{
-			case Size::S:
-				f(GameSetting::get().map.Value().map_small);
-				break;
-			case Size::M:
-				f(GameSetting::get().map.Value().map_middle);
-				break;
-			case Size::L:
-				f(GameSetting::get().map.Value().map_large);
-				break;
-		}
+		GameSetting::get().map.applyValue(f);
 		return map;
 	}
 
@@ -297,8 +286,8 @@ void Arena::paintVenue()
 void Arena::createSnake()
 {
 	// random snake initial postion
-	auto x_range = GameSetting::get().map_size.Value() - 2 * (1 + snake_init_length);
-	auto y_range = GameSetting::get().map_size.Value() - 2 * (1 + snake_init_length);
+	auto x_range = GameSetting::get().map.size.Value() - 2 * (1 + snake_init_length);
+	auto y_range = GameSetting::get().map.size.Value() - 2 * (1 + snake_init_length);
 	auto begin_head_x = GetRandom(0, x_range);
 	auto begin_head_y = GetRandom(0, y_range);
 	Direction direction;

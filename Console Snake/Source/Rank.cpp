@@ -21,8 +21,8 @@ void RankBase::newResult(std::wstring new_name, int new_score, bool winning)
 		std::move(new_name),
 		new_score,
 		GameSetting::get().speed.Value(),
-		GameSetting::get().map_size.Value(),
-		GameSetting::get().map_size.Value(),
+		GameSetting::get().map.size.Value(),
+		GameSetting::get().map.size.Value(),
 		winning
 	};
 

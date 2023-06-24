@@ -492,21 +492,21 @@ using MapShapeSmall = MapShape<15>;
 using MapShapeMiddle = MapShape<20>;
 using MapShapeLarge = MapShape<24>;
 
-struct MapSet
+struct MapCell
 {
 	MapShapeSmall map_small;
 	MapShapeMiddle map_middle;
 	MapShapeLarge map_large;
 };
 
-struct MapEnum {
+struct MapSetEnum {
 	enum Tag {
 		Square, Space,
 		DefaultValue = Square
 	};
 };
-using Map = MultiCustomEnum<MapEnum, MapSet>;
-ENUM_DEFINE(Map)
+using MapSet = MultiCustomEnum<MapSetEnum, MapCell>;
+ENUM_DEFINE(MapSet)
 {
 	{
 		{
@@ -653,6 +653,30 @@ ENUM_DEFINE(Map)
 			}
 		},
 		L"Space"
+	}
+};
+
+struct Map // Proxy
+{
+	MapSet set;
+	Size size;
+
+	void setNextValue() noexcept
+	{
+		if (size.setNextValue() == Size::S)
+			set.setNextValue();
+	}
+	void applyValue(auto&& f) const noexcept
+	{
+		switch (+size)
+		{
+			case Size::S:
+				f(set.Value().map_small); break;
+			case Size::M:
+				f(set.Value().map_middle); break;
+			case Size::L:
+				f(set.Value().map_large); break;
+		}
 	}
 };
 

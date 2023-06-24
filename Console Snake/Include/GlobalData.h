@@ -20,7 +20,6 @@ struct GameSettingMember
 {
 	Speed speed;
 	Lang lang;
-	Size map_size;
 	Map map;
 	Theme theme;
 	bool show_frame = false;

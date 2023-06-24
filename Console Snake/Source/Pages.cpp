@@ -48,8 +48,8 @@ void GamePage::run()
 		Console::get().setConsoleWindow(Console::UseFrame);
 	else
 		Console::get().setConsoleWindow(Console::NoFrame);
-	auto width = GameSetting::get().map_size.Value();
-	auto height = GameSetting::get().map_size.Value();
+	auto width = GameSetting::get().map.size.Value();
+	auto height = GameSetting::get().map.size.Value();
 	canvas.setClientSize(width, height);
 
 	PlayGround playground(this->canvas);
@@ -87,8 +87,8 @@ void DemoPage::run()
 				});
 	canvas.clear();
 	auto [width2, height2] = canvas.getClientSize();
-	auto width1 = GameSetting::get().map_size.Value();
-	auto height1 = GameSetting::get().map_size.Value();
+	auto width1 = GameSetting::get().map.size.Value();
+	auto height1 = GameSetting::get().map.size.Value();
 	canvas.setCursorOffset((width2 - width1) / 2, (height2 - height1) / 2);
 
 	DemoGround demoground(this->canvas);
@@ -213,7 +213,6 @@ void SettingPage::run()
 
 			case K_2:
 			{
-				GameSetting::get().map_size.setNextValue();
 				GameSetting::get().map.setNextValue();
 			}
 			break;
@@ -325,9 +324,9 @@ void SettingPage::paintCurOptions()
 	print(~GameSetting::get().speed.Name());
 
 	canvas.setCursor(baseX, baseY + 2);
-	print(GameSetting::get().map.Name());
+	print(GameSetting::get().map.set.Name());
 	print(L" - ");
-	print(GameSetting::get().map_size.Name());
+	print(GameSetting::get().map.size.Name());
 
 	canvas.setCursor(baseX, baseY + 4);
 	print(GameSetting::get().show_frame

@@ -136,7 +136,7 @@ void GameSavingBase::convertFromSaveData() noexcept
 		gs.theme.convertFrom(theme_temp);
 
 		gs.speed.convertFrom(bin_data.setting.speed);
-		gs.map_size.convertFrom(bin_data.setting.width);
+		gs.map.size.convertFrom(bin_data.setting.width);
 		//gs.height.convertFrom(bin_data.setting.height);
 		gs.lang.convertFrom(Convert{ bin_data.setting.lang });
 		LocalizedStrings::setLang(gs.lang.Value());
@@ -178,8 +178,8 @@ void GameSavingBase::convertToSaveData() noexcept
 		}
 
 		bin_data.setting.speed = gs.speed.Value();
-		bin_data.setting.width = gs.map_size.Value();
-		bin_data.setting.height = gs.map_size.Value();
+		bin_data.setting.width = gs.map.size.Value();
+		bin_data.setting.height = gs.map.size.Value();
 		bin_data.setting.lang = gs.lang.Value();
 		bin_data.setting.show_frame = gs.show_frame;
 	}
