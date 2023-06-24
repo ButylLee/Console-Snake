@@ -26,11 +26,10 @@ class GameSavingBase
 	};
 
 	struct SettingSavingItem
-	{
+	{//TODO:save custom map
 		int16_t theme[static_cast<size_t>(Element::Mask_)][2] = {};
 		int16_t speed = 0;
-		int16_t width = 0;
-		int16_t height = 0;
+		int16_t size = 0;
 		int8_t lang = 0;
 		int8_t show_frame = 0;
 	};
@@ -38,9 +37,9 @@ class GameSavingBase
 	struct RankSavingItem
 	{
 		wchar_t name[Rank::name_max_length] = {};
+		wchar_t map_name[Map::name_max_length] = {};
 		int16_t score = 0;
-		int16_t width = 0;
-		int16_t height = 0;
+		int16_t size = 0;
 		int8_t speed = 0;
 		int8_t is_win = 0;
 	};

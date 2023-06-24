@@ -136,26 +136,27 @@ void GameSavingBase::convertFromSaveData() noexcept
 		gs.theme.convertFrom(theme_temp);
 
 		gs.speed.convertFrom(bin_data.setting.speed);
-		gs.map.size.convertFrom(bin_data.setting.width);
-		//gs.height.convertFrom(bin_data.setting.height);
+		gs.map.size.convertFrom(bin_data.setting.size);
 		gs.lang.convertFrom(Convert{ bin_data.setting.lang });
 		LocalizedStrings::setLang(gs.lang.Value());
 		gs.show_frame = Convert{ bin_data.setting.show_frame };
 	}
 	// rank data
 	wchar_t name[Rank::name_max_length + 1] = {};
+	wchar_t map_name[Map::name_max_length + 1] = {};
 	auto [rank, lock] = Rank::get().modifyRank();
 	for (size_t i = 0; i < Rank::rank_count; i++)
 	{
 		auto& save_item = bin_data.rank_list[i];
 		auto& rank_item = rank[i];
 		rank_item.score = Convert{ save_item.score };
-		rank_item.width = Convert{ save_item.width };
-		rank_item.height = Convert{ save_item.height };
+		rank_item.size = Convert{ save_item.size };
 		rank_item.speed = Convert{ save_item.speed };
 		rank_item.is_win = Convert{ save_item.is_win };
 		std::copy_n(save_item.name, Rank::name_max_length, name);
 		rank_item.name = name;
+		std::copy_n(save_item.map_name, Map::name_max_length, map_name);
+		rank_item.map_name = map_name;
 
 		if (rank_item.is_win)
 			GameData::get().colorful_title = true;
@@ -173,15 +174,14 @@ void GameSavingBase::convertToSaveData() noexcept
 		auto& elements = theme_temp.elements;
 		for (size_t i = 0; i < std::extent_v<decltype(theme_temp.elements)>; i++)
 		{
-			bin_data.setting.theme[i][0] = elements[i].facade.Value();
-			bin_data.setting.theme[i][1] = elements[i].color.Value();
+			bin_data.setting.theme[i][0] = Convert{ elements[i].facade.Value() };
+			bin_data.setting.theme[i][1] = Convert{ elements[i].color.Value() };
 		}
 
-		bin_data.setting.speed = gs.speed.Value();
-		bin_data.setting.width = gs.map.size.Value();
-		bin_data.setting.height = gs.map.size.Value();
-		bin_data.setting.lang = gs.lang.Value();
-		bin_data.setting.show_frame = gs.show_frame;
+		bin_data.setting.speed = Convert{ gs.speed.Value() };
+		bin_data.setting.size = Convert{ gs.map.size.Value() };
+		bin_data.setting.lang = Convert{ gs.lang.Value() };
+		bin_data.setting.show_frame = Convert{ gs.show_frame };
 	}
 	// rank data
 	auto [rank, lock] = Rank::get().getRank();
@@ -189,12 +189,12 @@ void GameSavingBase::convertToSaveData() noexcept
 	{
 		auto& save_item = bin_data.rank_list[i];
 		auto& rank_item = rank[i];
-		save_item.score = rank_item.score;
-		save_item.width = rank_item.width;
-		save_item.height = rank_item.height;
-		save_item.speed = rank_item.speed;
-		save_item.is_win = rank_item.is_win;
+		save_item.score = Convert{ rank_item.score };
+		save_item.size = Convert{ rank_item.size };
+		save_item.speed = Convert{ rank_item.speed };
+		save_item.is_win = Convert{ rank_item.is_win };
 		std::copy_n(rank_item.name.c_str(), Rank::name_max_length, save_item.name);
+		std::copy_n(rank_item.map_name.c_str(), Map::name_max_length, save_item.map_name);
 	}
 }
 

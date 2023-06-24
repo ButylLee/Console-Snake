@@ -18,8 +18,8 @@ public:
 		std::wstring name;
 		int score = 0;
 		Speed::ValueType speed = {};
-		Size::ValueType width = {};
-		Size::ValueType height = {};
+		MapSet::NameType map_name;
+		Size::ValueType size = {};
 		bool is_win = false;
 	};
 	static constexpr size_t rank_count = 10;
