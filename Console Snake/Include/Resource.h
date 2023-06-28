@@ -484,6 +484,7 @@ public:
 	{
 		return MapShapeIterator(data + CompressedSize - (RemainCount == 0 ? 0 : 1), RemainCount);
 	}
+	size_t size() const noexcept { return Size; }
 
 private:
 	std::byte data[CompressedSize];

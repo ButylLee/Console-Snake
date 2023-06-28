@@ -16,6 +16,7 @@ namespace
 								 GameSetting::get().map.size.Value());
 		auto f = [&](const auto& m)
 		{
+			assert(map.total_size() == m.size());
 			std::transform(m.begin(), m.end(), map.iter_all().begin(),
 						   [](Element type)
 						   {
