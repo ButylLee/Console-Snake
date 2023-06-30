@@ -546,14 +546,20 @@ void CustomMapPage::paintInterface()
                 / /   / / / / ___/ __/ __ \/ __ `__ \   / /|_/ / __ `/ __ \
                / /___/ /_/ (__  ) /_/ /_/ / / / / / /  / /  / / /_/ / /_/ /
                \____/\__,_/____/\__/\____/_/ /_/ /_/  /_/  /_/\__,_/ .___/ 
-                                                                  /_/      )title"; // Slant
+                                                                  /_/      )title" + 1; // Slant
 	canvas.setColor(Color::LightAqua);
 	print(custom_map_title);
 }
 
 void CustomMapPage::paintCurOptions()
 {
+	paintCurMap();
+}
 
+void CustomMapPage::paintCurMap()
+{
+	canvas.setCursorOffset(0, 10);
+	finally { canvas.setCursorOffset(0, 0); };
 }
 
 /***************************************

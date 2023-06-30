@@ -330,8 +330,7 @@ struct ElementSet
 		Facade facade;
 		Color color;
 
-		friend constexpr bool
-		operator==(const Appearance&, const Appearance&) = default;
+		friend bool operator==(const Appearance&, const Appearance&) = default;
 	}elements[static_cast<size_t>(Element::Mask_)];
 
 	constexpr auto& operator[](auto which) noexcept
@@ -342,8 +341,7 @@ struct ElementSet
 	{
 		return elements[static_cast<size_t>(which)];
 	}
-	friend constexpr bool
-	operator==(const ElementSet&, const ElementSet&) = default;
+	friend bool operator==(const ElementSet&, const ElementSet&) = default;
 };
 
 struct ThemeEnum {

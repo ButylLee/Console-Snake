@@ -91,12 +91,30 @@ private:
 class CustomMapPage :public NormalPage
 {
 	FACTORY_MAP_REGISTER(CustomMapPage);
+private:
+	class MapSelector
+	{
+
+	};
+	class MapSelectorList
+	{
+
+	};
+	class MapViewer
+	{
+
+	};
+
 public:
 	void run() override;
 
 private:
 	void paintInterface();
 	void paintCurOptions();
+	void paintCurMap();
+
+private:
+	Map map;
 };
 
 class BeginPage :public NormalPage
