@@ -41,10 +41,7 @@ public:
 
 protected:
 	static constexpr ClientSize default_size = { 45,35 };
-	enum struct ShowVersion
-	{
-		Yes, No
-	};
+	enum struct ShowVersion { No, Yes };
 
 protected:
 	void paintTitle(ShowVersion);
@@ -98,12 +95,30 @@ private:
 	};
 	class MapSelectorList
 	{
-
+	public:
+		MapSelectorList(Map& map) :map(map) {}
+		void paint();
+		void selectPrev();
+		void selectNext();
+		void deleteSelected();
+	private:
+		Map& map;
 	};
 	class MapViewer
 	{
-
+	public:
+		enum struct Direction { Up, Down, Left, Right };
+	public:
+		MapViewer(Map& map) :map(map) {}
+		void paint() const;
+		void moveSelected(Direction);
+		void switchSelected();
+		void clearMap();
+	private:
+		Map& map;
+		short x = 0, y = 0;
 	};
+	enum struct EditorLevel { MapSelect, MapEdit };
 
 public:
 	void run() override;
@@ -111,10 +126,12 @@ public:
 private:
 	void paintInterface();
 	void paintCurOptions();
-	void paintCurMap();
 
 private:
+	EditorLevel editor_level = EditorLevel::MapSelect;
 	Map map;
+	MapSelectorList map_list{ map };
+	MapViewer map_viewer{ map };
 };
 
 class BeginPage :public NormalPage

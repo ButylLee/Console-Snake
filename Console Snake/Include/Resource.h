@@ -158,17 +158,17 @@ TOKEN_DEF(
 
 	custom_map_prev,
 	custom_map_next,
-	custom_map_edit_save,
-	custom_map_switch_size,
-	custom_map_cancel_edit,
+	custom_map_edit_map,
 	custom_map_delete_map,
 	custom_map_delete_map_confirm,
-	custom_map_curr_row,
-	custom_map_curr_col,
+	custom_map_switch_size,
 	custom_map_curr_size,
+	custom_map_curr_pos,
 	custom_map_move_cursor,
 	custom_map_switch_block,
 	custom_map_all_blank,
+	custom_map_save_edit,
+	custom_map_cancel_edit,
 
 	game_congratulations,
 	game_you_win,
@@ -205,24 +205,16 @@ LANG_DEFAULT(en_US);
 MAKE_LOCALIZED_STRS
 {
 	{
-
 #include "LangENG.inl"
-
 	},
 	{
-
 #include "LangCHS.inl"
-
 	},
 	{
-
 #include "LangCHT.inl"
-
 	},
 	{
-
 #include "LangJPN.inl"
-
 	}
 };
 

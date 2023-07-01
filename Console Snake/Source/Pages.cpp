@@ -519,22 +519,113 @@ void CustomThemePage::generateRandomTheme()
 /***************************************
  class CustomMapPage
 ****************************************/
+void CustomMapPage::MapSelectorList::paint()
+{
+
+}
+
+void CustomMapPage::MapSelectorList::selectPrev()
+{
+}
+
+void CustomMapPage::MapSelectorList::selectNext()
+{
+}
+
+void CustomMapPage::MapSelectorList::deleteSelected()
+{
+}
+
+void CustomMapPage::MapViewer::paint() const
+{
+
+}
+
+void CustomMapPage::MapViewer::moveSelected(Direction direct)
+{
+	switch (direct)
+	{
+		case Direction::Up:
+			y == 0 ? y = map.size.Value() - 1 : y--;
+			break;
+		case Direction::Down:
+			y == map.size.Value() - 1 ? y = 0 : y++;
+			break;
+		case Direction::Left:
+			x == 0 ? x = map.size.Value() - 1 : x--;
+			break;
+		case Direction::Right:
+			x == map.size.Value() - 1 ? x = 0 : x++;
+			break;
+	}
+	//TODO:paint curr and recover prev
+}
+
+void CustomMapPage::MapViewer::switchSelected()
+{
+}
+
+void CustomMapPage::MapViewer::clearMap()
+{
+}
+
 void CustomMapPage::run()
 {
 	canvas.setClientSize(default_size);
 	paintInterface();
+	canvas.setCursorOffset(0, 6);
+	map_list.paint();
+	canvas.setCursorOffset(0, 10);
+	map_viewer.paint();
+	canvas.setCursorOffset(0, 0);
 
 	while (true)
 	{
 		paintCurOptions();
-		switch (getwch())
+		switch (editor_level)
 		{
-			case K_Enter:
-				[[fallthrough]];
-			case K_Esc:
-				GameData::get().selection = PageSelect::SettingPage;
-				return;
+			case EditorLevel::MapSelect:
+				switch (getwch())
+				{
+					case K_F1:
+						map_list.selectPrev(); break;
+					case K_F2:
+						map_list.selectNext(); break;
+					case K_F3:
+						editor_level = EditorLevel::MapEdit; break;
+					case K_F4:
+						map.size.setNextValue(); break;
+					case K_Delete:
+						//TODO:confirm delete
+						map_list.deleteSelected(); break;
+					case K_Enter: case K_Esc:
+						GameData::get().selection = PageSelect::SettingPage;
+						return;
+				}
+				break;
+			case EditorLevel::MapEdit:
+				switch (getwch())
+				{
+					case K_UP: case K_W: case K_w:
+						map_viewer.moveSelected(MapViewer::Direction::Up); break;
+					case K_DOWN: case K_S: case K_s:
+						map_viewer.moveSelected(MapViewer::Direction::Down); break;
+					case K_LEFT: case K_A: case K_a:
+						map_viewer.moveSelected(MapViewer::Direction::Left); break;
+					case K_RIGHT: case K_D: case K_d:
+						map_viewer.moveSelected(MapViewer::Direction::Right); break;
+					case K_Space:
+						map_viewer.switchSelected(); break;
+					case K_Ctrl_Bb:
+						map_viewer.clearMap(); break;
+					case K_Enter:
+						editor_level = EditorLevel::MapSelect; break;
+					case K_Esc:
+						editor_level = EditorLevel::MapSelect; break;
+				}
+				break;
 		}
+
 	}
 }
 
@@ -549,17 +640,48 @@ void CustomMapPage::paintInterface()
                                                                   /_/      )title" + 1; // Slant
 	canvas.setColor(Color::LightAqua);
 	print(custom_map_title);
+
+	canvas.setColor(Color::White);
+	canvas.setCursorOffset(25, 10);
+	finally { canvas.setCursorOffset(0, 0); };
+
+	canvas.setCursor(2, 0);
+	print(~Token::custom_map_prev);
+	canvas.setCursor(11, 0);
+	print(~Token::custom_map_next);
+	canvas.setCursor(2, 2);
+	print(~Token::custom_map_edit_map);
+	canvas.setCursor(11, 2);
+	print(~Token::custom_map_delete_map);
+	canvas.setCursor(2, 4);
+	print(~Token::custom_map_switch_size);
+	canvas.setCursor(1, 6);
+	print(L"------------------------------------");
+
+	canvas.setCursor(2, 11);
+	print(~Token::custom_map_move_cursor);
+	canvas.setCursor(2, 13);
+	print(~Token::custom_map_switch_block);
+	canvas.setCursor(2, 15);
+	print(~Token::custom_map_all_blank);
+	canvas.setCursor(2, 18);
+	print(~Token::custom_map_save_edit);
+	canvas.setCursor(2, 20);
+	print(~Token::custom_map_cancel_edit);
 }
 
 void CustomMapPage::paintCurOptions()
 {
-	paintCurMap();
-}
-
-void CustomMapPage::paintCurMap()
-{
-	canvas.setCursorOffset(0, 10);
+	canvas.setColor(Color::White);
+	canvas.setCursorOffset(25, 10);
 	finally { canvas.setCursorOffset(0, 0); };
+
+	canvas.setCursor(11, 4);
+	print(~Token::custom_map_curr_size);
+	print(map.size.Name());
+	canvas.setCursor(2, 8);
+	print(~Token::custom_map_curr_pos);
+
 }
 
 /***************************************
