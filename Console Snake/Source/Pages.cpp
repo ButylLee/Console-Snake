@@ -519,20 +519,20 @@ void CustomThemePage::generateRandomTheme()
 /***************************************
  class CustomMapPage
 ****************************************/
-void CustomMapPage::MapSelectorList::paint()
+void CustomMapPage::MapSelector::paint()
 {
 
 }
 
-void CustomMapPage::MapSelectorList::selectPrev()
+void CustomMapPage::MapSelector::selectPrev()
 {
 }
 
-void CustomMapPage::MapSelectorList::selectNext()
+void CustomMapPage::MapSelector::selectNext()
 {
 }
 
-void CustomMapPage::MapSelectorList::deleteSelected()
+void CustomMapPage::MapSelector::deleteSelected()
 {
 }
 

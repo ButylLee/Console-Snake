@@ -91,18 +91,16 @@ class CustomMapPage :public NormalPage
 private:
 	class MapSelector
 	{
-
-	};
-	class MapSelectorList
-	{
+		static constexpr size_t view_span = 5;
 	public:
-		MapSelectorList(Map& map) :map(map) {}
+		MapSelector(Map& map) :map(map) {}
 		void paint();
 		void selectPrev();
 		void selectNext();
 		void deleteSelected();
 	private:
 		Map& map;
+		size_t view_begin = 0;
 	};
 	class MapViewer
 	{
@@ -130,7 +128,7 @@ private:
 private:
 	EditorLevel editor_level = EditorLevel::MapSelect;
 	Map map;
-	MapSelectorList map_list{ map };
+	MapSelector map_list{ map };
 	MapViewer map_viewer{ map };
 };
 
