@@ -5,7 +5,10 @@
 #include "PageInterface.h"
 #include "Canvas.h"
 #include "GlobalData.h"
+#include "Resource.h"
+#include "DynArray.h"
 #include <memory>
+#include <optional>
 
 class GamePage :public Page
 {
@@ -109,11 +112,16 @@ private:
 	public:
 		MapViewer(Map& map) :map(map) {}
 		void paint() const;
+		void editSelected();
+		void exitEditing(bool save_changed);
 		void moveSelected(Direction);
 		void switchSelected();
-		void clearMap();
+		void setAllBlank();
+		short getX() const noexcept { return x; }
+		short getY() const noexcept { return y; }
 	private:
 		Map& map;
+		std::optional<DynArray<Element, 2>> editing_map;
 		short x = 0, y = 0;
 	};
 	enum struct EditorLevel { MapSelect, MapEdit };

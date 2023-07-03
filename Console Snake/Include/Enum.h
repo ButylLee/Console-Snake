@@ -117,6 +117,10 @@ public:
 	{
 		return static_cast<EnumType*>(this)->setNextValue();
 	}
+	const EnumType& setPrevValue() noexcept /* virtual */
+	{
+		return static_cast<EnumType*>(this)->setPrevValue();
+	}
 	const EnumType& setDefaultValue() noexcept
 	{
 		current_value_index = EnumTag::DefaultValue;
@@ -206,6 +210,14 @@ public:
 			this->current_value_index = 0;
 		else
 			this->current_value_index++;
+		return *this;
+	}
+	const Enum& setPrevValue() noexcept
+	{
+		if (this->current_value_index == 0)
+			this->current_value_index = enum_list.size() - 1;
+		else
+			this->current_value_index--;
 		return *this;
 	}
 	bool convertFrom(const ValueType& val) noexcept
@@ -298,7 +310,7 @@ public:
 		{
 			setDefaultValue_force();
 		}
-		else if (this->current_value_index == enum_list.size() - 1)
+		if (this->current_value_index == enum_list.size() - 1)
 		{
 			if (enum_custom.first)
 				this->current_value_index = CustomTag::Custom;
@@ -308,6 +320,25 @@ public:
 		else
 		{
 			this->current_value_index++;
+		}
+		return *this;
+	}
+	const CustomEnum& setPrevValue() noexcept
+	{
+		if (this->current_value_index == CustomTag::Custom && !enum_custom.first)
+		{
+			setDefaultValue_force();
+		}
+		if (this->current_value_index == 0)
+		{
+			if (enum_custom.first)
+				this->current_value_index = CustomTag::Custom;
+			else
+				this->current_value_index = enum_list.size() - 1;
+		}
+		else
+		{
+			this->current_value_index--;
 		}
 		return *this;
 	}
@@ -456,6 +487,14 @@ public:
 			this->current_value_index++;
 		return *this;
 	}
+	const MultiCustomEnum& setPrevValue() noexcept
+	{
+		if (this->current_value_index == 0)
+			this->current_value_index = enum_list.size() + custom_list.size() - 1;
+		else
+			this->current_value_index--;
+		return *this;
+	}
 	bool convertFrom(const ValueType& val) noexcept
 	{
 		auto pred = [&](const pair_type& item) {
@@ -518,7 +557,7 @@ public:
 	{
 		custom_list.emplace_back(std::move(val), std::move(name));
 	}
-	static void RemoveCustomItem(const NameType& name) noexcept
+	static bool RemoveCustomItem(const NameType& name) noexcept
 	{
 		auto iter = std::ranges::find_if(custom_list,
 										 [&](const pair_type& item)
@@ -526,10 +565,17 @@ public:
 											 return item.second == name;
 										 });
 		if (iter == custom_list.cend())
-			return;
+			return false;
 		size_t index = iter - custom_list.cbegin() + enum_list.size();
-		custom_list.erase(iter);
-		NotifyAllObject(index);
+		return RemoveCustomItem(MultiCustomEnum(static_cast<EnumTag>(index)));
+	}
+	static bool RemoveCustomItem(MultiCustomEnum obj) noexcept
+	{
+		if (obj.current_value_index < enum_list.size())
+			return false;
+		custom_list.erase(custom_list.cbegin() + obj.current_value_index - enum_list.size());
+		NotifyAllObject(obj.current_value_index);
+		return true;
 	}
 
 private:
