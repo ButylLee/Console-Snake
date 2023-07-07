@@ -9,6 +9,7 @@
 #include <random>
 #include <type_traits>
 #include <cstddef>
+#include <cassert>
 
 #define GAME_VERSION "2.22"
 
@@ -483,6 +484,35 @@ public:
 			}
 		}
 	}
+	template<typename Iter>
+	MapShape(Iter begin, Iter end) noexcept
+	{
+		assert(end - begin == Size);
+		size_t index = 0;
+		for (unsigned char count = 0, byte = 0; begin != end; ++begin)
+		{
+			Element item = *begin;
+			switch (item)
+			{
+				case Element::Blank:
+					byte |= 0b0 << count; break;
+				case Element::Barrier:
+					byte |= 0b1 << count; break;
+			}
+			if (begin == end - 1)
+			{
+				data[index] = std::byte{ byte };
+				return;
+			}
+			if (++count == 8)
+			{
+				count = 0;
+				data[index++] = std::byte{ byte };
+				byte = 0;
+			}
+		}
+	}
+	MapShape() = default;
 	MapShapeIterator begin() const noexcept { return MapShapeIterator(data, 0); }
 	MapShapeIterator end() const noexcept
 	{
@@ -491,7 +521,7 @@ public:
 	size_t size() const noexcept { return Size; }
 
 private:
-	std::byte data[CompressedSize];
+	std::byte data[CompressedSize] = {};
 };
 using MapShapeSmall = MapShape<15>;
 using MapShapeMiddle = MapShape<20>;
@@ -672,7 +702,7 @@ struct Map // Proxy
 		if (size.setNextValue() == Size::S)
 			set.setNextValue();
 	}
-	void applyValue(auto&& f) const noexcept
+	void applyValue(auto&& f) const
 	{
 		switch (+size)
 		{
@@ -682,6 +712,18 @@ struct Map // Proxy
 				f(set.Value().map_middle); break;
 			case Size::L:
 				f(set.Value().map_large); break;
+		}
+	}
+	void applyCustomValue(auto&& f)
+	{
+		switch (+size)
+		{
+			case Size::S:
+				f(MapSet::ModifyCustomItem(set).map_small); break;
+			case Size::M:
+				f(MapSet::ModifyCustomItem(set).map_middle); break;
+			case Size::L:
+				f(MapSet::ModifyCustomItem(set).map_large); break;
 		}
 	}
 };

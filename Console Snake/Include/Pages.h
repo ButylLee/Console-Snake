@@ -95,11 +95,16 @@ private:
 	class MapSelector
 	{
 		static constexpr size_t view_span = 5;
+		static constexpr size_t max_mapset_count = 20;
+		static constexpr const wchar_t* temp_mapset_name = L"$";
 	public:
-		MapSelector(Map& map) :map(map) {}
+		MapSelector(Map& map);
+		~MapSelector() noexcept;
 		void paint();
 		void selectPrev();
 		void selectNext();
+		DynArray<Element, 2> fetchSelected();
+		void replaceSelected(const DynArray<Element, 2>&);
 		void deleteSelected();
 	private:
 		Map& map;
@@ -110,21 +115,21 @@ private:
 	public:
 		enum struct Direction { Up, Down, Left, Right };
 	public:
-		MapViewer(Map& map) :map(map) {}
 		void paint() const;
-		void editSelected();
-		void exitEditing(bool save_changed);
+		void changeMap(DynArray<Element, 2>);
+		void enterEditing();
+		const DynArray<Element, 2>& exitEditing();
 		void moveSelected(Direction);
 		void switchSelected();
 		void setAllBlank();
-		short getX() const noexcept { return x; }
-		short getY() const noexcept { return y; }
+		size_t getX() const noexcept { return x; }
+		size_t getY() const noexcept { return y; }
 	private:
-		Map& map;
-		std::optional<DynArray<Element, 2>> editing_map;
-		short x = 0, y = 0;
+		DynArray<Element, 2> editing_map;
+		size_t x = 0, y = 0;
+		bool is_editing = false;
 	};
-	enum struct EditorLevel { MapSelect, MapEdit };
+	enum struct EditorLevel { MapSelect, MapEdit, MapNaming };
 
 public:
 	void run() override;
@@ -137,7 +142,7 @@ private:
 	EditorLevel editor_level = EditorLevel::MapSelect;
 	Map map;
 	MapSelector map_list{ map };
-	MapViewer map_viewer{ map };
+	MapViewer map_viewer;
 };
 
 class BeginPage :public NormalPage

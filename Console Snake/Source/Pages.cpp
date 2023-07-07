@@ -22,6 +22,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <utility>
 #include <numeric>
 #include <algorithm>
 #include <type_traits>
@@ -520,6 +521,18 @@ void CustomThemePage::generateRandomTheme()
 /***************************************
  class CustomMapPage
 ****************************************/
+CustomMapPage::MapSelector::MapSelector(Map& map)
+	:map(map)
+{
+	if (MapSet::GetCount() < max_mapset_count)
+		MapSet::AddCustomItem({}, temp_mapset_name);
+}
+
+CustomMapPage::MapSelector::~MapSelector() noexcept
+{
+	MapSet::RemoveCustomItem(temp_mapset_name);
+}
+
 void CustomMapPage::MapSelector::paint()
 {
 
@@ -527,25 +540,63 @@ void CustomMapPage::MapSelector::paint()
 
 void CustomMapPage::MapSelector::selectPrev()
 {
+	if (+map.set == 0)
+		return;
 	map.set.setPrevValue();
 	//TODO:paint
+	//TODO:change map view
 }
 
 void CustomMapPage::MapSelector::selectNext()
 {
+	if (+map.set == MapSet::GetCount() - 1)
+		return;
 	map.set.setNextValue();
 	//TODO:paint
+	//TODO:change map view
+}
+
+DynArray<Element, 2> CustomMapPage::MapSelector::fetchSelected()
+{
+	DynArray<Element, 2> map_shape(map.size.Value(), map.size.Value());
+	auto f = [&](const auto& m)
+	{
+		assert(map_shape.total_size() == m.size());
+		std::copy(m.begin(), m.end(), map_shape.iter_all().begin());
+	};
+	map.applyValue(f);
+	return map_shape;
+}
+
+void CustomMapPage::MapSelector::replaceSelected(const DynArray<Element, 2>& map_shape)
+{
+	assert(map_shape.total_size() == map.size.Value() * map.size.Value());
+	auto f = [&](auto& m)
+	{
+		using type = std::remove_reference_t<decltype(m)>;
+		m = type(map_shape.iter_all().begin(), map_shape.iter_all().end());
+	};
+	map.applyCustomValue(f);
+	if (map.set.Name() == temp_mapset_name)
+	{
+		MapSet::RenameCustomItem(map.set, L"MapUnnamed"_crypt);
+		if (MapSet::GetCount() < max_mapset_count)
+			MapSet::AddCustomItem({}, temp_mapset_name);
+	}
 }
 
 void CustomMapPage::MapSelector::deleteSelected()
 {
 	MapSet temp = map.set;
-
-	if (MapSet::RemoveCustomItem(map.set))
-	{
-
-	}
+	temp.setPrevValue();
+	if (map.set.Name() == temp_mapset_name)
+		return;
+	MapSet::RemoveCustomItem(map.set);
+	if (MapSet(MapSet::GetCount() - 1).Name() != temp_mapset_name)
+		MapSet::AddCustomItem({}, temp_mapset_name);
+	map.set = temp.setNextValue();
 	//TODO:paint
+	//TODO:change map view
 }
 
 void CustomMapPage::MapViewer::paint() const
@@ -553,31 +604,41 @@ void CustomMapPage::MapViewer::paint() const
 
 }
 
-void CustomMapPage::MapViewer::editSelected()
+void CustomMapPage::MapViewer::changeMap(DynArray<Element, 2> map)
 {
+	editing_map = std::move(map);
+	//paint
 }
 
-void CustomMapPage::MapViewer::exitEditing(bool save_changed)
+void CustomMapPage::MapViewer::enterEditing()
 {
+	assert(!is_editing);
+	is_editing = true;
+	//TODO:paint cursor
+}
+
+const DynArray<Element, 2>& CustomMapPage::MapViewer::exitEditing()
+{
+	//TODO:remove cursor
+	is_editing = false;
+	return editing_map;
 }
 
 void CustomMapPage::MapViewer::moveSelected(Direction direct)
 {
-	if (!editing_map)
-		return;
 	switch (direct)
 	{
 		case Direction::Up:
-			y == 0 ? y = editing_map.value().size() - 1 : y--;
+			y == 0 ? y = editing_map.size() - 1 : y--;
 			break;
 		case Direction::Down:
-			y == editing_map.value().size() - 1 ? y = 0 : y++;
+			y == editing_map.size() - 1 ? y = 0 : y++;
 			break;
 		case Direction::Left:
-			x == 0 ? x = editing_map.value().size() - 1 : x--;
+			x == 0 ? x = editing_map.size() - 1 : x--;
 			break;
 		case Direction::Right:
-			x == editing_map.value().size() - 1 ? x = 0 : x++;
+			x == editing_map.size() - 1 ? x = 0 : x++;
 			break;
 	}
 	//TODO:paint curr and recover prev
@@ -585,20 +646,16 @@ void CustomMapPage::MapViewer::moveSelected(Direction direct)
 
 void CustomMapPage::MapViewer::switchSelected()
 {
-	if (!editing_map)
-		return;
 	using type = std::underlying_type_t<Element>;
-	type value = static_cast<type>(editing_map.value()[y][x]);
+	type value = static_cast<type>(editing_map[y][x]);
 	type mask = static_cast<type>(Element::Mask_);
-	editing_map.value()[y][x] = static_cast<Element>(mask - value);
+	editing_map[y][x] = static_cast<Element>(mask - value);
 	//TODO:paint
 }
 
 void CustomMapPage::MapViewer::setAllBlank()
 {
-	if (!editing_map)
-		return;
-	for (auto& node : editing_map.value().iter_all())
+	for (auto& node : editing_map.iter_all())
 		node = Element::Blank;
 	//TODO:paint
 }
@@ -622,18 +679,32 @@ void CustomMapPage::run()
 				switch (getwch())
 				{
 					case K_F1:
-						map_list.selectPrev(); break;
+						map_list.selectPrev();
+						map_viewer.changeMap(map_list.fetchSelected());
+						break;
 					case K_F2:
-						map_list.selectNext(); break;
+						map_list.selectNext();
+						map_viewer.changeMap(map_list.fetchSelected());
+						break;
 					case K_F3:
-						map_viewer.editSelected();
-						editor_level = EditorLevel::MapEdit;
+						if (MapSet::IsCustomItem(map.set))
+						{
+							map_viewer.enterEditing();
+							editor_level = EditorLevel::MapEdit;
+						}
 						break;
 					case K_F4:
-						map.size.setNextValue(); break;
+						map.size.setNextValue();
+						map_viewer.changeMap(map_list.fetchSelected());
+						break;
 					case K_Delete:
-						//TODO:confirm delete
-						map_list.deleteSelected(); break;
+						if (MapSet::IsCustomItem(map.set))
+						{
+							//TODO:confirm delete
+							map_list.deleteSelected();
+							map_viewer.changeMap(map_list.fetchSelected());
+						}
+						break;
 					case K_Enter: case K_Esc:
 						GameData::get().selection = PageSelect::SettingPage;
 						return;
@@ -655,11 +726,11 @@ void CustomMapPage::run()
 					case K_Ctrl_Bb:
 						map_viewer.setAllBlank(); break;
 					case K_Enter:
-						map_viewer.exitEditing(true);
+						map_list.replaceSelected(map_viewer.exitEditing());
 						editor_level = EditorLevel::MapSelect;
 						break;
 					case K_Esc:
-						map_viewer.exitEditing(false);
+						map_viewer.exitEditing();
 						editor_level = EditorLevel::MapSelect;
 						break;
 				}
@@ -720,7 +791,7 @@ void CustomMapPage::paintCurOptions()
 	print(map.size.Name());
 	canvas.setCursor(2, 8);
 	print(~Token::custom_map_curr_pos);
-	print(::format(L"({:2}, {:2})"_crypt, map_viewer.getX(), map_viewer.getY()));
+	print(::format(L"({:>2},{:<2})"_crypt, map_viewer.getX(), map_viewer.getY()));
 }
 
 /***************************************

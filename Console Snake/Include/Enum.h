@@ -152,6 +152,10 @@ public:
 	{
 		return EnumType::GetValueFrom(name);
 	}
+	static size_t GetCount() noexcept /* virtual */
+	{
+		return EnumType::GetCount();
+	}
 
 public:
 	friend bool operator==(const EnumBase& lhs, const EnumBase& rhs) noexcept
@@ -265,6 +269,10 @@ public:
 		if (iter != enum_list.cend())
 			return (*iter).first;
 		return {};
+	}
+	static size_t GetCount() noexcept
+	{
+		return enum_list.size();
 	}
 
 private:
@@ -408,6 +416,10 @@ public:
 			return (*iter).first;
 		return {};
 	}
+	static size_t GetCount() noexcept
+	{
+		return enum_list.size() + enum_custom ? 1 : 0;
+	}
 
 	static void SetCustomValue(ValueType custom)
 	{
@@ -445,7 +457,7 @@ public:
 	using typename Base::ValueType;
 	using typename Base::NameType;
 private:
-	using pair_type = std::pair<ValueType, std::add_const_t<NameType>>;
+	using pair_type = std::pair<ValueType, NameType>;
 	using list_type = const std::vector<pair_type>;
 	using custom_list_type = std::vector<pair_type>;
 	using notify_list_type = std::vector<MultiCustomEnum*>;
@@ -458,6 +470,12 @@ public:
 	MultiCustomEnum(EnumTag tag)
 		:Base(tag)
 	{
+		notify_list.push_back(this);
+	}
+	MultiCustomEnum(size_t index)
+		:Base(static_cast<EnumTag>(index))
+	{
+		assert(index < GetCount());
 		notify_list.push_back(this);
 	}
 	MultiCustomEnum(const MultiCustomEnum& other)
@@ -516,13 +534,11 @@ public:
 	}
 	NameType Name() const noexcept
 	{
-		const pair_type& item = FetchEnumItem(this->current_value_index);
-		return item.second;
+		return FetchEnumItem(this->current_value_index).second;
 	}
 	const ValueType& Value() const noexcept
 	{
-		const pair_type& item = FetchEnumItem(this->current_value_index);
-		return item.first;
+		return FetchEnumItem(this->current_value_index).first;
 	}
 
 public:
@@ -552,7 +568,15 @@ public:
 			return (*iter).first;
 		return {};
 	}
+	static size_t GetCount() noexcept
+	{
+		return enum_list.size() + custom_list.size();
+	}
 
+	static bool IsCustomItem(MultiCustomEnum obj) noexcept
+	{
+		return static_cast<size_t>(obj.current_value_index) >= enum_list.size();
+	}
 	static void AddCustomItem(ValueType val, NameType name)
 	{
 		custom_list.emplace_back(std::move(val), std::move(name));
@@ -571,11 +595,22 @@ public:
 	}
 	static bool RemoveCustomItem(MultiCustomEnum obj) noexcept
 	{
-		if (obj.current_value_index < enum_list.size())
+		if (!IsCustomItem(obj))
 			return false;
 		custom_list.erase(custom_list.cbegin() + obj.current_value_index - enum_list.size());
 		NotifyAllObject(obj.current_value_index);
 		return true;
+	}
+	static bool RenameCustomItem(MultiCustomEnum obj, NameType new_name)
+	{
+		if (!IsCustomItem(obj))
+			return false;
+		FetchCustomItem(obj).second = new_name;
+		return true;
+	}
+	static ValueType& ModifyCustomItem(MultiCustomEnum obj) noexcept
+	{
+		return FetchCustomItem(obj).first;
 	}
 
 private:
@@ -587,13 +622,18 @@ private:
 		else
 			return custom_list[index - enum_list.size()];
 	}
+	static pair_type& FetchCustomItem(MultiCustomEnum obj) noexcept
+	{
+		assert(IsCustomItem(obj));
+		return custom_list[obj.current_value_index - enum_list.size()];
+	}
 	static void NotifyAllObject(size_t removed_index) noexcept
 	{
 		for (auto& obj : notify_list)
 		{
 			if (obj->current_value_index == removed_index)
 				obj->setDefaultValue();
-			else if (obj->current_value_index > removed_index)
+			else if (static_cast<size_t>(obj->current_value_index) > removed_index)
 				obj->current_value_index--;
 		}
 	}
