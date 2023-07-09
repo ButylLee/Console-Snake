@@ -521,8 +521,8 @@ void CustomThemePage::generateRandomTheme()
 /***************************************
  class CustomMapPage
 ****************************************/
-CustomMapPage::MapSelector::MapSelector(Map& map)
-	:map(map)
+CustomMapPage::MapSelector::MapSelector(Canvas& canvas, Map& map)
+	: canvas(canvas), map(map)
 {
 	if (MapSet::GetCount() < max_mapset_count)
 		MapSet::AddCustomItem({}, temp_mapset_name);
@@ -533,27 +533,24 @@ CustomMapPage::MapSelector::~MapSelector() noexcept
 	MapSet::RemoveCustomItem(temp_mapset_name);
 }
 
-void CustomMapPage::MapSelector::paint()
-{
-
-}
-
 void CustomMapPage::MapSelector::selectPrev()
 {
 	if (+map.set == 0)
 		return;
+	if (+map.set - view_begin == 0 && +map.set != 0)
+		view_begin--;
 	map.set.setPrevValue();
-	//TODO:paint
-	//TODO:change map view
+	refreshMapList();
 }
 
 void CustomMapPage::MapSelector::selectNext()
 {
 	if (+map.set == MapSet::GetCount() - 1)
 		return;
+	if (+map.set - view_begin == max_mapset_count - 1 && +map.set != MapSet::GetCount() - 1)
+		view_begin++;
 	map.set.setNextValue();
-	//TODO:paint
-	//TODO:change map view
+	refreshMapList();
 }
 
 DynArray<Element, 2> CustomMapPage::MapSelector::fetchSelected()
@@ -595,13 +592,46 @@ void CustomMapPage::MapSelector::deleteSelected()
 	if (MapSet(MapSet::GetCount() - 1).Name() != temp_mapset_name)
 		MapSet::AddCustomItem({}, temp_mapset_name);
 	map.set = temp.setNextValue();
-	//TODO:paint
-	//TODO:change map view
+	refreshMapList();
 }
 
-void CustomMapPage::MapViewer::paint() const
+void CustomMapPage::MapSelector::paint()
 {
+	canvas.setCursorOffset(canvas_offset_x, canvas_offset_y);
+	finally { canvas.setCursorOffset(0, 0); };
+	canvas.setCursor(2, 0);
+	for (size_t i = 0; i < view_span; i++)
+		print(L"  /------------\\ " + !!i);
+	canvas.setCursor(2, 2);
+	for (size_t i = 0; i < view_span; i++)
+		print(L"  \\------------/ " + !!i);
+	canvas.setCursor(2, 1);
+	for (size_t i = 0; i < view_span; i++)
+		print(L"  |            | " + !!i);
+	assert(+map.set == 0);
+	refreshMapList();
+}
 
+void CustomMapPage::MapSelector::refreshMapList()
+{
+	MapSet set(view_begin);
+	canvas.setCursorOffset(canvas_offset_x, canvas_offset_y);
+	finally { canvas.setCursorOffset(0, 0); };
+	canvas.setCursor(2, 1);
+	for (size_t i = 0; i < view_span; i++)
+	{
+		if (set == map.set)
+			canvas.setColor(Color::LightGreen);
+		else
+			canvas.setColor(Color::White);
+		if (set.Name() == temp_mapset_name)
+		{
+			print(L" |   --++--   | ");
+			break;
+		}
+		print(::format(L"  |{:02}{: <10.10}| " + !!i, i + 1, set.Name()));
+		set.setNextValue();
+	}
 }
 
 void CustomMapPage::MapViewer::changeMap(DynArray<Element, 2> map)
@@ -660,15 +690,18 @@ void CustomMapPage::MapViewer::setAllBlank()
 	//TODO:paint
 }
 
+void CustomMapPage::MapViewer::paint() const
+{
+	canvas.setCursorOffset(canvas_offset_x, canvas_offset_y);
+	finally { canvas.setCursorOffset(0, 0); };
+}
+
 void CustomMapPage::run()
 {
 	canvas.setClientSize(default_size);
 	paintInterface();
-	canvas.setCursorOffset(0, 6);
 	map_list.paint();
-	canvas.setCursorOffset(0, 10);
 	map_viewer.paint();
-	canvas.setCursorOffset(0, 0);
 
 	while (true)
 	{

@@ -597,7 +597,7 @@ public:
 	{
 		if (!IsCustomItem(obj))
 			return false;
-		custom_list.erase(custom_list.cbegin() + obj.current_value_index - enum_list.size());
+		custom_list.erase(custom_list.cbegin() + (obj.current_value_index - enum_list.size()));
 		NotifyAllObject(obj.current_value_index);
 		return true;
 	}

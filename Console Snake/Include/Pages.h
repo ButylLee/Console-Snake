@@ -95,36 +95,43 @@ private:
 	class MapSelector
 	{
 		static constexpr size_t view_span = 5;
-		static constexpr size_t max_mapset_count = 20;
+		static constexpr size_t max_mapset_count = 16;
 		static constexpr const wchar_t* temp_mapset_name = L"$";
+		static constexpr short canvas_offset_x = 0, canvas_offset_y = 6;
 	public:
-		MapSelector(Map& map);
+		MapSelector(Canvas&, Map&);
 		~MapSelector() noexcept;
-		void paint();
 		void selectPrev();
 		void selectNext();
 		DynArray<Element, 2> fetchSelected();
 		void replaceSelected(const DynArray<Element, 2>&);
 		void deleteSelected();
+		void paint();
 	private:
+		void refreshMapList();
+	private:
+		Canvas& canvas;
 		Map& map;
 		size_t view_begin = 0;
 	};
 	class MapViewer
 	{
+		static constexpr short canvas_offset_x = 0, canvas_offset_y = 10;
 	public:
 		enum struct Direction { Up, Down, Left, Right };
 	public:
-		void paint() const;
+		MapViewer(Canvas& canvas) :canvas(canvas) {}
 		void changeMap(DynArray<Element, 2>);
 		void enterEditing();
 		const DynArray<Element, 2>& exitEditing();
 		void moveSelected(Direction);
 		void switchSelected();
 		void setAllBlank();
+		void paint() const;
 		size_t getX() const noexcept { return x; }
 		size_t getY() const noexcept { return y; }
 	private:
+		Canvas& canvas;
 		DynArray<Element, 2> editing_map;
 		size_t x = 0, y = 0;
 		bool is_editing = false;
@@ -141,8 +148,8 @@ private:
 private:
 	EditorLevel editor_level = EditorLevel::MapSelect;
 	Map map;
-	MapSelector map_list{ map };
-	MapViewer map_viewer;
+	MapSelector map_list{ canvas, map };
+	MapViewer map_viewer{ canvas };
 };
 
 class BeginPage :public NormalPage
