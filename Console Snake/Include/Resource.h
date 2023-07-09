@@ -242,7 +242,7 @@ struct SizeEnum {
 		DefaultValue = S
 	};
 };
-using Size = Enum<SizeEnum, short>;
+using Size = Enum<SizeEnum, unsigned short>;
 ENUM_DEFINE(Size)
 {
 	{ 15, L"Small  " },

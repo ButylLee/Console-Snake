@@ -637,7 +637,7 @@ void CustomMapPage::MapSelector::refreshMapList()
 void CustomMapPage::MapViewer::changeMap(DynArray<Element, 2> map)
 {
 	editing_map = std::move(map);
-	//paint
+	paint();
 }
 
 void CustomMapPage::MapViewer::enterEditing()
@@ -687,13 +687,42 @@ void CustomMapPage::MapViewer::setAllBlank()
 {
 	for (auto& node : editing_map.iter_all())
 		node = Element::Blank;
-	//TODO:paint
+	paint();
 }
 
 void CustomMapPage::MapViewer::paint() const
 {
 	canvas.setCursorOffset(canvas_offset_x, canvas_offset_y);
 	finally { canvas.setCursorOffset(0, 0); };
+	canvas.setColor(Color::White);
+
+	std::wstring line;
+	auto map_begin_pos = static_cast<unsigned short>((Size(Size::L).Value() - editing_map.size()) / 2);
+	auto iter = editing_map.iter_all().begin();
+	for (unsigned short row = 0; row < Size(Size::L).Value(); row++)
+	{
+		canvas.setCursor(0, row);
+		line.clear();
+		for (unsigned short column = 0; column < Size(Size::L).Value(); column++)
+		{
+			if (row >= map_begin_pos && column >= map_begin_pos &&
+				row < map_begin_pos + editing_map.size() &&
+				column < map_begin_pos + editing_map.size())
+			{
+				assert(iter < editing_map.iter_all().end());
+				switch (*iter++)
+				{
+					case Element::Blank:
+						line += L'□'; break;
+					case Element::Barrier:
+						line += L'■'; break;
+				}
+			}
+			else
+				line += L"  ";
+		}
+		print(line);
+	}
 }
 
 void CustomMapPage::run()
@@ -701,6 +730,7 @@ void CustomMapPage::run()
 	canvas.setClientSize(default_size);
 	paintInterface();
 	map_list.paint();
+	map_viewer.changeMap(map_list.fetchSelected());
 	map_viewer.paint();
 
 	while (true)

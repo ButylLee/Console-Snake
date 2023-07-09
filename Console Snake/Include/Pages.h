@@ -116,7 +116,7 @@ private:
 	};
 	class MapViewer
 	{
-		static constexpr short canvas_offset_x = 0, canvas_offset_y = 10;
+		static constexpr short canvas_offset_x = 1, canvas_offset_y = 10;
 	public:
 		enum struct Direction { Up, Down, Left, Right };
 	public:
