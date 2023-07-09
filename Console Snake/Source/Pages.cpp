@@ -547,7 +547,7 @@ void CustomMapPage::MapSelector::selectNext()
 {
 	if (+map.set == MapSet::GetCount() - 1)
 		return;
-	if (+map.set - view_begin == max_mapset_count - 1 && +map.set != MapSet::GetCount() - 1)
+	if (+map.set - view_begin == view_span - 1 && +map.set != MapSet::GetCount() - 1)
 		view_begin++;
 	map.set.setNextValue();
 	refreshMapList();
@@ -576,10 +576,11 @@ void CustomMapPage::MapSelector::replaceSelected(const DynArray<Element, 2>& map
 	map.applyCustomValue(f);
 	if (map.set.Name() == temp_mapset_name)
 	{
-		MapSet::RenameCustomItem(map.set, L"MapUnnamed"_crypt);
+		MapSet::RenameCustomItem(map.set, L"Unnamed"_crypt);
 		if (MapSet::GetCount() < max_mapset_count)
 			MapSet::AddCustomItem({}, temp_mapset_name);
 	}
+	refreshMapList();
 }
 
 void CustomMapPage::MapSelector::deleteSelected()
@@ -605,18 +606,19 @@ void CustomMapPage::MapSelector::paint()
 	canvas.setCursor(2, 2);
 	for (size_t i = 0; i < view_span; i++)
 		print(L"  \\------------/ " + !!i);
-	canvas.setCursor(2, 1);
-	for (size_t i = 0; i < view_span; i++)
-		print(L"  |            | " + !!i);
 	assert(+map.set == 0);
 	refreshMapList();
 }
 
 void CustomMapPage::MapSelector::refreshMapList()
 {
-	MapSet set(view_begin);
 	canvas.setCursorOffset(canvas_offset_x, canvas_offset_y);
 	finally { canvas.setCursorOffset(0, 0); };
+	canvas.setCursor(2, 1);
+	for (size_t i = 0; i < view_span; i++)
+		print(L"  |            | " + !!i);
+
+	MapSet set(view_begin);
 	canvas.setCursor(2, 1);
 	for (size_t i = 0; i < view_span; i++)
 	{
@@ -629,7 +631,7 @@ void CustomMapPage::MapSelector::refreshMapList()
 			print(L" |   --++--   | ");
 			break;
 		}
-		print(::format(L"  |{:02}{: <10.10}| " + !!i, i + 1, set.Name()));
+		print(::format(L"  |{:02}{: <10.10}| " + !!i, view_begin + i + 1, set.Name()));
 		set.setNextValue();
 	}
 }
