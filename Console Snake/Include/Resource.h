@@ -11,7 +11,7 @@
 #include <cstddef>
 #include <cassert>
 
-#define GAME_VERSION "2.22"
+#define GAME_VERSION "2.30"
 
 namespace Resource {
 	inline constexpr const char* save_file_name = "SnakeSaved.bin";
@@ -163,6 +163,7 @@ TOKEN_DEF(
 	custom_map_delete_map,
 	custom_map_delete_map_confirm,
 	custom_map_switch_size,
+	custom_map_rename,
 	custom_map_curr_size,
 	custom_map_curr_pos,
 	custom_map_move_cursor,

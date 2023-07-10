@@ -600,6 +600,7 @@ void CustomMapPage::MapSelector::paint()
 {
 	canvas.setCursorOffset(canvas_offset_x, canvas_offset_y);
 	finally { canvas.setCursorOffset(0, 0); };
+	canvas.setColor(normal_color);
 	canvas.setCursor(2, 0);
 	for (size_t i = 0; i < view_span; i++)
 		print(L"  /------------\\ " + !!i);
@@ -614,6 +615,7 @@ void CustomMapPage::MapSelector::refreshMapList()
 {
 	canvas.setCursorOffset(canvas_offset_x, canvas_offset_y);
 	finally { canvas.setCursorOffset(0, 0); };
+	canvas.setColor(normal_color);
 	canvas.setCursor(2, 1);
 	for (size_t i = 0; i < view_span; i++)
 		print(L"  |            | " + !!i);
@@ -623,9 +625,9 @@ void CustomMapPage::MapSelector::refreshMapList()
 	for (size_t i = 0; i < view_span; i++)
 	{
 		if (set == map.set)
-			canvas.setColor(Color::LightGreen);
+			canvas.setColor(highlight_color);
 		else
-			canvas.setColor(Color::White);
+			canvas.setColor(normal_color);
 		if (set.Name() == temp_mapset_name)
 		{
 			print(L" |   --++--   | ");
@@ -646,18 +648,20 @@ void CustomMapPage::MapViewer::enterEditing()
 {
 	assert(!is_editing);
 	is_editing = true;
-	//TODO:paint cursor
+	paintSelectedPos(highlight_color);
 }
 
 const DynArray<Element, 2>& CustomMapPage::MapViewer::exitEditing()
 {
-	//TODO:remove cursor
+	assert(is_editing);
 	is_editing = false;
+	paintSelectedPos(normal_color);
 	return editing_map;
 }
 
 void CustomMapPage::MapViewer::moveSelected(Direction direct)
 {
+	paintSelectedPos(normal_color);
 	switch (direct)
 	{
 		case Direction::Up:
@@ -673,16 +677,19 @@ void CustomMapPage::MapViewer::moveSelected(Direction direct)
 			x == editing_map.size() - 1 ? x = 0 : x++;
 			break;
 	}
-	//TODO:paint curr and recover prev
+	paintSelectedPos(highlight_color);
 }
 
 void CustomMapPage::MapViewer::switchSelected()
 {
-	using type = std::underlying_type_t<Element>;
-	type value = static_cast<type>(editing_map[y][x]);
-	type mask = static_cast<type>(Element::Mask_);
-	editing_map[y][x] = static_cast<Element>(mask - value);
-	//TODO:paint
+	switch (editing_map[y][x])
+	{
+		case Element::Blank:
+			editing_map[y][x] = Element::Barrier; break;
+		case Element::Barrier:
+			editing_map[y][x] = Element::Blank; break;
+	}
+	paintSelectedPos(highlight_color);
 }
 
 void CustomMapPage::MapViewer::setAllBlank()
@@ -690,13 +697,14 @@ void CustomMapPage::MapViewer::setAllBlank()
 	for (auto& node : editing_map.iter_all())
 		node = Element::Blank;
 	paint();
+	paintSelectedPos(highlight_color);
 }
 
 void CustomMapPage::MapViewer::paint() const
 {
 	canvas.setCursorOffset(canvas_offset_x, canvas_offset_y);
 	finally { canvas.setCursorOffset(0, 0); };
-	canvas.setColor(Color::White);
+	canvas.setColor(normal_color);
 
 	std::wstring line;
 	auto map_begin_pos = static_cast<unsigned short>((Size(Size::L).Value() - editing_map.size()) / 2);
@@ -727,6 +735,24 @@ void CustomMapPage::MapViewer::paint() const
 	}
 }
 
+void CustomMapPage::MapViewer::paintSelectedPos(Color color) const
+{
+	canvas.setCursorOffset(canvas_offset_x, canvas_offset_y);
+	finally { canvas.setCursorOffset(0, 0); };
+	auto map_begin_pos = (Size(Size::L).Value() - editing_map.size()) / 2;
+	auto pos_x = static_cast<short>(map_begin_pos + x);
+	auto pos_y = static_cast<short>(map_begin_pos + y);
+	canvas.setCursor(pos_x, pos_y);
+	canvas.setColor(color);
+	switch (editing_map[y][x])
+	{
+		case Element::Blank:
+			print(L'□'); break;
+		case Element::Barrier:
+			print(L'■'); break;
+	}
+}
+
 void CustomMapPage::run()
 {
 	canvas.setClientSize(default_size);
@@ -738,9 +764,9 @@ void CustomMapPage::run()
 	while (true)
 	{
 		paintCurOptions();
-		switch (editor_level)
+		switch (editor_state)
 		{
-			case EditorLevel::MapSelect:
+			case EditorState::MapSelect:
 				switch (getwch())
 				{
 					case K_F1:
@@ -755,7 +781,7 @@ void CustomMapPage::run()
 						if (MapSet::IsCustomItem(map.set))
 						{
 							map_viewer.enterEditing();
-							editor_level = EditorLevel::MapEdit;
+							editor_state = EditorState::MapEdit;
 						}
 						break;
 					case K_F4:
@@ -763,11 +789,22 @@ void CustomMapPage::run()
 						map_viewer.changeMap(map_list.fetchSelected());
 						break;
 					case K_Delete:
-						if (MapSet::IsCustomItem(map.set))
+						if (MapSet::IsCustomItem(map.set) && map.set.Name() != MapSelector::temp_mapset_name)
 						{
-							//TODO:confirm delete
-							map_list.deleteSelected();
-							map_viewer.changeMap(map_list.fetchSelected());
+							canvas.setCursorOffset(25, 10);
+							finally { canvas.setCursorOffset(0, 0); };
+							canvas.setCursor(11, 2);
+							canvas.setColor(Color::Red);
+							print(~Token::custom_map_delete_map_confirm);
+							if (getwch() == K_Delete)
+							{
+								map_list.deleteSelected();
+								map_viewer.changeMap(map_list.fetchSelected());
+							}
+							canvas.setCursorOffset(25, 10);
+							canvas.setCursor(11, 2);
+							canvas.setColor(Color::White);
+							print(~Token::custom_map_delete_map);
 						}
 						break;
 					case K_Enter: case K_Esc:
@@ -775,7 +812,7 @@ void CustomMapPage::run()
 						return;
 				}
 				break;
-			case EditorLevel::MapEdit:
+			case EditorState::MapEdit:
 				switch (getwch())
 				{
 					case K_UP: case K_W: case K_w:
@@ -792,11 +829,11 @@ void CustomMapPage::run()
 						map_viewer.setAllBlank(); break;
 					case K_Enter:
 						map_list.replaceSelected(map_viewer.exitEditing());
-						editor_level = EditorLevel::MapSelect;
+						editor_state = EditorState::MapSelect;
 						break;
 					case K_Esc:
 						map_viewer.exitEditing();
-						editor_level = EditorLevel::MapSelect;
+						editor_state = EditorState::MapSelect;
 						break;
 				}
 				break;
@@ -856,7 +893,7 @@ void CustomMapPage::paintCurOptions()
 	print(map.size.Name());
 	canvas.setCursor(2, 8);
 	print(~Token::custom_map_curr_pos);
-	print(::format(L"({:>2},{:<2})"_crypt, map_viewer.getX(), map_viewer.getY()));
+	print(::format(L"({:>2},{:<2})"_crypt, map_viewer.getX() + 1, map_viewer.getY() + 1));
 }
 
 /***************************************

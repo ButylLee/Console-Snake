@@ -96,8 +96,10 @@ private:
 	{
 		static constexpr size_t view_span = 5;
 		static constexpr size_t max_mapset_count = 16;
-		static constexpr const wchar_t* temp_mapset_name = L"$";
+		static constexpr Color normal_color = Color::White, highlight_color = Color::LightGreen;
 		static constexpr short canvas_offset_x = 0, canvas_offset_y = 6;
+	public:
+		static constexpr const wchar_t* temp_mapset_name = L"$";
 	public:
 		MapSelector(Canvas&, Map&);
 		~MapSelector() noexcept;
@@ -116,6 +118,7 @@ private:
 	};
 	class MapViewer
 	{
+		static constexpr Color normal_color = Color::White, highlight_color = Color::LightGreen;
 		static constexpr short canvas_offset_x = 1, canvas_offset_y = 10;
 	public:
 		enum struct Direction { Up, Down, Left, Right };
@@ -131,12 +134,14 @@ private:
 		size_t getX() const noexcept { return x; }
 		size_t getY() const noexcept { return y; }
 	private:
+		void paintSelectedPos(Color) const;
+	private:
 		Canvas& canvas;
 		DynArray<Element, 2> editing_map;
 		size_t x = 0, y = 0;
 		bool is_editing = false;
 	};
-	enum struct EditorLevel { MapSelect, MapEdit, MapNaming };
+	enum struct EditorState { MapSelect, MapEdit, MapNaming };
 
 public:
 	void run() override;
@@ -146,7 +151,7 @@ private:
 	void paintCurOptions();
 
 private:
-	EditorLevel editor_level = EditorLevel::MapSelect;
+	EditorState editor_state = EditorState::MapSelect;
 	Map map;
 	MapSelector map_list{ canvas, map };
 	MapViewer map_viewer{ canvas };

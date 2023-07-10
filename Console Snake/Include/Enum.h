@@ -107,7 +107,7 @@ public:
 public:
 	EnumBase() = default;
 	// EnumTag literals could implicitly cast to CustomEnum
-	EnumBase(EnumTag tag) noexcept
+	constexpr EnumBase(EnumTag tag) noexcept
 	{
 		current_value_index = static_cast<size_t>(tag);
 	}
@@ -203,7 +203,7 @@ private:
 
 public:
 	Enum() = default;
-	Enum(EnumTag tag) noexcept
+	constexpr Enum(EnumTag tag) noexcept
 		:Base(tag)
 	{}
 
@@ -304,10 +304,10 @@ private:
 
 public:
 	CustomEnum() = default;
-	CustomEnum(EnumTag tag) noexcept
+	constexpr CustomEnum(EnumTag tag) noexcept
 		:Base(tag)
 	{}
-	CustomEnum(CustomTag tag) noexcept
+	constexpr CustomEnum(CustomTag tag) noexcept
 		:Base(static_cast<EnumTag>(tag))
 	{}
 
