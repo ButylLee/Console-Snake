@@ -1054,7 +1054,8 @@ void RankPage::paintInterface()
 			buffer += ~Token::rank_setting;
 			speed = ~Speed::GetNameFrom(item.speed);
 			buffer += ::format(L"{:<{}} "_crypt, std::move(speed), 6);
-			buffer += ::format(L"{:.{}} - {}"_crypt, item.map_name, Map::name_max_length, Size::GetNameFrom(item.size));
+			buffer += ::format(L"{0:>{1}.{1}} - {2}"_crypt,
+							   item.map_name, Map::name_max_half_width, Size::GetNameFrom(item.size));
 
 			buffer = ::format(L"{:^{}}"_crypt, std::move(buffer), baseX * 2);
 			print(buffer);

@@ -37,7 +37,7 @@ class GameSavingBase
 	struct RankSavingItem
 	{
 		wchar_t name[Rank::name_max_length] = {};
-		wchar_t map_name[Map::name_max_length] = {};
+		wchar_t map_name[Map::name_max_half_width] = {};
 		int16_t score = 0;
 		int16_t size = 0;
 		int8_t speed = 0;

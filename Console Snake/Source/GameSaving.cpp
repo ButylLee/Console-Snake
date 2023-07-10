@@ -143,7 +143,7 @@ void GameSavingBase::convertFromSaveData() noexcept
 	}
 	// rank data
 	wchar_t name[Rank::name_max_length + 1] = {};
-	wchar_t map_name[Map::name_max_length + 1] = {};
+	wchar_t map_name[Map::name_max_half_width + 1] = {};
 	auto [rank, lock] = Rank::get().modifyRank();
 	for (size_t i = 0; i < Rank::rank_count; i++)
 	{
@@ -155,7 +155,7 @@ void GameSavingBase::convertFromSaveData() noexcept
 		rank_item.is_win = Convert{ save_item.is_win };
 		std::copy_n(save_item.name, Rank::name_max_length, name);
 		rank_item.name = name;
-		std::copy_n(save_item.map_name, Map::name_max_length, map_name);
+		std::copy_n(save_item.map_name, Map::name_max_half_width, map_name);
 		rank_item.map_name = map_name;
 
 		if (rank_item.is_win)
@@ -194,7 +194,7 @@ void GameSavingBase::convertToSaveData() noexcept
 		save_item.speed = Convert{ rank_item.speed };
 		save_item.is_win = Convert{ rank_item.is_win };
 		std::copy_n(rank_item.name.c_str(), Rank::name_max_length, save_item.name);
-		std::copy_n(rank_item.map_name.c_str(), Map::name_max_length, save_item.map_name);
+		std::copy_n(rank_item.map_name.c_str(), Map::name_max_half_width, save_item.map_name);
 	}
 }
 

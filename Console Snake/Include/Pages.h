@@ -142,7 +142,7 @@ private:
 	};
 	static constexpr Color normal_color = Color::White, highlight_color = Color::LightGreen;
 	static constexpr short canvas_offset_x = 25, canvas_offset_y = 10;
-	static constexpr size_t name_max_full_width = 5;
+	static constexpr size_t name_max_full_width = Map::name_max_half_width / 2;
 	enum struct EditorState { MapSelect, MapEdit, MapNaming };
 
 public:

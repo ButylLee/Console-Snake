@@ -694,7 +694,7 @@ ENUM_DEFINE(MapSet)
 
 struct Map // Proxy
 {
-	static constexpr size_t name_max_length = 8;
+	static constexpr size_t name_max_half_width = 10;
 	MapSet set;
 	Size size;
 
