@@ -11,6 +11,7 @@
 #include <string_view>
 #include <format>
 #include <algorithm>
+#include <numeric>
 
 using wint = uint32_t;
 static_assert(sizeof(wint) == 2 * sizeof(wint_t));
@@ -78,7 +79,7 @@ inline std::wstring format(std::wstring_view fmt, TArgs&&... args)
 /***************************************
  Function: calculate the full-width length
 ****************************************/
-constexpr size_t StrFullWidthLen(std::wstring_view str) noexcept
+constexpr size_t StrFullWidthLength(std::wstring_view str) noexcept
 {
 	size_t half_width_count = std::ranges::count_if(
 		str, [](wchar_t ch)
@@ -89,6 +90,26 @@ constexpr size_t StrFullWidthLen(std::wstring_view str) noexcept
 	);
 	half_width_count /= 2;
 	return str.length() - half_width_count;
+}
+
+/***************************************
+ Function: calculate the index of
+           specified length in full-width
+****************************************/
+constexpr size_t StrIndexOfFullWidthLength(std::wstring_view str, size_t length) noexcept
+{
+	length *= 2;
+	size_t index = 0, count = 0;
+	for (; index < str.size(); index++)
+	{
+		if (!(str[index] >> sizeof(wchar_t) * CHAR_BIT / 2) && iswprint(str[index]))
+			count += 1;
+		else
+			count += 2;
+		if (count > length)
+			break;
+	}
+	return index;
 }
 
 /***************************************

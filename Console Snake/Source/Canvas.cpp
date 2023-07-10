@@ -91,6 +91,6 @@ void Canvas::applyClientSize() noexcept
 
 short Canvas::calCenteredCoord(const std::wstring_view& str) const noexcept
 {
-	short coord = (size.width - static_cast<short>(StrFullWidthLen(str))) / 2;
+	short coord = (size.width - static_cast<short>(StrFullWidthLength(str))) / 2;
 	return coord > 0 ? coord : 0;
 }

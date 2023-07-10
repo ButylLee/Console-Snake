@@ -96,10 +96,9 @@ private:
 	{
 		static constexpr size_t view_span = 5;
 		static constexpr size_t max_mapset_count = 16;
-		static constexpr Color normal_color = Color::White, highlight_color = Color::LightGreen;
 		static constexpr short canvas_offset_x = 0, canvas_offset_y = 6;
 	public:
-		static constexpr const wchar_t* temp_mapset_name = L"$";
+		static constexpr const wchar_t* temp_mapset_name = L"$>_<";
 	public:
 		MapSelector(Canvas&, Map&);
 		~MapSelector() noexcept;
@@ -109,6 +108,7 @@ private:
 		void replaceSelected(const DynArray<Element, 2>&);
 		void deleteSelected();
 		void paint();
+		void renameCurrentMapSet();
 	private:
 		void refreshMapList();
 	private:
@@ -118,7 +118,6 @@ private:
 	};
 	class MapViewer
 	{
-		static constexpr Color normal_color = Color::White, highlight_color = Color::LightGreen;
 		static constexpr short canvas_offset_x = 1, canvas_offset_y = 10;
 	public:
 		enum struct Direction { Up, Down, Left, Right };
@@ -141,6 +140,9 @@ private:
 		size_t x = 0, y = 0;
 		bool is_editing = false;
 	};
+	static constexpr Color normal_color = Color::White, highlight_color = Color::LightGreen;
+	static constexpr short canvas_offset_x = 25, canvas_offset_y = 10;
+	static constexpr size_t name_max_full_width = 5;
 	enum struct EditorState { MapSelect, MapEdit, MapNaming };
 
 public:

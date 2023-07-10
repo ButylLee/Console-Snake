@@ -611,6 +611,27 @@ void CustomMapPage::MapSelector::paint()
 	refreshMapList();
 }
 
+void CustomMapPage::MapSelector::renameCurrentMapSet()
+{
+	canvas.setCursorOffset(canvas_offset_x, canvas_offset_y);
+	canvas.setCursor(static_cast<short>(4 + 8 * (+map.set - view_begin)), 1);
+	canvas.setColor(Color::LightYellow);
+	std::wstring name;
+	for (wchar_t ch;;)
+	{
+		ch = getwchar();
+		if (ch == L'\n')
+			break;
+		if (iswprint(ch) && ch != L' ')
+			name += ch;
+	}
+	if (StrFullWidthLength(name) > name_max_full_width)
+		name.resize(StrIndexOfFullWidthLength(name, name_max_full_width));
+	if (!name.empty() && name != temp_mapset_name)
+		MapSet::RenameCustomItem(map.set, std::move(name));
+	refreshMapList();
+}
+
 void CustomMapPage::MapSelector::refreshMapList()
 {
 	canvas.setCursorOffset(canvas_offset_x, canvas_offset_y);
@@ -630,10 +651,10 @@ void CustomMapPage::MapSelector::refreshMapList()
 			canvas.setColor(normal_color);
 		if (set.Name() == temp_mapset_name)
 		{
-			print(L" |   --++--   | ");
+			print(L"  |   --++--   | " + !!i);
 			break;
 		}
-		print(::format(L"  |{:02}{: <10.10}| " + !!i, view_begin + i + 1, set.Name()));
+		print(::format((L" " + !!i) + L" |{:02}{: <10.10}| "_crypt, view_begin + i + 1, set.Name()));
 		set.setNextValue();
 	}
 }
@@ -788,20 +809,24 @@ void CustomMapPage::run()
 						map.size.setNextValue();
 						map_viewer.changeMap(map_list.fetchSelected());
 						break;
+					case K_F5:
+						if (MapSet::IsCustomItem(map.set) && map.set.Name() != MapSelector::temp_mapset_name)
+							editor_state = EditorState::MapNaming;
+						break;
 					case K_Delete:
 						if (MapSet::IsCustomItem(map.set) && map.set.Name() != MapSelector::temp_mapset_name)
 						{
-							canvas.setCursorOffset(25, 10);
 							finally { canvas.setCursorOffset(0, 0); };
+							canvas.setCursorOffset(canvas_offset_x, canvas_offset_y);
 							canvas.setCursor(11, 2);
-							canvas.setColor(Color::Red);
+							canvas.setColor(Color::LightRed);
 							print(~Token::custom_map_delete_map_confirm);
 							if (getwch() == K_Delete)
 							{
 								map_list.deleteSelected();
 								map_viewer.changeMap(map_list.fetchSelected());
 							}
-							canvas.setCursorOffset(25, 10);
+							canvas.setCursorOffset(canvas_offset_x, canvas_offset_y);
 							canvas.setCursor(11, 2);
 							canvas.setColor(Color::White);
 							print(~Token::custom_map_delete_map);
@@ -837,6 +862,24 @@ void CustomMapPage::run()
 						break;
 				}
 				break;
+			case EditorState::MapNaming:
+			{
+				finally { canvas.setCursorOffset(0, 0); };
+				canvas.setCursorOffset(canvas_offset_x, canvas_offset_y);
+				canvas.setCursor(11, 4);
+				canvas.setColor(highlight_color);
+				print(~Token::custom_map_rename);
+
+				map_list.renameCurrentMapSet();
+				
+				canvas.setCursorOffset(canvas_offset_x, canvas_offset_y);
+				canvas.setCursor(11, 4);
+				canvas.setColor(normal_color);
+				print(~Token::custom_map_rename);
+
+				editor_state = EditorState::MapSelect;
+			}
+			break;
 		}
 	}
 }
@@ -854,7 +897,7 @@ void CustomMapPage::paintInterface()
 	print(custom_map_title);
 
 	canvas.setColor(Color::White);
-	canvas.setCursorOffset(25, 10);
+	canvas.setCursorOffset(canvas_offset_x, canvas_offset_y);
 	finally { canvas.setCursorOffset(0, 0); };
 
 	canvas.setCursor(2, 0);
@@ -867,6 +910,8 @@ void CustomMapPage::paintInterface()
 	print(~Token::custom_map_delete_map);
 	canvas.setCursor(2, 4);
 	print(~Token::custom_map_switch_size);
+	canvas.setCursor(11, 4);
+	print(~Token::custom_map_rename);
 	canvas.setCursor(1, 6);
 	print(L"------------------------------------");
 
@@ -885,10 +930,10 @@ void CustomMapPage::paintInterface()
 void CustomMapPage::paintCurOptions()
 {
 	canvas.setColor(Color::White);
-	canvas.setCursorOffset(25, 10);
+	canvas.setCursorOffset(canvas_offset_x, canvas_offset_y);
 	finally { canvas.setCursorOffset(0, 0); };
 
-	canvas.setCursor(11, 4);
+	canvas.setCursor(11, 8);
 	print(~Token::custom_map_curr_size);
 	print(map.size.Name());
 	canvas.setCursor(2, 8);
