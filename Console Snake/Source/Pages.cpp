@@ -318,7 +318,7 @@ void SettingPage::paintInterface()
 void SettingPage::paintCurOptions()
 {
 	auto [baseX, baseY] = canvas.getClientSize();
-	baseX = baseX / 2 + 3;
+	baseX = baseX / 2 + 4;
 	baseY = baseY / 2 + 1;
 	canvas.setColor(Color::White);
 
@@ -858,6 +858,7 @@ void CustomMapPage::run()
 						break;
 					case K_Esc:
 						map_viewer.exitEditing();
+						map_viewer.changeMap(map_list.fetchSelected());
 						editor_state = EditorState::MapSelect;
 						break;
 				}
