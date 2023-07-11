@@ -135,8 +135,16 @@ void GameSavingBase::convertFromSaveData() noexcept
 		}
 		gs.theme.convertFrom(theme_temp);
 
+		wchar_t map_name[Map::name_max_half_width + 1] = {};
+		for (size_t i = 0; i < bin_data.setting.custom_map_count; i++)
+		{
+			std::copy_n(bin_data.setting.map_name[i], Map::name_max_half_width, map_name);
+			MapSet::AddCustomItem(bin_data.setting.map[i], map_name);
+		}
+
 		gs.speed.convertFrom(bin_data.setting.speed);
 		gs.map.size.convertFrom(bin_data.setting.size);
+		gs.map.set = MapSet(bin_data.setting.map_select);
 		gs.lang.convertFrom(Convert{ bin_data.setting.lang });
 		LocalizedStrings::setLang(gs.lang.Value());
 		gs.show_frame = Convert{ bin_data.setting.show_frame };
@@ -178,8 +186,18 @@ void GameSavingBase::convertToSaveData() noexcept
 			bin_data.setting.theme[i][1] = Convert{ elements[i].color.Value() };
 		}
 
+		MapSet map(MapSet::Mask_ - 1);
+		bin_data.setting.custom_map_count = Convert{ MapSet::GetCount() - MapSet::Mask_ };
+		for (size_t i = 0; i < bin_data.setting.custom_map_count; i++)
+		{
+			map.setNextValue();
+			bin_data.setting.map[i] = map.Value();
+			std::copy_n(map.Name().c_str(), Map::name_max_half_width, bin_data.setting.map_name[i]);
+		}
+
 		bin_data.setting.speed = Convert{ gs.speed.Value() };
 		bin_data.setting.size = Convert{ gs.map.size.Value() };
+		bin_data.setting.map_select = Convert{ gs.map.set.Index() };
 		bin_data.setting.lang = Convert{ gs.lang.Value() };
 		bin_data.setting.show_frame = Convert{ gs.show_frame };
 	}

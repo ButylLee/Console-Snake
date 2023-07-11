@@ -138,7 +138,7 @@ public:
 	{
 		return static_cast<const EnumType*>(this)->Value();
 	}
-	EnumTag operator+() const noexcept
+	EnumTag Index() const noexcept
 	{
 		return static_cast<EnumTag>(current_value_index);
 	}
@@ -158,27 +158,27 @@ public:
 	}
 
 public:
-	friend bool operator==(const EnumBase& lhs, const EnumBase& rhs) noexcept
+	friend constexpr bool operator==(const EnumBase& lhs, const EnumBase& rhs) noexcept
 	{
 		return lhs.current_value_index == rhs.current_value_index;
 	}
-	friend bool operator!=(const EnumBase& lhs, const EnumBase& rhs) noexcept
+	friend constexpr bool operator!=(const EnumBase& lhs, const EnumBase& rhs) noexcept
 	{
 		return !(lhs == rhs);
 	}
-	friend bool operator<(const EnumBase& lhs, const EnumBase& rhs) noexcept
+	friend constexpr bool operator<(const EnumBase& lhs, const EnumBase& rhs) noexcept
 	{
 		return lhs.current_value_index < rhs.current_value_index;
 	}
-	friend bool operator>(const EnumBase& lhs, const EnumBase& rhs) noexcept
+	friend constexpr bool operator>(const EnumBase& lhs, const EnumBase& rhs) noexcept
 	{
 		return rhs < lhs;
 	}
-	friend bool operator<=(const EnumBase& lhs, const EnumBase& rhs) noexcept
+	friend constexpr bool operator<=(const EnumBase& lhs, const EnumBase& rhs) noexcept
 	{
 		return !(lhs > rhs);
 	}
-	friend bool operator>=(const EnumBase& lhs, const EnumBase& rhs) noexcept
+	friend constexpr bool operator>=(const EnumBase& lhs, const EnumBase& rhs) noexcept
 	{
 		return !(lhs < rhs);
 	}

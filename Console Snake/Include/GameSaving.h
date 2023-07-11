@@ -26,10 +26,14 @@ class GameSavingBase
 	};
 
 	struct SettingSavingItem
-	{//TODO:save custom map
+	{
+		MapCell map[Map::max_mapset_count - MapSet::Mask_] = {};
+		wchar_t map_name[Map::max_mapset_count - MapSet::Mask_][Map::name_max_half_width] = {};
 		int16_t theme[static_cast<size_t>(Element::Mask_)][2] = {};
 		int16_t speed = 0;
 		int16_t size = 0;
+		uint8_t custom_map_count = 0;
+		uint8_t map_select = 0;
 		int8_t lang = 0;
 		int8_t show_frame = 0;
 	};

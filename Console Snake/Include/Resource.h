@@ -240,6 +240,7 @@ ENUM_DEFINE(Lang)
 struct SizeEnum {
 	enum Tag {
 		S, M, L,
+		Mask_,
 		DefaultValue = S
 	};
 };
@@ -538,6 +539,7 @@ struct MapCell
 struct MapSetEnum {
 	enum Tag {
 		Square, Space,
+		Mask_,
 		DefaultValue = Square
 	};
 };
@@ -694,6 +696,7 @@ ENUM_DEFINE(MapSet)
 
 struct Map // Proxy
 {
+	static constexpr size_t max_mapset_count = 16;
 	static constexpr size_t name_max_half_width = 10;
 	MapSet set;
 	Size size;
@@ -705,7 +708,7 @@ struct Map // Proxy
 	}
 	void applyValue(auto&& f) const
 	{
-		switch (+size)
+		switch (size.Index())
 		{
 			case Size::S:
 				f(set.Value().map_small); break;
@@ -717,7 +720,7 @@ struct Map // Proxy
 	}
 	void applyCustomValue(auto&& f)
 	{
-		switch (+size)
+		switch (size.Index())
 		{
 			case Size::S:
 				f(MapSet::ModifyCustomItem(set).map_small); break;

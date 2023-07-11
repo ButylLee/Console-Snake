@@ -95,7 +95,6 @@ private:
 	class MapSelector
 	{
 		static constexpr size_t view_span = 5;
-		static constexpr size_t max_mapset_count = 16;
 		static constexpr short canvas_offset_x = 0, canvas_offset_y = 6;
 	public:
 		static constexpr const wchar_t* temp_mapset_name = L"$>_<";

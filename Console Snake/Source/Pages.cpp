@@ -273,13 +273,14 @@ void SettingPage::run()
 			case K_Esc:
 			{
 				GameData::get().selection = PageSelect::MenuPage;
-				// restore
+				// restore settings
 				GameSetting::get() = setting_backup;
 				LocalizedStrings::setLang(setting_backup.lang.Value());
 				if (custom_theme_backup)
 					GameSetting::get().theme.SetCustomValue(*custom_theme_backup);
 				else
 					GameSetting::get().theme.ClearCustomValue();
+				// excluding custom maps
 			}
 			return;
 		}
@@ -524,7 +525,7 @@ void CustomThemePage::generateRandomTheme()
 CustomMapPage::MapSelector::MapSelector(Canvas& canvas, Map& map)
 	: canvas(canvas), map(map)
 {
-	if (MapSet::GetCount() < max_mapset_count)
+	if (MapSet::GetCount() < Map::max_mapset_count)
 		MapSet::AddCustomItem({}, temp_mapset_name);
 }
 
@@ -535,9 +536,9 @@ CustomMapPage::MapSelector::~MapSelector() noexcept
 
 void CustomMapPage::MapSelector::selectPrev()
 {
-	if (+map.set == 0)
+	if (map.set.Index() == 0)
 		return;
-	if (+map.set - view_begin == 0 && +map.set != 0)
+	if (map.set.Index() - view_begin == 0 && map.set.Index() != 0)
 		view_begin--;
 	map.set.setPrevValue();
 	refreshMapList();
@@ -545,9 +546,9 @@ void CustomMapPage::MapSelector::selectPrev()
 
 void CustomMapPage::MapSelector::selectNext()
 {
-	if (+map.set == MapSet::GetCount() - 1)
+	if (map.set.Index() == MapSet::GetCount() - 1)
 		return;
-	if (+map.set - view_begin == view_span - 1 && +map.set != MapSet::GetCount() - 1)
+	if (map.set.Index() - view_begin == view_span - 1 && map.set.Index() != MapSet::GetCount() - 1)
 		view_begin++;
 	map.set.setNextValue();
 	refreshMapList();
@@ -577,7 +578,7 @@ void CustomMapPage::MapSelector::replaceSelected(const DynArray<Element, 2>& map
 	if (map.set.Name() == temp_mapset_name)
 	{
 		MapSet::RenameCustomItem(map.set, L"Unnamed"_crypt);
-		if (MapSet::GetCount() < max_mapset_count)
+		if (MapSet::GetCount() < Map::max_mapset_count)
 			MapSet::AddCustomItem({}, temp_mapset_name);
 	}
 	refreshMapList();
@@ -607,14 +608,14 @@ void CustomMapPage::MapSelector::paint()
 	canvas.setCursor(2, 2);
 	for (size_t i = 0; i < view_span; i++)
 		print(L"  \\------------/ " + !!i);
-	assert(+map.set == 0);
+	assert(map.set.Index() == 0);
 	refreshMapList();
 }
 
 void CustomMapPage::MapSelector::renameCurrentMapSet()
 {
 	canvas.setCursorOffset(canvas_offset_x, canvas_offset_y);
-	canvas.setCursor(static_cast<short>(4 + 8 * (+map.set - view_begin)), 1);
+	canvas.setCursor(static_cast<short>(4 + 8 * (map.set.Index() - view_begin)), 1);
 	canvas.setColor(Color::LightYellow);
 	std::wstring name;
 	for (wchar_t ch;;)
@@ -834,6 +835,7 @@ void CustomMapPage::run()
 						break;
 					case K_Enter: case K_Esc:
 						GameData::get().selection = PageSelect::SettingPage;
+						GameSaving::get().save();
 						return;
 				}
 				break;
