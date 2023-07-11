@@ -208,70 +208,58 @@ void SettingPage::run()
 		switch (getwch())
 		{
 			case K_1:
-			{
 				GameSetting::get().speed.setNextValue();
-			}
-			break;
+				break;
 
 			case K_2:
-			{
 				GameSetting::get().map.setNextValue();
-			}
-			break;
+				break;
 
 			case K_F2:
-			{
 				GameData::get().selection = PageSelect::CustomMapPage;
-				auto page = Page::Create();
-				page->run();
+				{
+					auto page = Page::Create();
+					page->run();
+				}
+				GameSaving::get().save();
 				canvas.setClientSize(default_size);
 				paintInterface();
-			}
-			break;
+				break;
 
 			case K_3:
-			{
 				if (!GameSetting::get().old_console_host)
 					GameSetting::get().show_frame = !GameSetting::get().show_frame;
-			}
-			break;
+				break;
 
 			case K_4:
-			{
 				GameSetting::get().theme.setNextValue();
-			}
-			break;
+				break;
 
 			case K_F4:
-			{
 				GameData::get().selection = PageSelect::CustomThemePage;
-				auto page = Page::Create();
-				page->run();
+				{
+					auto page = Page::Create();
+					page->run();
+				}
 				canvas.setClientSize(default_size);
 				paintInterface();
-			}
-			break;
+				break;
 
 			case K_5:
-			{
 				LocalizedStrings::setLang(
 					GameSetting::get().lang.setNextValue().Value()
 				);
 				Console::get().setTitle(~Token::console_title);
 				canvas.clear();
 				paintInterface();
-			}
-			break;
+				break;
 
 			case K_Enter:
-			{
 				GameData::get().selection = PageSelect::MenuPage;
 				GameSaving::get().save();
-			}
-			return;
+				return;
 
 			case K_Esc:
-			{
 				GameData::get().selection = PageSelect::MenuPage;
 				// restore settings
 				GameSetting::get() = setting_backup;
@@ -281,8 +269,7 @@ void SettingPage::run()
 				else
 					GameSetting::get().theme.ClearCustomValue();
 				// excluding custom maps
-			}
-			return;
+				return;
 		}
 	}
 }
@@ -835,7 +822,6 @@ void CustomMapPage::run()
 						break;
 					case K_Enter: case K_Esc:
 						GameData::get().selection = PageSelect::SettingPage;
-						GameSaving::get().save();
 						return;
 				}
 				break;
