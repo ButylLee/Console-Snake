@@ -789,6 +789,12 @@ void CustomMapPage::run()
 					case K_F3:
 						if (MapSet::IsCustomItem(map.set))
 						{
+							finally { canvas.setCursorOffset(0, 0); };
+							canvas.setCursorOffset(canvas_offset_x, canvas_offset_y);
+							canvas.setCursor(2, 2);
+							canvas.setColor(highlight_color);
+							print(~Token::custom_map_edit_map);
+
 							map_viewer.enterEditing();
 							editor_state = EditorState::MapEdit;
 						}
@@ -816,7 +822,7 @@ void CustomMapPage::run()
 							}
 							canvas.setCursorOffset(canvas_offset_x, canvas_offset_y);
 							canvas.setCursor(11, 2);
-							canvas.setColor(Color::White);
+							canvas.setColor(normal_color);
 							print(~Token::custom_map_delete_map);
 						}
 						break;
@@ -842,11 +848,13 @@ void CustomMapPage::run()
 						map_viewer.setAllBlank(); break;
 					case K_Enter:
 						map_list.replaceSelected(map_viewer.exitEditing());
+						paintInterface();
 						editor_state = EditorState::MapSelect;
 						break;
 					case K_Esc:
 						map_viewer.exitEditing();
 						map_viewer.changeMap(map_list.fetchSelected());
+						paintInterface();
 						editor_state = EditorState::MapSelect;
 						break;
 				}
@@ -882,12 +890,14 @@ void CustomMapPage::paintInterface()
                / /___/ /_/ (__  ) /_/ /_/ / / / / / /  / /  / / /_/ / /_/ /
                \____/\__,_/____/\__/\____/_/ /_/ /_/  /_/  /_/\__,_/ .___/ 
                                                                   /_/      )title" + 1; // Slant
+	canvas.setCursorOffset(0, 0);
+	canvas.setCursor(0, 0);
 	canvas.setColor(Color::LightAqua);
 	print(custom_map_title);
 
-	canvas.setColor(Color::White);
 	canvas.setCursorOffset(canvas_offset_x, canvas_offset_y);
 	finally { canvas.setCursorOffset(0, 0); };
+	canvas.setColor(normal_color);
 
 	canvas.setCursor(2, 0);
 	print(~Token::custom_map_prev);
@@ -918,7 +928,7 @@ void CustomMapPage::paintInterface()
 
 void CustomMapPage::paintCurOptions()
 {
-	canvas.setColor(Color::White);
+	canvas.setColor(normal_color);
 	canvas.setCursorOffset(canvas_offset_x, canvas_offset_y);
 	finally { canvas.setCursorOffset(0, 0); };
 
