@@ -14,16 +14,16 @@
 #define GAME_VERSION "2.30"
 
 namespace Resource {
-	inline constexpr const char* save_file_name = "SnakeSaved.bin";
-	inline constexpr const unsigned char crypto_key[] = {
+	inline constexpr const char* SaveFileName = "SnakeSaved.bin";
+	inline constexpr const unsigned char CryptoKey[] = {
 		0x54, 0xDE, 0x3B, 0xF2, 0xD8, 0x5D, 0x4E, 0x04,
 		0xB2, 0xBE, 0x4D, 0xCC, 0xC3, 0xAD, 0xEB, 0x1C,
 	};
-	inline constexpr const unsigned char crypto_IV[] = {
+	inline constexpr const unsigned char CryptoIV[] = {
 		0xE9, 0x5C, 0x99, 0x13, 0xCC, 0x94, 0x4A, 0x0C,
 		0x92, 0xD1, 0x48, 0x9E, 0x03, 0x9B, 0x4E, 0xA4,
 	};
-	inline const wchar_t* const game_title = []
+	inline const wchar_t* const GameTitle = []
 	{
 		static constexpr const wchar_t* titles[] = { LR"title(
 
@@ -696,8 +696,8 @@ ENUM_DEFINE(MapSet)
 
 struct Map // Proxy
 {
-	static constexpr size_t max_mapset_count = 16;
-	static constexpr size_t name_max_half_width = 10;
+	static constexpr size_t MaxMapSetCount = 16;
+	static constexpr size_t NameMaxHalfWidth = 10;
 	MapSet set;
 	Size size;
 

@@ -107,7 +107,7 @@ private:
 
 class Arena :public Venue
 {
-	static constexpr int snake_init_length = 3;
+	static constexpr int SnakeInitLength = 3;
 public:
 	Arena(Canvas& canvas);
 

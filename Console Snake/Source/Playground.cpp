@@ -87,7 +87,7 @@ void PlayGround::play()
 	Timer timer([&]
 				{
 					pause_flicker_flag = !pause_flicker_flag;
-				}, pause_flicker_interval, Timer::Loop);
+				}, PauseFlickerInterval, Timer::Loop);
 
 	while (true)
 	{
@@ -174,8 +174,8 @@ void PlayGround::ending()
 		}
 		if (name.find_first_not_of(L' ') == std::string::npos)
 			name.clear(); // clear if only has spaces
-		if (name.length() > Rank::name_max_length)
-			name.resize(Rank::name_max_length);
+		if (name.length() > Rank::NameMaxLength)
+			name.resize(Rank::NameMaxLength);
 		Rank::get().newResult(name, GameData::get().score, arena.isWin());
 	}
 

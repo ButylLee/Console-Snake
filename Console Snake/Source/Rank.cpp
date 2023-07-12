@@ -5,7 +5,7 @@
 RankBase::RankBase() noexcept
 {
 	try {
-		rank_table.reserve(rank_count + 1);
+		rank_table.reserve(RankCount + 1);
 	}
 	catch (...) {
 		// Strong exception guarantee of vector.reserve(...)
@@ -71,5 +71,5 @@ void RankBase::clearRank()
 {
 	std::unique_lock lock(rank_mutex);
 	rank_table.clear();
-	rank_table = std::vector<RankItem>{ rank_count };
+	rank_table = std::vector<RankItem>{ RankCount };
 }

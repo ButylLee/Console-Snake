@@ -27,8 +27,8 @@ class GameSavingBase
 
 	struct SettingSavingItem
 	{
-		MapCell map[Map::max_mapset_count - MapSet::Mask_] = {};
-		wchar_t map_name[Map::max_mapset_count - MapSet::Mask_][Map::name_max_half_width] = {};
+		MapCell map[Map::MaxMapSetCount - MapSet::Mask_] = {};
+		wchar_t map_name[Map::MaxMapSetCount - MapSet::Mask_][Map::NameMaxHalfWidth] = {};
 		int16_t theme[static_cast<size_t>(Element::Mask_)][2] = {};
 		int16_t speed = 0;
 		int16_t size = 0;
@@ -40,8 +40,8 @@ class GameSavingBase
 
 	struct RankSavingItem
 	{
-		wchar_t name[Rank::name_max_length] = {};
-		wchar_t map_name[Map::name_max_half_width] = {};
+		wchar_t name[Rank::NameMaxLength] = {};
+		wchar_t map_name[Map::NameMaxHalfWidth] = {};
 		int16_t score = 0;
 		int16_t size = 0;
 		int8_t speed = 0;
@@ -62,7 +62,7 @@ private:
 	struct {
 		Magic magic;
 		SettingSavingItem setting;
-		RankSavingItem rank_list[Rank::rank_count];
+		RankSavingItem rank_list[Rank::RankCount];
 	}bin_data;
 
 	std::future<void> done;

@@ -22,8 +22,8 @@ public:
 		Size::ValueType size = {};
 		bool is_win = false;
 	};
-	static constexpr size_t rank_count = 10;
-	static constexpr size_t name_max_length = 12;
+	static constexpr size_t RankCount = 10;
+	static constexpr size_t NameMaxLength = 12;
 
 protected:
 	RankBase() noexcept;
@@ -40,7 +40,7 @@ public:
 	void clearRank();
 
 private:
-	std::vector<RankItem> rank_table{ rank_count };
+	std::vector<RankItem> rank_table{ RankCount };
 	mutable std::future<void> done;
 	mutable std::shared_mutex rank_mutex;
 };

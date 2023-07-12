@@ -264,7 +264,7 @@ bool Arena::isOver() const noexcept
 
 bool Arena::isWin() const noexcept
 {
-	return Venue::isWin(GameData::get().score, snake_init_length);
+	return Venue::isWin(GameData::get().score, SnakeInitLength);
 }
 
 void Arena::paintElement(Element which)
@@ -287,8 +287,8 @@ void Arena::paintVenue()
 void Arena::createSnake()
 {
 	// random snake initial postion
-	auto x_range = GameSetting::get().map.size.Value() - 2 * (1 + snake_init_length);
-	auto y_range = GameSetting::get().map.size.Value() - 2 * (1 + snake_init_length);
+	auto x_range = GameSetting::get().map.size.Value() - 2 * (1 + SnakeInitLength);
+	auto y_range = GameSetting::get().map.size.Value() - 2 * (1 + SnakeInitLength);
 	auto begin_head_x = GetRandom(0, x_range);
 	auto begin_head_y = GetRandom(0, y_range);
 	Direction direction;
@@ -308,12 +308,12 @@ void Arena::createSnake()
 		else
 			direction = Direction::Up;
 	}
-	begin_head_x += 1 + snake_init_length;
-	begin_head_y += 1 + snake_init_length;
+	begin_head_x += 1 + SnakeInitLength;
+	begin_head_y += 1 + SnakeInitLength;
 
 	// place initial snake body
 	addSnakeBody(direction, begin_head_x, begin_head_y);
-	for (size_t i = 0; i < snake_init_length - 1; i++)
+	for (size_t i = 0; i < SnakeInitLength - 1; i++)
 		addSnakeBody(-direction);
 }
 

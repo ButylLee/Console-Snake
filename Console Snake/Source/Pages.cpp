@@ -119,7 +119,7 @@ void AboutPage::run()
 void NormalPage::paintTitle(ShowVersion show_version)
 {
 	canvas.setColor(Color::LightBlue);
-	print(Resource::game_title);
+	print(Resource::GameTitle);
 	if (show_version == ShowVersion::Yes)
 		print(~Token::game_version);
 }
@@ -131,7 +131,7 @@ void MenuPage::run()
 {
 	Console::get().setTitle(~Token::console_title);
 	Console::get().setConsoleWindow(Console::UseFrame);
-	canvas.setClientSize(default_size);
+	canvas.setClientSize(DefaultSize);
 	paintInterface();
 
 	using namespace std::chrono_literals;
@@ -199,7 +199,7 @@ void MenuPage::paintInterface()
 ****************************************/
 void SettingPage::run()
 {
-	canvas.setClientSize(default_size);
+	canvas.setClientSize(DefaultSize);
 	paintInterface();
 
 	while (true)
@@ -222,7 +222,7 @@ void SettingPage::run()
 					page->run();
 				}
 				GameSaving::get().save();
-				canvas.setClientSize(default_size);
+				canvas.setClientSize(DefaultSize);
 				paintInterface();
 				break;
 
@@ -241,7 +241,7 @@ void SettingPage::run()
 					auto page = Page::Create();
 					page->run();
 				}
-				canvas.setClientSize(default_size);
+				canvas.setClientSize(DefaultSize);
 				paintInterface();
 				break;
 
@@ -344,7 +344,7 @@ CustomThemePage::CustomThemePage() noexcept
 
 void CustomThemePage::run()
 {
-	canvas.setClientSize(default_size);
+	canvas.setClientSize(DefaultSize);
 	paintInterface();
 
 	while (true)
@@ -512,13 +512,13 @@ void CustomThemePage::generateRandomTheme()
 CustomMapPage::MapSelector::MapSelector(Canvas& canvas, Map& map)
 	: canvas(canvas), map(map)
 {
-	if (MapSet::GetCount() < Map::max_mapset_count)
-		MapSet::AddCustomItem({}, temp_mapset_name);
+	if (MapSet::GetCount() < Map::MaxMapSetCount)
+		MapSet::AddCustomItem({}, TempMapSetName);
 }
 
 CustomMapPage::MapSelector::~MapSelector() noexcept
 {
-	MapSet::RemoveCustomItem(temp_mapset_name);
+	MapSet::RemoveCustomItem(TempMapSetName);
 }
 
 void CustomMapPage::MapSelector::selectPrev()
@@ -535,7 +535,7 @@ void CustomMapPage::MapSelector::selectNext()
 {
 	if (map.set.Index() == MapSet::GetCount() - 1)
 		return;
-	if (map.set.Index() - view_begin == view_span - 1 && map.set.Index() != MapSet::GetCount() - 1)
+	if (map.set.Index() - view_begin == ViewSpan - 1 && map.set.Index() != MapSet::GetCount() - 1)
 		view_begin++;
 	map.set.setNextValue();
 	refreshMapList();
@@ -562,11 +562,11 @@ void CustomMapPage::MapSelector::replaceSelected(const DynArray<Element, 2>& map
 		m = type(map_shape.iter_all().begin(), map_shape.iter_all().end());
 	};
 	map.applyCustomValue(f);
-	if (map.set.Name() == temp_mapset_name)
+	if (map.set.Name() == TempMapSetName)
 	{
 		MapSet::RenameCustomItem(map.set, L"Unnamed"_crypt);
-		if (MapSet::GetCount() < Map::max_mapset_count)
-			MapSet::AddCustomItem({}, temp_mapset_name);
+		if (MapSet::GetCount() < Map::MaxMapSetCount)
+			MapSet::AddCustomItem({}, TempMapSetName);
 	}
 	refreshMapList();
 }
@@ -575,25 +575,25 @@ void CustomMapPage::MapSelector::deleteSelected()
 {
 	MapSet temp = map.set;
 	temp.setPrevValue();
-	if (map.set.Name() == temp_mapset_name)
+	if (map.set.Name() == TempMapSetName)
 		return;
 	MapSet::RemoveCustomItem(map.set);
-	if (MapSet(MapSet::GetCount() - 1).Name() != temp_mapset_name)
-		MapSet::AddCustomItem({}, temp_mapset_name);
+	if (MapSet(MapSet::GetCount() - 1).Name() != TempMapSetName)
+		MapSet::AddCustomItem({}, TempMapSetName);
 	map.set = temp.setNextValue();
 	refreshMapList();
 }
 
 void CustomMapPage::MapSelector::paint()
 {
-	canvas.setCursorOffset(canvas_offset_x, canvas_offset_y);
+	canvas.setCursorOffset(CanvasOffsetX, CanvasOffsetY);
 	finally { canvas.setCursorOffset(0, 0); };
-	canvas.setColor(normal_color);
+	canvas.setColor(NormalColor);
 	canvas.setCursor(2, 0);
-	for (size_t i = 0; i < view_span; i++)
+	for (size_t i = 0; i < ViewSpan; i++)
 		print(L"  /------------\\ " + !!i);
 	canvas.setCursor(2, 2);
-	for (size_t i = 0; i < view_span; i++)
+	for (size_t i = 0; i < ViewSpan; i++)
 		print(L"  \\------------/ " + !!i);
 	assert(map.set.Index() == 0);
 	refreshMapList();
@@ -601,7 +601,7 @@ void CustomMapPage::MapSelector::paint()
 
 void CustomMapPage::MapSelector::renameCurrentMapSet()
 {
-	canvas.setCursorOffset(canvas_offset_x, canvas_offset_y);
+	canvas.setCursorOffset(CanvasOffsetX, CanvasOffsetY);
 	canvas.setCursor(static_cast<short>(4 + 8 * (map.set.Index() - view_begin)), 1);
 	canvas.setColor(Color::LightYellow);
 	std::wstring name;
@@ -613,31 +613,31 @@ void CustomMapPage::MapSelector::renameCurrentMapSet()
 		if (iswprint(ch) && ch != L' ')
 			name += ch;
 	}
-	if (StrFullWidthLength(name) > name_max_full_width)
-		name.resize(StrIndexOfFullWidthLength(name, name_max_full_width));
-	if (!name.empty() && name != temp_mapset_name)
+	if (StrFullWidthLength(name) > NameMaxFullWidth)
+		name.resize(StrIndexOfFullWidthLength(name, NameMaxFullWidth));
+	if (!name.empty() && name != TempMapSetName)
 		MapSet::RenameCustomItem(map.set, std::move(name));
 	refreshMapList();
 }
 
 void CustomMapPage::MapSelector::refreshMapList()
 {
-	canvas.setCursorOffset(canvas_offset_x, canvas_offset_y);
+	canvas.setCursorOffset(CanvasOffsetX, CanvasOffsetY);
 	finally { canvas.setCursorOffset(0, 0); };
-	canvas.setColor(normal_color);
+	canvas.setColor(NormalColor);
 	canvas.setCursor(2, 1);
-	for (size_t i = 0; i < view_span; i++)
+	for (size_t i = 0; i < ViewSpan; i++)
 		print(L"  |            | " + !!i);
 
 	MapSet set(view_begin);
 	canvas.setCursor(2, 1);
-	for (size_t i = 0; i < view_span; i++)
+	for (size_t i = 0; i < ViewSpan; i++)
 	{
 		if (set == map.set)
-			canvas.setColor(highlight_color);
+			canvas.setColor(HighlightColor);
 		else
-			canvas.setColor(normal_color);
-		if (set.Name() == temp_mapset_name)
+			canvas.setColor(NormalColor);
+		if (set.Name() == TempMapSetName)
 		{
 			print(L"  |   --++--   | " + !!i);
 			break;
@@ -657,20 +657,20 @@ void CustomMapPage::MapViewer::enterEditing()
 {
 	assert(!is_editing);
 	is_editing = true;
-	paintSelectedPos(highlight_color);
+	paintSelectedPos(HighlightColor);
 }
 
 const DynArray<Element, 2>& CustomMapPage::MapViewer::exitEditing()
 {
 	assert(is_editing);
 	is_editing = false;
-	paintSelectedPos(normal_color);
+	paintSelectedPos(NormalColor);
 	return editing_map;
 }
 
 void CustomMapPage::MapViewer::moveSelected(Direction direct)
 {
-	paintSelectedPos(normal_color);
+	paintSelectedPos(NormalColor);
 	switch (direct)
 	{
 		case Direction::Up:
@@ -686,7 +686,7 @@ void CustomMapPage::MapViewer::moveSelected(Direction direct)
 			x == editing_map.size() - 1 ? x = 0 : x++;
 			break;
 	}
-	paintSelectedPos(highlight_color);
+	paintSelectedPos(HighlightColor);
 }
 
 void CustomMapPage::MapViewer::switchSelected()
@@ -698,7 +698,7 @@ void CustomMapPage::MapViewer::switchSelected()
 		case Element::Barrier:
 			editing_map[y][x] = Element::Blank; break;
 	}
-	paintSelectedPos(highlight_color);
+	paintSelectedPos(HighlightColor);
 }
 
 void CustomMapPage::MapViewer::setAllBlank()
@@ -706,14 +706,14 @@ void CustomMapPage::MapViewer::setAllBlank()
 	for (auto& node : editing_map.iter_all())
 		node = Element::Blank;
 	paint();
-	paintSelectedPos(highlight_color);
+	paintSelectedPos(HighlightColor);
 }
 
 void CustomMapPage::MapViewer::paint() const
 {
-	canvas.setCursorOffset(canvas_offset_x, canvas_offset_y);
+	canvas.setCursorOffset(CanvasOffsetX, CanvasOffsetY);
 	finally { canvas.setCursorOffset(0, 0); };
-	canvas.setColor(normal_color);
+	canvas.setColor(NormalColor);
 
 	std::wstring line;
 	auto map_begin_pos = static_cast<unsigned short>((Size(Size::L).Value() - editing_map.size()) / 2);
@@ -746,7 +746,7 @@ void CustomMapPage::MapViewer::paint() const
 
 void CustomMapPage::MapViewer::paintSelectedPos(Color color) const
 {
-	canvas.setCursorOffset(canvas_offset_x, canvas_offset_y);
+	canvas.setCursorOffset(CanvasOffsetX, CanvasOffsetY);
 	finally { canvas.setCursorOffset(0, 0); };
 	auto map_begin_pos = (Size(Size::L).Value() - editing_map.size()) / 2;
 	auto pos_x = static_cast<short>(map_begin_pos + x);
@@ -764,7 +764,7 @@ void CustomMapPage::MapViewer::paintSelectedPos(Color color) const
 
 void CustomMapPage::run()
 {
-	canvas.setClientSize(default_size);
+	canvas.setClientSize(DefaultSize);
 	paintInterface();
 	map_list.paint();
 	map_viewer.changeMap(map_list.fetchSelected());
@@ -790,9 +790,9 @@ void CustomMapPage::run()
 						if (MapSet::IsCustomItem(map.set))
 						{
 							finally { canvas.setCursorOffset(0, 0); };
-							canvas.setCursorOffset(canvas_offset_x, canvas_offset_y);
+							canvas.setCursorOffset(CanvasOffsetX, CanvasOffsetY);
 							canvas.setCursor(2, 2);
-							canvas.setColor(highlight_color);
+							canvas.setColor(HighlightColor);
 							print(~Token::custom_map_edit_map);
 
 							map_viewer.enterEditing();
@@ -804,14 +804,14 @@ void CustomMapPage::run()
 						map_viewer.changeMap(map_list.fetchSelected());
 						break;
 					case K_F5:
-						if (MapSet::IsCustomItem(map.set) && map.set.Name() != MapSelector::temp_mapset_name)
+						if (MapSet::IsCustomItem(map.set) && map.set.Name() != MapSelector::TempMapSetName)
 							editor_state = EditorState::MapNaming;
 						break;
 					case K_Delete:
-						if (MapSet::IsCustomItem(map.set) && map.set.Name() != MapSelector::temp_mapset_name)
+						if (MapSet::IsCustomItem(map.set) && map.set.Name() != MapSelector::TempMapSetName)
 						{
 							finally { canvas.setCursorOffset(0, 0); };
-							canvas.setCursorOffset(canvas_offset_x, canvas_offset_y);
+							canvas.setCursorOffset(CanvasOffsetX, CanvasOffsetY);
 							canvas.setCursor(11, 2);
 							canvas.setColor(Color::LightRed);
 							print(~Token::custom_map_delete_map_confirm);
@@ -820,9 +820,9 @@ void CustomMapPage::run()
 								map_list.deleteSelected();
 								map_viewer.changeMap(map_list.fetchSelected());
 							}
-							canvas.setCursorOffset(canvas_offset_x, canvas_offset_y);
+							canvas.setCursorOffset(CanvasOffsetX, CanvasOffsetY);
 							canvas.setCursor(11, 2);
-							canvas.setColor(normal_color);
+							canvas.setColor(NormalColor);
 							print(~Token::custom_map_delete_map);
 						}
 						break;
@@ -862,16 +862,16 @@ void CustomMapPage::run()
 			case EditorState::MapNaming:
 			{
 				finally { canvas.setCursorOffset(0, 0); };
-				canvas.setCursorOffset(canvas_offset_x, canvas_offset_y);
+				canvas.setCursorOffset(CanvasOffsetX, CanvasOffsetY);
 				canvas.setCursor(11, 4);
-				canvas.setColor(highlight_color);
+				canvas.setColor(HighlightColor);
 				print(~Token::custom_map_rename);
 
 				map_list.renameCurrentMapSet();
 				
-				canvas.setCursorOffset(canvas_offset_x, canvas_offset_y);
+				canvas.setCursorOffset(CanvasOffsetX, CanvasOffsetY);
 				canvas.setCursor(11, 4);
-				canvas.setColor(normal_color);
+				canvas.setColor(NormalColor);
 				print(~Token::custom_map_rename);
 
 				editor_state = EditorState::MapSelect;
@@ -895,9 +895,9 @@ void CustomMapPage::paintInterface()
 	canvas.setColor(Color::LightAqua);
 	print(custom_map_title);
 
-	canvas.setCursorOffset(canvas_offset_x, canvas_offset_y);
+	canvas.setCursorOffset(CanvasOffsetX, CanvasOffsetY);
 	finally { canvas.setCursorOffset(0, 0); };
-	canvas.setColor(normal_color);
+	canvas.setColor(NormalColor);
 
 	canvas.setCursor(2, 0);
 	print(~Token::custom_map_prev);
@@ -928,8 +928,8 @@ void CustomMapPage::paintInterface()
 
 void CustomMapPage::paintCurOptions()
 {
-	canvas.setColor(normal_color);
-	canvas.setCursorOffset(canvas_offset_x, canvas_offset_y);
+	canvas.setColor(NormalColor);
+	canvas.setCursorOffset(CanvasOffsetX, CanvasOffsetY);
 	finally { canvas.setCursorOffset(0, 0); };
 
 	canvas.setCursor(11, 8);
@@ -945,7 +945,7 @@ void CustomMapPage::paintCurOptions()
 ****************************************/
 void BeginPage::run()
 {
-	canvas.setClientSize(default_size);
+	canvas.setClientSize(DefaultSize);
 	paintInterface();
 
 	(void)getwch();
@@ -971,7 +971,7 @@ void BeginPage::paintInterface()
 						return;
 					canvas.setCursor(0, 0);
 					canvas.setColor(color.setNextValue());
-					print(Resource::game_title);
+					print(Resource::GameTitle);
 					print(~Token::game_version);
 					std::this_thread::sleep_for(200ms);
 				}
@@ -982,7 +982,7 @@ void BeginPage::paintInterface()
 						return;
 					canvas.setCursor(0, 0);
 					canvas.setColor(color_flag ? Color::Aqua : Color::LightBlue);
-					print(Resource::game_title);
+					print(Resource::GameTitle);
 					print(~Token::game_version);
 					color_flag = !color_flag;
 					std::this_thread::sleep_for(900ms);
@@ -996,7 +996,7 @@ void BeginPage::paintInterface()
 ****************************************/
 void RankPage::run()
 {
-	canvas.setClientSize(default_size);
+	canvas.setClientSize(DefaultSize);
 	paintInterface();
 
 	while (true)
@@ -1046,14 +1046,14 @@ void RankPage::paintInterface()
 
 			buffer = ::format(~Token::rank_No, number++);
 			name = item.name.empty() ? ~Token::rank_anonymous : item.name;
-			buffer += ::format(L"{:<{}}"_crypt, std::move(name), Rank::name_max_length);
+			buffer += ::format(L"{:<{}}"_crypt, std::move(name), Rank::NameMaxLength);
 			buffer += ::format(L" {:>4.4}"_crypt, item.is_win ? ~Token::rank_win : std::to_wstring(item.score));
 			buffer += L" | "_crypt;
 			buffer += ~Token::rank_setting;
 			speed = ~Speed::GetNameFrom(item.speed);
 			buffer += ::format(L"{:<{}} "_crypt, std::move(speed), 6);
 			buffer += ::format(L"{0:>{1}.{1}} - {2}"_crypt,
-							   item.map_name, Map::name_max_half_width, Size::GetNameFrom(item.size));
+							   item.map_name, Map::NameMaxHalfWidth, Size::GetNameFrom(item.size));
 
 			buffer = ::format(L"{:^{}}"_crypt, std::move(buffer), baseX * 2);
 			print(buffer);

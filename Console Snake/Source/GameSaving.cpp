@@ -38,8 +38,8 @@ namespace {
 	{
 		using namespace CryptoPP;
 
-		static SecByteBlock key(Resource::crypto_key, AES::DEFAULT_KEYLENGTH);
-		static SecByteBlock iv(Resource::crypto_IV, AES::BLOCKSIZE);
+		static SecByteBlock key(Resource::CryptoKey, AES::DEFAULT_KEYLENGTH);
+		static SecByteBlock iv(Resource::CryptoIV, AES::BLOCKSIZE);
 		CBC_Mode<AES>::Encryption encry;
 		encry.SetKeyWithIV(key, key.size(), iv);
 
@@ -56,8 +56,8 @@ namespace {
 	{
 		using namespace CryptoPP;
 
-		static SecByteBlock key(Resource::crypto_key, AES::DEFAULT_KEYLENGTH);
-		static SecByteBlock iv(Resource::crypto_IV, AES::BLOCKSIZE);
+		static SecByteBlock key(Resource::CryptoKey, AES::DEFAULT_KEYLENGTH);
+		static SecByteBlock iv(Resource::CryptoIV, AES::BLOCKSIZE);
 		CBC_Mode<AES>::Decryption decry;
 		decry.SetKeyWithIV(key, key.size(), iv);
 
@@ -78,7 +78,7 @@ GameSavingBase::GameSavingBase() try
 	std::ios::sync_with_stdio(false);
 
 	// Try to open the save file
-	path save_file_path(Resource::save_file_name);
+	path save_file_path(Resource::SaveFileName);
 	std::ifstream save_file(save_file_path, std::ios::binary);
 	if (!save_file.is_open())
 		return;
@@ -135,10 +135,10 @@ void GameSavingBase::convertFromSaveData() noexcept
 		}
 		gs.theme.convertFrom(theme_temp);
 
-		wchar_t map_name[Map::name_max_half_width + 1] = {};
+		wchar_t map_name[Map::NameMaxHalfWidth + 1] = {};
 		for (size_t i = 0; i < bin_data.setting.custom_map_count; i++)
 		{
-			std::copy_n(bin_data.setting.map_name[i], Map::name_max_half_width, map_name);
+			std::copy_n(bin_data.setting.map_name[i], Map::NameMaxHalfWidth, map_name);
 			MapSet::AddCustomItem(bin_data.setting.map[i], map_name);
 		}
 
@@ -150,10 +150,10 @@ void GameSavingBase::convertFromSaveData() noexcept
 		gs.show_frame = Convert{ bin_data.setting.show_frame };
 	}
 	// rank data
-	wchar_t name[Rank::name_max_length + 1] = {};
-	wchar_t map_name[Map::name_max_half_width + 1] = {};
+	wchar_t name[Rank::NameMaxLength + 1] = {};
+	wchar_t map_name[Map::NameMaxHalfWidth + 1] = {};
 	auto [rank, lock] = Rank::get().modifyRank();
-	for (size_t i = 0; i < Rank::rank_count; i++)
+	for (size_t i = 0; i < Rank::RankCount; i++)
 	{
 		auto& save_item = bin_data.rank_list[i];
 		auto& rank_item = rank[i];
@@ -161,9 +161,9 @@ void GameSavingBase::convertFromSaveData() noexcept
 		rank_item.size = Convert{ save_item.size };
 		rank_item.speed = Convert{ save_item.speed };
 		rank_item.is_win = Convert{ save_item.is_win };
-		std::copy_n(save_item.name, Rank::name_max_length, name);
+		std::copy_n(save_item.name, Rank::NameMaxLength, name);
 		rank_item.name = name;
-		std::copy_n(save_item.map_name, Map::name_max_half_width, map_name);
+		std::copy_n(save_item.map_name, Map::NameMaxHalfWidth, map_name);
 		rank_item.map_name = map_name;
 
 		if (rank_item.is_win)
@@ -192,7 +192,7 @@ void GameSavingBase::convertToSaveData() noexcept
 		{
 			map.setNextValue();
 			bin_data.setting.map[i] = map.Value();
-			std::copy_n(map.Name().c_str(), Map::name_max_half_width, bin_data.setting.map_name[i]);
+			std::copy_n(map.Name().c_str(), Map::NameMaxHalfWidth, bin_data.setting.map_name[i]);
 		}
 
 		bin_data.setting.speed = Convert{ gs.speed.Value() };
@@ -203,7 +203,7 @@ void GameSavingBase::convertToSaveData() noexcept
 	}
 	// rank data
 	auto [rank, lock] = Rank::get().getRank();
-	for (size_t i = 0; i < Rank::rank_count; i++)
+	for (size_t i = 0; i < Rank::RankCount; i++)
 	{
 		auto& save_item = bin_data.rank_list[i];
 		auto& rank_item = rank[i];
@@ -211,8 +211,8 @@ void GameSavingBase::convertToSaveData() noexcept
 		save_item.size = Convert{ rank_item.size };
 		save_item.speed = Convert{ rank_item.speed };
 		save_item.is_win = Convert{ rank_item.is_win };
-		std::copy_n(rank_item.name.c_str(), Rank::name_max_length, save_item.name);
-		std::copy_n(rank_item.map_name.c_str(), Map::name_max_half_width, save_item.map_name);
+		std::copy_n(rank_item.name.c_str(), Rank::NameMaxLength, save_item.name);
+		std::copy_n(rank_item.map_name.c_str(), Map::NameMaxHalfWidth, save_item.map_name);
 	}
 }
 
@@ -237,7 +237,7 @@ void GameSavingBase::save()
 							  cipher = AES_encrypt(binary_pool);
 
 							  // Open the save file and write
-							  std::ofstream save_file(Resource::save_file_name, std::ios::binary);
+							  std::ofstream save_file(Resource::SaveFileName, std::ios::binary);
 							  save_file.exceptions(std::ios_base::badbit | std::ios_base::failbit);
 							  save_file.write(cipher.c_str(), cipher.size());
 						  }

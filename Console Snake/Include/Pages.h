@@ -43,7 +43,7 @@ public:
 	void run() override = 0;
 
 protected:
-	static constexpr ClientSize default_size = { 45,35 };
+	static constexpr ClientSize DefaultSize = { 45,35 };
 	enum struct ShowVersion { No, Yes };
 
 protected:
@@ -94,10 +94,10 @@ class CustomMapPage :public NormalPage
 private:
 	class MapSelector
 	{
-		static constexpr size_t view_span = 5;
-		static constexpr short canvas_offset_x = 0, canvas_offset_y = 6;
+		static constexpr size_t ViewSpan = 5;
+		static constexpr short CanvasOffsetX = 0, CanvasOffsetY = 6;
 	public:
-		static constexpr const wchar_t* temp_mapset_name = L"$>_<";
+		static constexpr const wchar_t* TempMapSetName = L"$>_<";
 	public:
 		MapSelector(Canvas&, Map&);
 		~MapSelector() noexcept;
@@ -117,7 +117,7 @@ private:
 	};
 	class MapViewer
 	{
-		static constexpr short canvas_offset_x = 1, canvas_offset_y = 10;
+		static constexpr short CanvasOffsetX = 1, CanvasOffsetY = 10;
 	public:
 		enum struct Direction { Up, Down, Left, Right };
 	public:
@@ -139,9 +139,9 @@ private:
 		size_t x = 0, y = 0;
 		bool is_editing = false;
 	};
-	static constexpr Color normal_color = Color::White, highlight_color = Color::LightGreen;
-	static constexpr short canvas_offset_x = 25, canvas_offset_y = 10;
-	static constexpr size_t name_max_full_width = Map::name_max_half_width / 2;
+	static constexpr Color NormalColor = Color::White, HighlightColor = Color::LightGreen;
+	static constexpr short CanvasOffsetX = 25, CanvasOffsetY = 10;
+	static constexpr size_t NameMaxFullWidth = Map::NameMaxHalfWidth / 2;
 	enum struct EditorState { MapSelect, MapEdit, MapNaming };
 
 public:
