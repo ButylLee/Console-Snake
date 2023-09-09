@@ -42,4 +42,26 @@ inline std::common_type_t<T1, T2> GetRandom(T1 min, T2 max)
 			   param_type{ static_cast<float_type>(min), static_cast<float_type>(max) });
 }
 
+// random interval: [0, n)
+template<std::integral T = int, typename Iter>
+inline T GetWeightedDiscreteRandom(Iter first, Iter last)
+{
+	static std::discrete_distribution<T> dis;
+	using param_type = typename decltype(dis)::param_type;
+	assert(first <= last);
+	return dis(GetRandomEngine(),
+			   param_type{ first, last });
+}
+
+// random interval: [0, count)
+// Fn: (i:int)->probability:int
+template<std::integral T = int, typename Fn>
+inline T GetWeightedDiscreteRandom(size_t count, Fn fn)
+{
+	static std::discrete_distribution<T> dis;
+	using param_type = typename decltype(dis)::param_type;
+	return dis(GetRandomEngine(),
+			   param_type{ count, 0, static_cast<double>(count), fn });
+}
+
 #endif // SNAKE_RANDOM_HEADER_

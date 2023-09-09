@@ -57,7 +57,7 @@ void GamePage::run()
 	PlayGround playground(this->canvas);
 	playground.play();
 
-	if (GameData::get().retry_game == true)
+	if (GameData::get().retry_game)
 	{
 		GameData::get().retry_game = false;
 	}

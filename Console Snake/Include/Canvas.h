@@ -22,7 +22,7 @@ public:
 	}
 	constexpr Cursor operator+(const Cursor& offset) const noexcept
 	{
-		return { this->x + offset.x, this->y + offset.y };
+		return { static_cast<short>(this->x + offset.x), static_cast<short>(this->y + offset.y) };
 	}
 public:
 	short x = 0;

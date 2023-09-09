@@ -69,8 +69,9 @@ struct PosNodeGroup
 
 class Venue
 {
+	static constexpr int SnakeIntendedInitLength = 3;
 public:
-	Venue(DynArray<MapNode, 2> map, void (Venue::* create_snake_func)());
+	Venue(DynArray<MapNode, 2> map);
 
 public:
 	PosNode getNextPosition() const noexcept;
@@ -78,17 +79,18 @@ public:
 	const DynArray<MapNode, 2>& getCurrentMap() const noexcept;
 
 protected:
-	void addSnakeBody(Direction head_direct, uint8_t head_x, uint8_t head_y) noexcept;
-	void addSnakeBody(Direction tail_direct) noexcept;
 	std::optional<PosNode> generateFood();
 
 	void orderDirection(Direction) noexcept;
 	PosNodeGroup updateFrame() noexcept;
 
-	bool isWin(size_t score, size_t snake_init_length) const noexcept;
+	bool isWin(size_t score) const noexcept;
 
 private:
 	void setupInvariant() noexcept;
+	void createSnake();
+	void addSnakeBody(Direction head_direct, uint8_t head_x, uint8_t head_y) noexcept;
+	void addSnakeBody(Direction tail_direct) noexcept;
 	void rebindData(int16_t snake_index, int8_t map_x, int8_t map_y) noexcept;
 	void forwardIndex(int16_t& index) const noexcept;
 	void backwardIndex(int16_t& index) const noexcept;
@@ -101,13 +103,13 @@ private:
 	DynArray<PosNode> snake_body;
 	int16_t snake_head_index = -1;
 	int16_t snake_tail_index = -1;
+	size_t snake_init_length = 0;
 
 	Direction snake_direct = Direction::None;
 };
 
 class Arena :public Venue
 {
-	static constexpr int SnakeInitLength = 3;
 public:
 	Arena(Canvas& canvas);
 
@@ -120,7 +122,6 @@ public:
 private:
 	void paintElement(Element);
 	void paintVenue();
-	void createSnake();
 	void generateFood();
 
 public:

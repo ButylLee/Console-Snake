@@ -2,11 +2,14 @@
 #include "GlobalData.h"
 #include "WideIO.h"
 #include "Random.h"
+#include "ErrorHandling.h"
 
 #include <utility>
 #include <type_traits>
-#include <cassert>
 #include <algorithm>
+#include <vector>
+#include <cassert>
+#include <cmath>
 
 namespace
 {
@@ -15,16 +18,16 @@ namespace
 		DynArray<MapNode, 2> map(GameSetting::get().map.size.Value(),
 								 GameSetting::get().map.size.Value());
 		auto f = [&](const auto& m)
-		{
-			assert(map.total_size() == m.size());
-			std::transform(m.begin(), m.end(), map.iter_all().begin(),
-						   [](Element type)
-						   {
-							   MapNode node;
-							   node.type = type;
-							   return node;
-						   });
-		};
+			{
+				assert(map.total_size() == m.size());
+				std::transform(m.begin(), m.end(), map.iter_all().begin(),
+							   [](Element type)
+							   {
+								   MapNode node;
+								   node.type = type;
+								   return node;
+							   });
+			};
 		GameSetting::get().map.applyValue(f);
 		return map;
 	}
@@ -41,11 +44,11 @@ namespace
 	}
 } // namespace
 
-Venue::Venue(DynArray<MapNode, 2> map_, void (Venue::* create_snake_func)())
+Venue::Venue(DynArray<MapNode, 2> map_)
 	: map(std::move(map_)), snake_body(GetMapBlankCount(map))
 {
 	setupInvariant();
-	(this->*create_snake_func)();
+	createSnake();
 	generateFood();
 }
 
@@ -66,50 +69,14 @@ const DynArray<MapNode, 2>& Venue::getCurrentMap() const noexcept
 	return map;
 }
 
-void Venue::addSnakeBody(Direction head_direct, uint8_t head_x, uint8_t head_y) noexcept
-{
-	assert(snake_head_index == -1 && snake_tail_index == -1 &&
-		   snake_direct == Direction::None);
-	snake_direct = head_direct;
-	map[head_y][head_x].type = Element::Snake;
-	snake_tail_index = snake_head_index = map[head_y][head_x].snake_index;
-	rebindData(snake_head_index, head_x, head_y);
-}
-
-void Venue::addSnakeBody(Direction tail_direct) noexcept
-{
-	assert(snake_head_index != -1 && snake_tail_index != -1);
-	if (tail_direct == snake_direct)
-		return;
-	auto [tail_x, tail_y] = snake_body[snake_tail_index];
-	backwardIndex(snake_tail_index);
-	switch (+tail_direct)
-	{
-		case Direction::Up:
-			tail_y--; break;
-		case Direction::Down:
-			tail_y++; break;
-		case Direction::Left:
-			tail_x--; break;
-		case Direction::Right:
-			tail_x++; break;
-	}
-	map[tail_y][tail_x].type = Element::Snake;
-	rebindData(snake_tail_index, tail_x, tail_y);
-}
-
 std::optional<PosNode> Venue::generateFood()
 {
 	size_t range;
 	// get usable range for food generating
 	if (snake_head_index > snake_tail_index)
-	{
 		range = snake_head_index - snake_tail_index - 1;
-	}
 	else
-	{
 		range = snake_body.total_size() - (snake_tail_index - snake_head_index + 1);
-	}
 	if (range == 0)
 		return {};
 
@@ -154,7 +121,7 @@ PosNodeGroup Venue::updateFrame() noexcept
 	return { 2, { head_x, head_y }, { tail_x, tail_y } };
 }
 
-bool Venue::isWin(size_t score, size_t snake_init_length) const noexcept
+bool Venue::isWin(size_t score) const noexcept
 {
 	return score + snake_init_length == snake_body.size();
 }
@@ -175,6 +142,153 @@ void Venue::setupInvariant() noexcept
 			}
 		}
 	}
+}
+
+namespace
+{
+	struct BlankNodeGenInfo
+	{
+		struct PosOffset
+		{
+			int8_t x;
+			int8_t y;
+			friend PosNode PosHandledOffset(PosNode pos, PosOffset offset, size_t size_y_, size_t size_x_) noexcept
+			{
+				int8_t x = pos.x + offset.x;
+				int8_t y = pos.y + offset.y;
+				int8_t size_x = static_cast<int8_t>(size_x_);
+				int8_t size_y = static_cast<int8_t>(size_y_);
+				if (x < 0) x += size_x;
+				else if (x >= size_x) x -= size_x;
+				if (y < 0) y += size_y;
+				else if (y >= size_y) y -= size_y;
+				pos.x = x;
+				pos.y = y;
+				return pos;
+			}
+		};
+		static constexpr PosOffset GenConvolutionOffset[24] =
+		{
+			{ -2,-2 }, { -1,-2 }, { +0,-2 }, { +1,-2 }, { +2,-2 },
+			{ -2,-1 }, { -1,-1 }, { +0,-1 }, { +1,-1 }, { +2,-1 },
+			{ -2,+0 }, { -1,+0 },            { +1,+0 }, { +2,+0 },
+			{ -2,+1 }, { -1,+1 }, { +0,+1 }, { +1,+1 }, { +2,+1 },
+			{ -2,+2 }, { -1,+2 }, { +0,+2 }, { +1,+2 }, { +2,+2 },
+		};
+		static constexpr size_t InitDirectCount = 4;
+		static constexpr Direction::Tags InitDirectMap[InitDirectCount] =
+		{ Direction::Up, Direction::Left, Direction::Right, Direction::Down };
+		static constexpr PosOffset InitDirectCalcOffset1[InitDirectCount] =
+		{ { 0,+1 }, { +1,0 }, { -1,0 }, { 0,-1 } };
+		static constexpr PosOffset InitDirectCalcOffset2[InitDirectCount] =
+		{ { 0,+2 }, { +2,0 }, { -2,0 }, { 0,-2 } };
+
+		PosNode pos;
+		int gen_probability = 1;
+		int init_direct_probability[InitDirectCount] = {};
+	};
+	constexpr auto ProbabilityNonlinearizer1 = [](auto x) { return x * x; };
+	constexpr auto ProbabilityNonlinearizer2 = [](auto x) { return static_cast<decltype(x)>(std::pow(10, x)); };
+}
+
+void Venue::createSnake()
+{
+	std::vector<BlankNodeGenInfo> blank_list;
+	auto& map = getCurrentMap();
+	for (uint8_t y = 0; y < map.size(0); y++)
+	{
+		for (uint8_t x = 0; x < map.size(1); x++)
+		{
+			auto& node = map[y][x];
+			if (node.type != Element::Blank)
+				continue;
+			BlankNodeGenInfo info;
+			// record Blank position
+			info.pos.x = x;
+			info.pos.y = y;
+
+			// calculate generate probability
+			for (size_t i = 0; i < std::size(info.GenConvolutionOffset); i++)
+			{
+				auto offset = info.GenConvolutionOffset[i];
+				auto curr_pos = PosHandledOffset(info.pos, offset, map.size(0), map.size(1));
+				if (map[curr_pos.y][curr_pos.x].type == Element::Blank)
+					info.gen_probability++;
+			}
+			info.gen_probability = ProbabilityNonlinearizer1(info.gen_probability);
+
+			// calculate initial direction probability
+			for (size_t i = 0; i < std::size(info.init_direct_probability); i++)
+			{
+				auto offset1 = info.InitDirectCalcOffset1[i];
+				auto offset2 = info.InitDirectCalcOffset2[i];
+				auto curr_pos1 = PosHandledOffset(info.pos, offset1, map.size(0), map.size(1));
+				auto curr_pos2 = PosHandledOffset(info.pos, offset2, map.size(0), map.size(1));
+				if (map[curr_pos1.y][curr_pos1.x].type == Element::Blank)
+					info.init_direct_probability[i]++;
+				if (map[curr_pos2.y][curr_pos2.x].type == Element::Blank)
+					info.init_direct_probability[i]++;
+			}
+			std::transform(std::begin(info.init_direct_probability),
+						   std::end(info.init_direct_probability),
+						   std::begin(info.init_direct_probability),
+						   ProbabilityNonlinearizer2);
+
+			blank_list.push_back(std::move(info));
+		}
+	}
+	if (blank_list.size() == 0)
+		throw RuntimeException(L"Invalid Map.");
+
+	// random snake initial node
+	auto fn = [&](auto i) { return blank_list[static_cast<size_t>(i)].gen_probability; };
+	auto& init_node = blank_list[GetWeightedDiscreteRandom<size_t>(blank_list.size(), fn)];
+	Direction init_direction = BlankNodeGenInfo::InitDirectMap[
+		GetWeightedDiscreteRandom<size_t>(std::begin(init_node.init_direct_probability),
+										  std::end(init_node.init_direct_probability)
+		)
+	];
+
+	// place initial snake body
+	addSnakeBody(init_direction, init_node.pos.x, init_node.pos.y);
+	for (size_t i = 0; i < SnakeIntendedInitLength - 1; i++)
+		addSnakeBody(-init_direction);
+}
+
+void Venue::addSnakeBody(Direction head_direct, uint8_t head_x, uint8_t head_y) noexcept
+{
+	assert(snake_head_index == -1 && snake_tail_index == -1 &&
+		   snake_direct == Direction::None);
+	snake_direct = head_direct;
+	map[head_y][head_x].type = Element::Snake;
+	snake_tail_index = snake_head_index = map[head_y][head_x].snake_index;
+	rebindData(snake_head_index, head_x, head_y);
+	snake_init_length++;
+}
+
+void Venue::addSnakeBody(Direction tail_direct) noexcept
+{
+	assert(snake_head_index != -1 && snake_tail_index != -1);
+	if (tail_direct == snake_direct)
+		return;
+	auto [tail_x, tail_y] = snake_body[snake_tail_index];
+	switch (+tail_direct)
+	{
+		case Direction::Up:
+			tail_y--; break;
+		case Direction::Down:
+			tail_y++; break;
+		case Direction::Left:
+			tail_x--; break;
+		case Direction::Right:
+			tail_x++; break;
+	}
+	if (map[tail_y][tail_x].type != Element::Blank)
+		return;
+	map[tail_y][tail_x].type = Element::Snake;
+	backwardIndex(snake_tail_index);
+	rebindData(snake_tail_index, tail_x, tail_y);
+	snake_init_length++;
 }
 
 void Venue::rebindData(int16_t index, int8_t x, int8_t y) noexcept
@@ -223,8 +337,7 @@ void Venue::nextPosition(uint8_t& x, uint8_t& y) const noexcept
 }
 
 Arena::Arena(Canvas& canvas)
-	: Venue(GetMap(), static_cast<void(Venue::*)()>(&Arena::createSnake))
-	, canvas(canvas)
+	: Venue(GetMap()), canvas(canvas)
 {
 	paintVenue();
 }
@@ -244,7 +357,7 @@ void Arena::updateFrame()
 			generateFood();
 			GameData::get().score++;
 			break;
-		case 2: // nothing
+		case 2: // move normally
 			paintElement(Element::Snake, nodes_updated.head_pos.x, nodes_updated.head_pos.y);
 			paintElement(Element::Blank, nodes_updated.tail_pos.x, nodes_updated.tail_pos.y);
 			break;
@@ -264,7 +377,7 @@ bool Arena::isOver() const noexcept
 
 bool Arena::isWin() const noexcept
 {
-	return Venue::isWin(GameData::get().score, SnakeInitLength);
+	return Venue::isWin(GameData::get().score);
 }
 
 void Arena::paintElement(Element which)
@@ -282,39 +395,6 @@ void Arena::paintVenue()
 		if (not(GameSetting::get().old_console_host && index++ == map.total_size() - 1))
 			paintElement(node.type);
 	}
-}
-
-void Arena::createSnake()
-{
-	// random snake initial postion
-	auto x_range = GameSetting::get().map.size.Value() - 2 * (1 + SnakeInitLength);
-	auto y_range = GameSetting::get().map.size.Value() - 2 * (1 + SnakeInitLength);
-	auto begin_head_x = GetRandom(0, x_range);
-	auto begin_head_y = GetRandom(0, y_range);
-	Direction direction;
-
-	// select initial direction
-	if (bool select_x_axis = GetRandom(0, 1))
-	{
-		if (begin_head_x < x_range / 2)
-			direction = Direction::Right;
-		else
-			direction = Direction::Left;
-	}
-	else
-	{
-		if (begin_head_y < y_range / 2)
-			direction = Direction::Down;
-		else
-			direction = Direction::Up;
-	}
-	begin_head_x += 1 + SnakeInitLength;
-	begin_head_y += 1 + SnakeInitLength;
-
-	// place initial snake body
-	addSnakeBody(direction, begin_head_x, begin_head_y);
-	for (size_t i = 0; i < SnakeInitLength - 1; i++)
-		addSnakeBody(-direction);
 }
 
 void Arena::generateFood()
