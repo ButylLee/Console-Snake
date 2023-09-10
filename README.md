@@ -1,6 +1,6 @@
 # Console Snake
 
-Classic game **Snake** implemented in Windows Console using modern C++, including features such as ranking, game-saving, theme-customizing.
+Classic game **Snake** implemented in Windows Console using modern C++, including features such as ranking, game-saving, theme-customizing and map-customizing.
 
 The game support 4 languages: **English**, **Simplified Chinese**, **Traditional Chinese** and **Japanese**.
 
