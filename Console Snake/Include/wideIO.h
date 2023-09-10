@@ -3,14 +3,17 @@
 #define SNAKE_WIDEIO_HEADER_
 
 #include <utility>
+#include <cstdint>
 #include <cwchar>
 #include <cwctype>
 #include <climits>
 #include <string>
 #include <string_view>
 #include <format>
+#include <algorithm>
+#include <numeric>
 
-using wint = unsigned int;
+using wint = uint32_t;
 static_assert(sizeof(wint) == 2 * sizeof(wint_t));
 
 /***************************************
@@ -76,17 +79,37 @@ inline std::wstring format(std::wstring_view fmt, TArgs&&... args)
 /***************************************
  Function: calculate the full-width length
 ****************************************/
-constexpr size_t StrFullWidthLen(std::wstring_view str) noexcept
+constexpr size_t StrFullWidthLength(std::wstring_view str) noexcept
 {
-	int half_width_count = 0;
-	for (const wchar_t& ch : str)
-	{
-		// select ASCII printable characters, which are half-width
-		if (!(ch >> sizeof(wchar_t) * CHAR_BIT / 2) && iswprint(ch))
-			half_width_count++;
-	}
+	size_t half_width_count = std::ranges::count_if(
+		str, [](wchar_t ch)
+		{
+			// select ASCII printable characters, which are half-width
+			return !(ch >> sizeof(wchar_t) * CHAR_BIT / 2) && iswprint(ch);
+		}
+	);
 	half_width_count /= 2;
 	return str.length() - half_width_count;
+}
+
+/***************************************
+ Function: calculate the index of
+           specified length in full-width
+****************************************/
+constexpr size_t StrIndexOfFullWidthLength(std::wstring_view str, size_t length) noexcept
+{
+	length *= 2;
+	size_t index = 0, count = 0;
+	for (; index < str.size(); index++)
+	{
+		if (!(str[index] >> sizeof(wchar_t) * CHAR_BIT / 2) && iswprint(str[index]))
+			count += 1;
+		else
+			count += 2;
+		if (count > length)
+			break;
+	}
+	return index;
 }
 
 /***************************************
@@ -94,13 +117,12 @@ constexpr size_t StrFullWidthLen(std::wstring_view str) noexcept
 ****************************************/
 constexpr size_t StrFullWidthCount(std::wstring_view str) noexcept
 {
-	int full_width_count = 0;
-	for (const wchar_t& ch : str)
-	{
-		if (!!(ch >> sizeof(wchar_t) * CHAR_BIT / 2) && iswprint(ch))
-			full_width_count++;
-	}
-	return full_width_count;
+	return std::ranges::count_if(
+		str, [](wchar_t ch)
+		{
+			return !!(ch >> sizeof(wchar_t) * CHAR_BIT / 2) && iswprint(ch);
+		}
+	);
 }
 
 #endif // SNAKE_WIDEIO_HEADER_

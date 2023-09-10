@@ -8,7 +8,7 @@
 #include <fstream>
 #include <filesystem>
 #include <stdexcept>
-#include <type_traits>
+#include <iterator>
 #include <cryptopp/cryptlib.h>
 #include <cryptopp/aes.h>
 #include <cryptopp/modes.h>
@@ -38,8 +38,8 @@ namespace {
 	{
 		using namespace CryptoPP;
 
-		static SecByteBlock key(Resource::crypto_key, AES::DEFAULT_KEYLENGTH);
-		static SecByteBlock iv(Resource::crypto_IV, AES::BLOCKSIZE);
+		static SecByteBlock key(Resource::CryptoKey, AES::DEFAULT_KEYLENGTH);
+		static SecByteBlock iv(Resource::CryptoIV, AES::BLOCKSIZE);
 		CBC_Mode<AES>::Encryption encry;
 		encry.SetKeyWithIV(key, key.size(), iv);
 
@@ -56,8 +56,8 @@ namespace {
 	{
 		using namespace CryptoPP;
 
-		static SecByteBlock key(Resource::crypto_key, AES::DEFAULT_KEYLENGTH);
-		static SecByteBlock iv(Resource::crypto_IV, AES::BLOCKSIZE);
+		static SecByteBlock key(Resource::CryptoKey, AES::DEFAULT_KEYLENGTH);
+		static SecByteBlock iv(Resource::CryptoIV, AES::BLOCKSIZE);
 		CBC_Mode<AES>::Decryption decry;
 		decry.SetKeyWithIV(key, key.size(), iv);
 
@@ -78,7 +78,7 @@ GameSavingBase::GameSavingBase() try
 	std::ios::sync_with_stdio(false);
 
 	// Try to open the save file
-	path save_file_path(Resource::save_file_name);
+	path save_file_path(Resource::SaveFileName);
 	std::ifstream save_file(save_file_path, std::ios::binary);
 	if (!save_file.is_open())
 		return;
@@ -126,37 +126,45 @@ void GameSavingBase::convertFromSaveData() noexcept
 	{
 		auto& gs = GameSetting::get();
 
-		decltype(gs.theme.Value()) theme_temp;
+		Theme::ValueType theme_temp;
 		auto& elements = theme_temp.elements;
-		for (size_t i = 0; i < std::extent_v<decltype(theme_temp.elements)>; i++)
+		for (size_t i = 0; i < std::size(theme_temp.elements); i++)
 		{
 			elements[i].facade.convertFrom(bin_data.setting.theme[i][0]);
 			elements[i].color.convertFrom(bin_data.setting.theme[i][1]);
 		}
 		gs.theme.convertFrom(theme_temp);
 
+		wchar_t map_name[Map::NameMaxHalfWidth + 1] = {};
+		for (size_t i = 0; i < bin_data.setting.custom_map_count; i++)
+		{
+			std::copy_n(bin_data.setting.map_name[i], Map::NameMaxHalfWidth, map_name);
+			MapSet::AddCustomItem(bin_data.setting.map[i], map_name);
+		}
+
 		gs.speed.convertFrom(bin_data.setting.speed);
-		gs.width.convertFrom(bin_data.setting.width);
-		gs.height.convertFrom(bin_data.setting.height);
-		LocalizedStrings::setLang(
-			gs.lang.convertFrom(Convert{ bin_data.setting.lang })
-		);
+		gs.map.size.convertFrom(bin_data.setting.size);
+		gs.map.set = MapSet(bin_data.setting.map_select);
+		gs.lang.convertFrom(Convert{ bin_data.setting.lang });
+		LocalizedStrings::setLang(gs.lang.Value());
 		gs.show_frame = Convert{ bin_data.setting.show_frame };
 	}
 	// rank data
-	wchar_t name[Rank::name_max_length + 1] = {};
+	wchar_t name[Rank::NameMaxLength + 1] = {};
+	wchar_t map_name[Map::NameMaxHalfWidth + 1] = {};
 	auto [rank, lock] = Rank::get().modifyRank();
-	for (size_t i = 0; i < Rank::rank_count; i++)
+	for (size_t i = 0; i < Rank::RankCount; i++)
 	{
 		auto& save_item = bin_data.rank_list[i];
 		auto& rank_item = rank[i];
 		rank_item.score = Convert{ save_item.score };
-		rank_item.width = Convert{ save_item.width };
-		rank_item.height = Convert{ save_item.height };
+		rank_item.size = Convert{ save_item.size };
 		rank_item.speed = Convert{ save_item.speed };
 		rank_item.is_win = Convert{ save_item.is_win };
-		std::copy_n(save_item.name, Rank::name_max_length, name);
+		std::copy_n(save_item.name, Rank::NameMaxLength, name);
 		rank_item.name = name;
+		std::copy_n(save_item.map_name, Map::NameMaxHalfWidth, map_name);
+		rank_item.map_name = map_name;
 
 		if (rank_item.is_win)
 			GameData::get().colorful_title = true;
@@ -172,30 +180,39 @@ void GameSavingBase::convertToSaveData() noexcept
 
 		auto theme_temp = gs.theme.Value();
 		auto& elements = theme_temp.elements;
-		for (size_t i = 0; i < std::extent_v<decltype(theme_temp.elements)>; i++)
+		for (size_t i = 0; i < std::size(theme_temp.elements); i++)
 		{
-			bin_data.setting.theme[i][0] = Convert{ elements[i].facade };
-			bin_data.setting.theme[i][1] = Convert{ elements[i].color };
+			bin_data.setting.theme[i][0] = Convert{ elements[i].facade.Value() };
+			bin_data.setting.theme[i][1] = Convert{ elements[i].color.Value() };
 		}
 
-		bin_data.setting.speed = Convert{ gs.speed };
-		bin_data.setting.width = Convert{ gs.width };
-		bin_data.setting.height = Convert{ gs.height };
-		bin_data.setting.lang = Convert{ gs.lang };
+		MapSet map(MapSet::Mask_ - 1);
+		bin_data.setting.custom_map_count = Convert{ MapSet::GetCount() - MapSet::Mask_ };
+		for (size_t i = 0; i < bin_data.setting.custom_map_count; i++)
+		{
+			map.setNextValue();
+			bin_data.setting.map[i] = map.Value();
+			std::copy_n(map.Name().c_str(), Map::NameMaxHalfWidth, bin_data.setting.map_name[i]);
+		}
+
+		bin_data.setting.speed = Convert{ gs.speed.Value() };
+		bin_data.setting.size = Convert{ gs.map.size.Value() };
+		bin_data.setting.map_select = Convert{ gs.map.set.Index() };
+		bin_data.setting.lang = Convert{ gs.lang.Value() };
 		bin_data.setting.show_frame = Convert{ gs.show_frame };
 	}
 	// rank data
 	auto [rank, lock] = Rank::get().getRank();
-	for (size_t i = 0; i < Rank::rank_count; i++)
+	for (size_t i = 0; i < Rank::RankCount; i++)
 	{
 		auto& save_item = bin_data.rank_list[i];
 		auto& rank_item = rank[i];
 		save_item.score = Convert{ rank_item.score };
-		save_item.width = Convert{ rank_item.width };
-		save_item.height = Convert{ rank_item.height };
+		save_item.size = Convert{ rank_item.size };
 		save_item.speed = Convert{ rank_item.speed };
 		save_item.is_win = Convert{ rank_item.is_win };
-		std::copy_n(rank_item.name.c_str(), Rank::name_max_length, save_item.name);
+		std::copy_n(rank_item.name.c_str(), Rank::NameMaxLength, save_item.name);
+		std::copy_n(rank_item.map_name.c_str(), Map::NameMaxHalfWidth, save_item.map_name);
 	}
 }
 
@@ -220,7 +237,7 @@ void GameSavingBase::save()
 							  cipher = AES_encrypt(binary_pool);
 
 							  // Open the save file and write
-							  std::ofstream save_file(Resource::save_file_name, std::ios::binary);
+							  std::ofstream save_file(Resource::SaveFileName, std::ios::binary);
 							  save_file.exceptions(std::ios_base::badbit | std::ios_base::failbit);
 							  save_file.write(cipher.c_str(), cipher.size());
 						  }

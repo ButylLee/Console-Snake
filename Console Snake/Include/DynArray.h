@@ -19,7 +19,7 @@ public:
 
 	DynArrayRef<T, Dimension - 1> operator[](size_t index) const noexcept
 	{
-		assert(index < arr_size[0]);
+		assert(index < arr_size[0] && arr_data);
 		return DynArrayRef<T, Dimension - 1>(arr_data + arr_remain[0] * index, arr_size + 1, arr_remain + 1);
 	}
 	DynArrayRef<T, Dimension - 1> front() const noexcept
@@ -60,7 +60,7 @@ public:
 
 	T& operator[](size_t index) const noexcept
 	{
-		assert(index < arr_size[0]);
+		assert(index < arr_size[0] && arr_data);
 		return arr_data[index];
 	}
 	T& front() const noexcept
@@ -369,6 +369,11 @@ public:
 #endif
 	}
 
+	template<>
+	DynArray()
+		: dim_info{}, total_count(0), arr_data(nullptr)
+	{}
+
 	~DynArray() noexcept
 	{
 		delete[] arr_data;
@@ -383,19 +388,24 @@ public:
 	{
 		this->dim_info = other.dim_info;
 		this->total_count = other.total_count;
+		if (this->total_count != 0)
+		{
 #ifndef NDEBUG
-		this->arr_data = new T[total_count]{};
+			this->arr_data = new T[total_count]{};
 #else
-		this->arr_data = new T[total_count];
+			this->arr_data = new T[total_count];
 #endif
-		std::copy_n(other.arr_data, total_count, this->arr_data);
+			std::copy_n(other.arr_data, total_count, this->arr_data);
+		}
+		else
+			this->arr_data = nullptr;
 	}
 
 	DynArray(DynArray&& other) noexcept
 	{
-		this->arr_data = other.arr_data;
 		this->dim_info = other.dim_info;
 		this->total_count = other.total_count;
+		this->arr_data = other.arr_data;
 		other.arr_data = nullptr;
 #ifndef NDEBUG
 		other.~DynArray();
@@ -404,8 +414,6 @@ public:
 
 	DynArray& operator=(DynArray other) & noexcept
 	{
-		// not checking each dimensions' size equal
-		// assign two different DynArrays is undefined
 		this->swap(other);
 		return *this;
 	}

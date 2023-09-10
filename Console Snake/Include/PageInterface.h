@@ -9,7 +9,7 @@
 
 #pragma region FactoryMacros
 
-#define FUNC_GET_MAP _getMap
+#define FUNC_GET_MAP _GetMap
 
 #define FACTORY_MAP_DEFINE_(class_name, key_scope) \
 protected: \
@@ -48,6 +48,7 @@ enum struct PageSelect
 	MenuPage,
 	SettingPage,
 	CustomThemePage,
+	CustomMapPage,
 	BeginPage,
 	RankPage
 };

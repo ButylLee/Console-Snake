@@ -72,7 +72,7 @@ Color Canvas::getColor() const noexcept
 
 void Canvas::applyColor()
 {
-	if (!SetConsoleTextAttribute(Console::get().getOutputHandle(), static_cast<WORD>(color)))
+	if (!SetConsoleTextAttribute(Console::get().getOutputHandle(), static_cast<WORD>(color.Value())))
 		throw NativeException{};
 }
 
@@ -91,6 +91,6 @@ void Canvas::applyClientSize() noexcept
 
 short Canvas::calCenteredCoord(const std::wstring_view& str) const noexcept
 {
-	short coord = (size.width - static_cast<short>(StrFullWidthLen(str))) / 2;
+	short coord = (size.width - static_cast<short>(StrFullWidthLength(str))) / 2;
 	return coord > 0 ? coord : 0;
 }

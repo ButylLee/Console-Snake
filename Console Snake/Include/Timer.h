@@ -13,7 +13,7 @@ class Timer
 {
 	static constexpr void NoCallback() noexcept {}
 public:
-	static constexpr std::chrono::milliseconds minimum_interval{ 1 };
+	static constexpr std::chrono::milliseconds MinimumInterval{ 1 };
 	enum Looping :bool { NoLoop = false, Loop = true };
 
 public:
@@ -32,7 +32,7 @@ public:
 				do {
 					auto end = high_resolution_clock::now() + delay;
 					do {
-						std::this_thread::sleep_for(minimum_interval);
+						std::this_thread::sleep_for(MinimumInterval);
 						if (!control->timer_enable)
 							return;
 						if (control->timer_reset)

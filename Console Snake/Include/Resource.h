@@ -7,21 +7,23 @@
 #include "EncryptedString.h"
 #include "WinHeader.h"
 #include <random>
-#include <type_traits>
+#include <iterator>
+#include <cstddef>
+#include <cassert>
 
-#define GAME_VERSION "2.22"
+#define GAME_VERSION "2.30"
 
 namespace Resource {
-	inline constexpr const char* save_file_name = "SnakeSaved.bin";
-	inline constexpr const unsigned char crypto_key[] = {
+	inline constexpr const char* SaveFileName = "SnakeSaved.bin";
+	inline constexpr const unsigned char CryptoKey[] = {
 		0x54, 0xDE, 0x3B, 0xF2, 0xD8, 0x5D, 0x4E, 0x04,
 		0xB2, 0xBE, 0x4D, 0xCC, 0xC3, 0xAD, 0xEB, 0x1C,
 	};
-	inline constexpr const unsigned char crypto_IV[] = {
+	inline constexpr const unsigned char CryptoIV[] = {
 		0xE9, 0x5C, 0x99, 0x13, 0xCC, 0x94, 0x4A, 0x0C,
 		0x92, 0xD1, 0x48, 0x9E, 0x03, 0x9B, 0x4E, 0xA4,
 	};
-	inline const wchar_t* const game_title = []
+	inline const wchar_t* const GameTitle = []
 	{
 		static constexpr const wchar_t* titles[] = { LR"title(
 
@@ -103,7 +105,7 @@ namespace Resource {
 		std::random_device engine;
 		std::uniform_int_distribution<size_t> dis;
 		using param_type = typename decltype(dis)::param_type;
-		return titles[dis(engine, param_type{ 0, std::extent_v<decltype(titles)> - 1 })];
+		return titles[dis(engine, param_type{ 0, std::size(titles) - 1 })];
 	}();
 } // namespace Resource
 
@@ -129,6 +131,7 @@ TOKEN_DEF(
 
 	setting_speed,
 	setting_map_size,
+	setting_customize_map,
 	setting_show_frame,
 	setting_theme,
 	setting_customize_theme,
@@ -153,6 +156,21 @@ TOKEN_DEF(
 	custom_theme_food,
 	custom_theme_snake,
 	custom_theme_barrier,
+
+	custom_map_prev,
+	custom_map_next,
+	custom_map_edit_map,
+	custom_map_delete_map,
+	custom_map_delete_map_confirm,
+	custom_map_switch_size,
+	custom_map_rename,
+	custom_map_curr_size,
+	custom_map_curr_pos,
+	custom_map_move_cursor,
+	custom_map_switch_block,
+	custom_map_all_blank,
+	custom_map_save_edit,
+	custom_map_cancel_edit,
 
 	game_congratulations,
 	game_you_win,
@@ -189,24 +207,16 @@ LANG_DEFAULT(en_US);
 MAKE_LOCALIZED_STRS
 {
 	{
-
 #include "LangENG.inl"
-
 	},
 	{
-
 #include "LangCHS.inl"
-
 	},
 	{
-
 #include "LangCHT.inl"
-
 	},
 	{
-
 #include "LangJPN.inl"
-
 	}
 };
 
@@ -229,29 +239,24 @@ ENUM_DEFINE(Lang)
 // --------------- Enum Size Resource ---------------
 struct SizeEnum {
 	enum Tag {
-		XS, S, M, L, XL,
+		S, M, L,
+		Mask_,
 		DefaultValue = S
 	};
 };
-using Size = CustomEnum<SizeEnum, short>;
+using Size = Enum<SizeEnum, unsigned short>;
 ENUM_DEFINE(Size)
 {
-	{ 13, L"(XS)" },
-	{ 17, L"(S) " },
-	{ 21, L"(M) " },
-	{ 24, L"(L) " },
-	{ 27, L"(XL)" }
-};
-ENUM_CUSTOM(Size)
-{
-	{}, L"(Custom)"
+	{ 15, L"Small  " },
+	{ 20, L"Middle " },
+	{ 24, L"Large  " }
 };
 
 // --------------- Enum Speed Resource ---------------
 struct SpeedEnum {
 	enum Tag {
-		SLOW, NORMAL, FAST,
-		DefaultValue = NORMAL
+		Slow, Normal, Fast,
+		DefaultValue = Normal
 	};
 };
 using Speed = CustomEnum<SpeedEnum, short, Token::StringName>;
@@ -277,7 +282,7 @@ struct ColorEnum {
 		Purple, LightPurple,
 		Yellow, LightYellow,
 		White , LightWhite,
-		Mask,
+		Mask_,
 		DefaultValue = White
 	};
 };
@@ -299,7 +304,7 @@ struct FacadeEnum {
 	enum Tag {
 		FullStar, FullCircle, FullRect, FullDiamond,
 		Star, Circle, Rect, Diamond,
-		Mask,
+		Mask_,
 		DefaultValue = FullStar
 	};
 };
@@ -316,15 +321,15 @@ ENUM_DEFINE(Facade)
 	{ L'◇', L"" },
 };
 
-// --------------- Theme Resource ---------------
+// --------------- Enum Theme Resource ---------------
 enum struct Element :size_t
 {
-	blank = 0,
-	food,
-	snake,
-	barrier,
+	Blank = 0,
+	Food,
+	Snake,
+	Barrier,
 
-	Mask
+	Mask_
 };
 
 struct ElementSet
@@ -334,17 +339,18 @@ struct ElementSet
 		Facade facade;
 		Color color;
 
-		friend constexpr bool
-		operator==(const Appearance&, const Appearance&) = default;
-	}elements[static_cast<size_t>(Element::Mask)];
+		friend bool operator==(const Appearance&, const Appearance&) = default;
+	}elements[static_cast<size_t>(Element::Mask_)];
 
-	template<typename T>
-	constexpr auto& operator[](T which) noexcept
+	constexpr auto& operator[](auto which) noexcept
 	{
 		return elements[static_cast<size_t>(which)];
 	}
-	friend constexpr bool
-	operator==(const ElementSet&, const ElementSet&) = default;
+	constexpr auto& operator[](auto which) const noexcept
+	{
+		return elements[static_cast<size_t>(which)];
+	}
+	friend bool operator==(const ElementSet&, const ElementSet&) = default;
 };
 
 struct ThemeEnum {
@@ -405,6 +411,325 @@ ENUM_DEFINE(Theme)
 ENUM_CUSTOM(Theme)
 {
 	{}, Token::setting_custom
+};
+
+// --------------- Enum Map Resource ---------------
+struct MapShapeIterator
+{
+	MapShapeIterator(const std::byte* data, size_t count) noexcept
+		:data(data), count(count)
+	{}
+	Element operator*() noexcept
+	{
+		switch (std::to_integer<int>(*data >> count & std::byte{0b1}))
+		{
+			case 0b0:
+				return Element::Blank;
+			case 0b1:
+				return Element::Barrier;
+		}
+		[[unlikely]] return Element::Blank;
+	}
+	MapShapeIterator& operator++() noexcept
+	{
+		if (++count == 8)
+		{
+			data++;
+			count = 0;
+		}
+		return *this;
+	}
+	MapShapeIterator operator++(int) noexcept
+	{
+		MapShapeIterator tmp = *this;
+		++*this;
+		return tmp;
+	}
+	bool operator==(const MapShapeIterator&) const = default;
+private:
+	const std::byte* data;
+	size_t count;
+};
+template<size_t N>
+class MapShape
+{
+	static constexpr size_t Size = N * N;
+	static constexpr size_t RemainCount = Size % 8;
+	static constexpr size_t CompressedSize = Size / 8 + (RemainCount == 0 ? 0 : 1);
+public:
+	template<size_t Count>
+	constexpr MapShape(const wchar_t(&str)[Count]) noexcept
+	{
+		static_assert(Count - 1 == Size + N); // - 1'\0', + N'\n'
+		size_t index = 0;
+		for (unsigned char count = 0, byte = 0; auto ch : str)
+		{
+			if (index == 0 && ch == L'\n')
+				continue;
+			switch (ch)
+			{
+				case L'□':
+					byte |= 0b0 << count; break;
+				case L'■':
+					byte |= 0b1 << count; break;
+				case L'\n':
+					continue;
+				case L'\0':
+					data[index] = std::byte{ byte };
+					return;
+			}
+			if (++count == 8)
+			{
+				count = 0;
+				data[index++] = std::byte{ byte };
+				byte = 0;
+			}
+		}
+	}
+	template<std::random_access_iterator Iter>
+	MapShape(Iter begin, Iter end) noexcept
+	{
+		assert(end - begin == Size);
+		size_t index = 0;
+		for (unsigned char count = 0, byte = 0; begin != end; ++begin)
+		{
+			Element item = *begin;
+			switch (item)
+			{
+				case Element::Blank:
+					byte |= 0b0 << count; break;
+				case Element::Barrier:
+					byte |= 0b1 << count; break;
+			}
+			if (begin == end - 1)
+			{
+				data[index] = std::byte{ byte };
+				return;
+			}
+			if (++count == 8)
+			{
+				count = 0;
+				data[index++] = std::byte{ byte };
+				byte = 0;
+			}
+		}
+	}
+	MapShape() = default;
+	MapShapeIterator begin() const noexcept { return MapShapeIterator(data, 0); }
+	MapShapeIterator end() const noexcept
+	{
+		return MapShapeIterator(data + CompressedSize - (RemainCount == 0 ? 0 : 1), RemainCount);
+	}
+	size_t size() const noexcept { return Size; }
+
+private:
+	std::byte data[CompressedSize] = {};
+};
+using MapShapeSmall = MapShape<15>;
+using MapShapeMiddle = MapShape<20>;
+using MapShapeLarge = MapShape<24>;
+
+struct MapCell
+{
+	MapShapeSmall map_small;
+	MapShapeMiddle map_middle;
+	MapShapeLarge map_large;
+};
+
+struct MapSetEnum {
+	enum Tag {
+		Square, Space,
+		Mask_,
+		DefaultValue = Square
+	};
+};
+using MapSet = MultiCustomEnum<MapSetEnum, MapCell>;
+ENUM_DEFINE(MapSet)
+{
+	{
+		{
+			{
+				LR"(
+■■■■■■■■■■■■■■■
+■□□□□□□□□□□□□□■
+■□□□□□□□□□□□□□■
+■□□□□□□□□□□□□□■
+■□□□□□□□□□□□□□■
+■□□□□□□□□□□□□□■
+■□□□□□□□□□□□□□■
+■□□□□□□□□□□□□□■
+■□□□□□□□□□□□□□■
+■□□□□□□□□□□□□□■
+■□□□□□□□□□□□□□■
+■□□□□□□□□□□□□□■
+■□□□□□□□□□□□□□■
+■□□□□□□□□□□□□□■
+■■■■■■■■■■■■■■■)"
+			},
+			{
+				LR"(
+■■■■■■■■■■■■■■■■■■■■
+■□□□□□□□□□□□□□□□□□□■
+■□□□□□□□□□□□□□□□□□□■
+■□□□□□□□□□□□□□□□□□□■
+■□□□□□□□□□□□□□□□□□□■
+■□□□□□□□□□□□□□□□□□□■
+■□□□□□□□□□□□□□□□□□□■
+■□□□□□□□□□□□□□□□□□□■
+■□□□□□□□□□□□□□□□□□□■
+■□□□□□□□□□□□□□□□□□□■
+■□□□□□□□□□□□□□□□□□□■
+■□□□□□□□□□□□□□□□□□□■
+■□□□□□□□□□□□□□□□□□□■
+■□□□□□□□□□□□□□□□□□□■
+■□□□□□□□□□□□□□□□□□□■
+■□□□□□□□□□□□□□□□□□□■
+■□□□□□□□□□□□□□□□□□□■
+■□□□□□□□□□□□□□□□□□□■
+■□□□□□□□□□□□□□□□□□□■
+■■■■■■■■■■■■■■■■■■■■)"
+			},
+			{
+				LR"(
+■■■■■■■■■■■■■■■■■■■■■■■■
+■□□□□□□□□□□□□□□□□□□□□□□■
+■□□□□□□□□□□□□□□□□□□□□□□■
+■□□□□□□□□□□□□□□□□□□□□□□■
+■□□□□□□□□□□□□□□□□□□□□□□■
+■□□□□□□□□□□□□□□□□□□□□□□■
+■□□□□□□□□□□□□□□□□□□□□□□■
+■□□□□□□□□□□□□□□□□□□□□□□■
+■□□□□□□□□□□□□□□□□□□□□□□■
+■□□□□□□□□□□□□□□□□□□□□□□■
+■□□□□□□□□□□□□□□□□□□□□□□■
+■□□□□□□□□□□□□□□□□□□□□□□■
+■□□□□□□□□□□□□□□□□□□□□□□■
+■□□□□□□□□□□□□□□□□□□□□□□■
+■□□□□□□□□□□□□□□□□□□□□□□■
+■□□□□□□□□□□□□□□□□□□□□□□■
+■□□□□□□□□□□□□□□□□□□□□□□■
+■□□□□□□□□□□□□□□□□□□□□□□■
+■□□□□□□□□□□□□□□□□□□□□□□■
+■□□□□□□□□□□□□□□□□□□□□□□■
+■□□□□□□□□□□□□□□□□□□□□□□■
+■□□□□□□□□□□□□□□□□□□□□□□■
+■□□□□□□□□□□□□□□□□□□□□□□■
+■■■■■■■■■■■■■■■■■■■■■■■■)"
+			}
+		},
+		L"Square"
+	},
+	{
+		{
+			{
+				LR"(
+□□□□□□□□□□□□□□□
+□□□□□□□□□□□□□□□
+□□□□□□□□□□□□□□□
+□□□□□□□□□□□□□□□
+□□□□□□□□□□□□□□□
+□□□□□□□□□□□□□□□
+□□□□□□□□□□□□□□□
+□□□□□□□□□□□□□□□
+□□□□□□□□□□□□□□□
+□□□□□□□□□□□□□□□
+□□□□□□□□□□□□□□□
+□□□□□□□□□□□□□□□
+□□□□□□□□□□□□□□□
+□□□□□□□□□□□□□□□
+□□□□□□□□□□□□□□□)"
+			},
+			{
+				LR"(
+□□□□□□□□□□□□□□□□□□□□
+□□□□□□□□□□□□□□□□□□□□
+□□□□□□□□□□□□□□□□□□□□
+□□□□□□□□□□□□□□□□□□□□
+□□□□□□□□□□□□□□□□□□□□
+□□□□□□□□□□□□□□□□□□□□
+□□□□□□□□□□□□□□□□□□□□
+□□□□□□□□□□□□□□□□□□□□
+□□□□□□□□□□□□□□□□□□□□
+□□□□□□□□□□□□□□□□□□□□
+□□□□□□□□□□□□□□□□□□□□
+□□□□□□□□□□□□□□□□□□□□
+□□□□□□□□□□□□□□□□□□□□
+□□□□□□□□□□□□□□□□□□□□
+□□□□□□□□□□□□□□□□□□□□
+□□□□□□□□□□□□□□□□□□□□
+□□□□□□□□□□□□□□□□□□□□
+□□□□□□□□□□□□□□□□□□□□
+□□□□□□□□□□□□□□□□□□□□
+□□□□□□□□□□□□□□□□□□□□)"
+			},
+			{
+				LR"(
+□□□□□□□□□□□□□□□□□□□□□□□□
+□□□□□□□□□□□□□□□□□□□□□□□□
+□□□□□□□□□□□□□□□□□□□□□□□□
+□□□□□□□□□□□□□□□□□□□□□□□□
+□□□□□□□□□□□□□□□□□□□□□□□□
+□□□□□□□□□□□□□□□□□□□□□□□□
+□□□□□□□□□□□□□□□□□□□□□□□□
+□□□□□□□□□□□□□□□□□□□□□□□□
+□□□□□□□□□□□□□□□□□□□□□□□□
+□□□□□□□□□□□□□□□□□□□□□□□□
+□□□□□□□□□□□□□□□□□□□□□□□□
+□□□□□□□□□□□□□□□□□□□□□□□□
+□□□□□□□□□□□□□□□□□□□□□□□□
+□□□□□□□□□□□□□□□□□□□□□□□□
+□□□□□□□□□□□□□□□□□□□□□□□□
+□□□□□□□□□□□□□□□□□□□□□□□□
+□□□□□□□□□□□□□□□□□□□□□□□□
+□□□□□□□□□□□□□□□□□□□□□□□□
+□□□□□□□□□□□□□□□□□□□□□□□□
+□□□□□□□□□□□□□□□□□□□□□□□□
+□□□□□□□□□□□□□□□□□□□□□□□□
+□□□□□□□□□□□□□□□□□□□□□□□□
+□□□□□□□□□□□□□□□□□□□□□□□□
+□□□□□□□□□□□□□□□□□□□□□□□□)"
+			}
+		},
+		L"Space"
+	}
+};
+
+struct Map // Proxy
+{
+	static constexpr size_t MaxMapSetCount = 16;
+	static constexpr size_t NameMaxHalfWidth = 10;
+	MapSet set;
+	Size size;
+
+	void setNextValue() noexcept
+	{
+		if (size.setNextValue() == Size::S)
+			set.setNextValue();
+	}
+	void applyValue(auto&& f) const
+	{
+		switch (size.Index())
+		{
+			case Size::S:
+				f(set.Value().map_small); break;
+			case Size::M:
+				f(set.Value().map_middle); break;
+			case Size::L:
+				f(set.Value().map_large); break;
+		}
+	}
+	void applyCustomValue(auto&& f)
+	{
+		switch (size.Index())
+		{
+			case Size::S:
+				f(MapSet::ModifyCustomItem(set).map_small); break;
+			case Size::M:
+				f(MapSet::ModifyCustomItem(set).map_middle); break;
+			case Size::L:
+				f(MapSet::ModifyCustomItem(set).map_large); break;
+		}
+	}
 };
 
 #endif // SNAKE_RESOURCE_HEADER_

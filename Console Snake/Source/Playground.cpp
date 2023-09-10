@@ -32,7 +32,7 @@ void PlayGround::play()
 			while (true)
 			{
 				if (arena.isOver())
-					return;
+					return (void)getwch();
 				if (arena.input_key != Direction::None)
 					continue;
 				auto ch = getwch();
@@ -82,12 +82,16 @@ void PlayGround::play()
 		if (th_input.joinable())
 			th_input.join();
 	};
+	auto exit_th_input = [&] {
+		ungetwch(K_Esc);
+		while (!th_input.joinable()); // synchronization
+	};
 
 	std::atomic<bool> pause_flicker_flag = false;
 	Timer timer([&]
 				{
 					pause_flicker_flag = !pause_flicker_flag;
-				}, pause_flicker_interval, Timer::Loop);
+				}, PauseFlickerInterval, Timer::Loop);
 
 	while (true)
 	{
@@ -98,8 +102,7 @@ void PlayGround::play()
 				arena.updateFrame();
 				if (arena.isOver())
 				{
-					// tell thread th_input to end
-					ungetwch(K_Esc);
+					exit_th_input();
 					ending();
 					return;
 				}
@@ -115,7 +118,7 @@ void PlayGround::play()
 			{
 				auto [x, y] = arena.getNextPosition();
 				if (pause_flicker_flag)
-					arena.paintElement(Element::snake, x, y);
+					arena.paintElement(Element::Snake, x, y);
 				else
 					arena.paintElement(arena.getPositionType(x, y), x, y);
 				std::this_thread::sleep_for(1us);
@@ -174,8 +177,8 @@ void PlayGround::ending()
 		}
 		if (name.find_first_not_of(L' ') == std::string::npos)
 			name.clear(); // clear if only has spaces
-		if (name.length() > Rank::name_max_length)
-			name.resize(Rank::name_max_length);
+		if (name.length() > Rank::NameMaxLength)
+			name.resize(Rank::NameMaxLength);
 		Rank::get().newResult(name, GameData::get().score, arena.isWin());
 	}
 

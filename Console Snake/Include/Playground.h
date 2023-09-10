@@ -10,7 +10,7 @@
 
 class PlayGround :NotCopyable
 {
-	static constexpr std::chrono::milliseconds pause_flicker_interval{ 500 };
+	static constexpr std::chrono::milliseconds PauseFlickerInterval{ 500 };
 	enum struct GameStatus
 	{
 		Running, Pausing, Ending

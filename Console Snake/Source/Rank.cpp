@@ -5,7 +5,7 @@
 RankBase::RankBase() noexcept
 {
 	try {
-		rank_table.reserve(rank_count + 1);
+		rank_table.reserve(RankCount + 1);
 	}
 	catch (...) {
 		// Strong exception guarantee of vector.reserve(...)
@@ -21,8 +21,8 @@ void RankBase::newResult(std::wstring new_name, int new_score, bool winning)
 		std::move(new_name),
 		new_score,
 		GameSetting::get().speed.Value(),
-		GameSetting::get().width,
-		GameSetting::get().height,
+		GameSetting::get().map.set.Name(),
+		GameSetting::get().map.size.Value(),
 		winning
 	};
 
@@ -71,5 +71,5 @@ void RankBase::clearRank()
 {
 	std::unique_lock lock(rank_mutex);
 	rank_table.clear();
-	rank_table = std::vector<RankItem>{ rank_count };
+	rank_table = std::vector<RankItem>{ RankCount };
 }

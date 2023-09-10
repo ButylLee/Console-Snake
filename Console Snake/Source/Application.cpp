@@ -32,7 +32,6 @@ namespace {
 			// -nolimit: freely adjust the width and height of Console
 			// -oldconsole: enable the compatibility of old console host
 			// -awesome: force enable colorful title
-			// -size [width]x[height]: set user defined game size
 			if (cmd == "-nolimit"_crypt)
 			{
 				no_limit = true;
@@ -45,21 +44,6 @@ namespace {
 			else if (cmd == "-awesome"_crypt)
 			{
 				GameData::get().colorful_title = true;
-			}
-			else if (cmd == "-size"_crypt)
-			{
-				cmd = commands[++i];
-				size_t place = cmd.find('x');
-				if (place == string::npos)
-					continue;
-				try {
-					GameSetting::get().width.setCustomValue(abs(stoi(cmd)));
-					cmd = cmd.substr(place + 1);
-					GameSetting::get().height.setCustomValue(abs(stoi(cmd)));
-				}
-				catch (...) {
-					continue;
-				}
 			}
 		}
 	}
