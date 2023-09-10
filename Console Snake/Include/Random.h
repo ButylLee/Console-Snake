@@ -56,6 +56,7 @@ inline T GetWeightedDiscreteRandom(Iter first, Iter last)
 // random interval: [0, count)
 // Fn: (i:int)->probability:int
 template<std::integral T = int, typename Fn>
+	requires requires(Fn f) { { f(1) } -> std::integral; }
 inline T GetWeightedDiscreteRandom(size_t count, Fn fn)
 {
 	static std::discrete_distribution<T> dis;
