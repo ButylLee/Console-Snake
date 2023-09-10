@@ -8,6 +8,7 @@
 #include "WinHeader.h"
 #include <random>
 #include <type_traits>
+#include <concepts>
 #include <cstddef>
 #include <cassert>
 
@@ -486,7 +487,7 @@ public:
 			}
 		}
 	}
-	template<typename Iter>
+	template<std::random_access_iterator Iter>
 	MapShape(Iter begin, Iter end) noexcept
 	{
 		assert(end - begin == Size);
