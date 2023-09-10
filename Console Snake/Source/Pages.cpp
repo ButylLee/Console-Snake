@@ -847,7 +847,11 @@ void CustomMapPage::run()
 					case K_Ctrl_Bb:
 						map_viewer.setAllBlank(); break;
 					case K_Enter:
-						map_list.replaceSelected(map_viewer.exitEditing());
+						if (auto& map = map_viewer.exitEditing();
+							std::ranges::any_of(map.iter_all(), [](Element e) { return e == Element::Blank; }))
+							map_list.replaceSelected(map);
+						else // all barrier map is invalid
+							map_viewer.changeMap(map_list.fetchSelected());
 						paintInterface();
 						editor_state = EditorState::MapSelect;
 						break;
