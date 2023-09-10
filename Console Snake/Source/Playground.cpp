@@ -32,7 +32,7 @@ void PlayGround::play()
 			while (true)
 			{
 				if (arena.isOver())
-					return;
+					return (void)getwch();
 				if (arena.input_key != Direction::None)
 					continue;
 				auto ch = getwch();
@@ -82,6 +82,10 @@ void PlayGround::play()
 		if (th_input.joinable())
 			th_input.join();
 	};
+	auto exit_th_input = [&] {
+		ungetwch(K_Esc);
+		while (!th_input.joinable()); // synchronization
+	};
 
 	std::atomic<bool> pause_flicker_flag = false;
 	Timer timer([&]
@@ -98,8 +102,7 @@ void PlayGround::play()
 				arena.updateFrame();
 				if (arena.isOver())
 				{
-					// tell thread th_input to end
-					ungetwch(K_Esc);
+					exit_th_input();
 					ending();
 					return;
 				}
