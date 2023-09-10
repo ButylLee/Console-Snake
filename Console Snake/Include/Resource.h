@@ -7,8 +7,7 @@
 #include "EncryptedString.h"
 #include "WinHeader.h"
 #include <random>
-#include <type_traits>
-#include <concepts>
+#include <iterator>
 #include <cstddef>
 #include <cassert>
 
@@ -106,7 +105,7 @@ namespace Resource {
 		std::random_device engine;
 		std::uniform_int_distribution<size_t> dis;
 		using param_type = typename decltype(dis)::param_type;
-		return titles[dis(engine, param_type{ 0, std::extent_v<decltype(titles)> - 1 })];
+		return titles[dis(engine, param_type{ 0, std::size(titles) - 1 })];
 	}();
 } // namespace Resource
 

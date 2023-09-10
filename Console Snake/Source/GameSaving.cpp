@@ -8,7 +8,7 @@
 #include <fstream>
 #include <filesystem>
 #include <stdexcept>
-#include <type_traits>
+#include <iterator>
 #include <cryptopp/cryptlib.h>
 #include <cryptopp/aes.h>
 #include <cryptopp/modes.h>
@@ -128,7 +128,7 @@ void GameSavingBase::convertFromSaveData() noexcept
 
 		Theme::ValueType theme_temp;
 		auto& elements = theme_temp.elements;
-		for (size_t i = 0; i < std::extent_v<decltype(theme_temp.elements)>; i++)
+		for (size_t i = 0; i < std::size(theme_temp.elements); i++)
 		{
 			elements[i].facade.convertFrom(bin_data.setting.theme[i][0]);
 			elements[i].color.convertFrom(bin_data.setting.theme[i][1]);
@@ -180,7 +180,7 @@ void GameSavingBase::convertToSaveData() noexcept
 
 		auto theme_temp = gs.theme.Value();
 		auto& elements = theme_temp.elements;
-		for (size_t i = 0; i < std::extent_v<decltype(theme_temp.elements)>; i++)
+		for (size_t i = 0; i < std::size(theme_temp.elements); i++)
 		{
 			bin_data.setting.theme[i][0] = Convert{ elements[i].facade.Value() };
 			bin_data.setting.theme[i][1] = Convert{ elements[i].color.Value() };

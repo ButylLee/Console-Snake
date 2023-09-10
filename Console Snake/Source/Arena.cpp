@@ -5,9 +5,9 @@
 #include "ErrorHandling.h"
 
 #include <utility>
-#include <type_traits>
 #include <algorithm>
 #include <vector>
+#include <iterator>
 #include <cassert>
 #include <cmath>
 
