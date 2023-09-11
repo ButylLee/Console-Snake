@@ -137,6 +137,9 @@
     <ClInclude Include="Include\Random.h">
       <Filter>头文件\Utility</Filter>
     </ClInclude>
+    <ClInclude Include="Include\Pythonic.h">
+      <Filter>头文件\Import</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Include\LangENG.inl">

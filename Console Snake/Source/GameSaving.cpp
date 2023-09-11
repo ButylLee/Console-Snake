@@ -9,6 +9,7 @@
 #include <filesystem>
 #include <stdexcept>
 #include <iterator>
+#include <string>
 #include <cryptopp/cryptlib.h>
 #include <cryptopp/aes.h>
 #include <cryptopp/modes.h>

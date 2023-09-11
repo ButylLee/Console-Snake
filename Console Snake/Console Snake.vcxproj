@@ -50,6 +50,7 @@
     <ClInclude Include="Include\PageInterface.h" />
     <ClInclude Include="Include\Pages.h" />
     <ClInclude Include="Include\PlayGround.h" />
+    <ClInclude Include="Include\Pythonic.h" />
     <ClInclude Include="Include\Random.h" />
     <ClInclude Include="Include\Rank.h" />
     <ClInclude Include="Include\Resource.h" />
