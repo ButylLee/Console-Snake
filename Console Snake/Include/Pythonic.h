@@ -16,51 +16,79 @@ public:
 	class range_iterator
 	{
 	public:
-		constexpr range_iterator(T pos) noexcept :pos_(pos) {}
 		constexpr range_iterator(T pos, T step) noexcept
 			:pos_(pos), step_(step)
 		{}
 		constexpr T operator*() const noexcept { return pos_; }
 		constexpr T operator++() noexcept { return pos_ += step_; }
 		constexpr T operator++(int) noexcept { return (pos_ += step_) - step_; }
-		constexpr bool operator==(const range_iterator& rhs) const noexcept {
+		constexpr bool operator==(const range_iterator& rhs) const noexcept
+		{
 			return this->pos_ == rhs.pos_;
 		}
-		constexpr bool operator!=(const range_iterator& rhs) const noexcept {
+		constexpr bool operator!=(const range_iterator& rhs) const noexcept
+		{
 			return !(*this == rhs);
 		}
 	private:
 		T pos_;
-		T step_ = T{ 1 };
+		T step_;
 	};
 
-	constexpr range(T end) noexcept :end_(end) { check(); }
-	constexpr range(T begin, T end) noexcept :begin_(begin), end_(end) { check(); }
-	constexpr range(T begin, T end, T step) noexcept
-		:begin_(begin), end_(end), step_(step) {
+	template<std::integral V>
+	constexpr range(V end) noexcept
+		:end_(static_cast<T>(end))
+	{
 		check();
 	}
-	constexpr auto begin() const noexcept {
+	template<std::integral U, std::integral V>
+	constexpr range(U begin, V end) noexcept
+		:begin_(static_cast<T>(begin)), end_(static_cast<T>(end))
+	{
+		check();
+	}
+	template<std::integral U, std::integral V, std::integral W>
+	constexpr range(U begin, V end, W step) noexcept
+		:begin_(static_cast<T>(begin)), end_(static_cast<T>(end)), step_(static_cast<T>(step))
+	{
+		check();
+	}
+	constexpr auto begin() const noexcept
+	{
 		return range_iterator(begin_, step_);
 	}
-	constexpr auto end() const noexcept {
+	constexpr auto end() const noexcept
+	{
 		return range_iterator(end_, step_);
 	}
 
 private:
-	constexpr void check() noexcept {
+	constexpr void check() noexcept
+	{
 		if (std::is_constant_evaluated())
-			static_assert((step_ > T{ 0 } && begin_ < end_ ||
-						   step_ < T{ 0 } && begin_ > end_) && step != T{ 0 });
+		{
+			if (step_ > T{ 0 } && begin_ > end_ ||
+				step_ < T{ 0 } && begin_ < end_ || step_ == T{ 0 })
+				begin_ = end_;
+		}
 		else
+		{
 			assert((step_ > T{ 0 } && begin_ < end_ ||
-					step_ < T{ 0 } && begin_ > end_) && step != T{ 0 });
+					step_ < T{ 0 } && begin_ > end_) && step_ != T{ 0 });
+		}
 	}
 	// [begin, end)
 	T begin_ = T{ 0 };
 	T end_;
 	T step_ = T{ 1 };
 };
+
+template<std::integral V>
+range(V) -> range<V>;
+template<std::integral U, std::integral V>
+range(U, V) -> range<V>;
+template<std::integral U, std::integral V, std::integral W>
+range(U, V, W) -> range<V>;
 
 template<typename Container>
 class enumerate
@@ -88,23 +116,28 @@ public:
 		constexpr enumerate_iterator(size_t index, Iter iter) noexcept
 			:index_(index), iter_(iter)
 		{}
-		constexpr auto operator*() const noexcept {
+		constexpr auto operator*() const noexcept
+		{
 			return item_pair(index_, *iter_);
 		}
-		constexpr enumerate_iterator& operator++() noexcept {
+		constexpr enumerate_iterator& operator++() noexcept
+		{
 			++index_;
 			++iter_;
 			return *this;
 		}
-		constexpr enumerate_iterator operator++(int) noexcept {
+		constexpr enumerate_iterator operator++(int) noexcept
+		{
 			enumerate_iterator tmp = *this;
 			this->operator++();
 			return tmp;
 		}
-		constexpr bool operator==(const enumerate_iterator& rhs) const noexcept {
+		constexpr bool operator==(const enumerate_iterator& rhs) const noexcept
+		{
 			return this->iter_ == rhs.iter_;
 		}
-		constexpr bool operator!=(const enumerate_iterator& rhs) const noexcept {
+		constexpr bool operator!=(const enumerate_iterator& rhs) const noexcept
+		{
 			return !(*this == rhs);
 		}
 
@@ -122,16 +155,20 @@ public:
 	constexpr enumerate(std::initializer_list<T> container) noexcept
 		:container_(container)
 	{}
-	constexpr auto begin() noexcept {
+	constexpr auto begin() noexcept
+	{
 		return enumerate_iterator(0, container_.begin());
 	}
-	constexpr auto begin() const noexcept {
+	constexpr auto begin() const noexcept
+	{
 		return enumerate_iterator(0, container_.begin());
 	}
-	constexpr auto end() noexcept {
+	constexpr auto end() noexcept
+	{
 		return enumerate_iterator(container_.size(), container_.end());
 	}
-	constexpr auto end() const noexcept {
+	constexpr auto end() const noexcept
+	{
 		return enumerate_iterator(container_.size(), container_.end());
 	}
 

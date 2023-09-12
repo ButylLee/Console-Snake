@@ -3,6 +3,7 @@
 #include "WideIO.h"
 #include "Random.h"
 #include "ErrorHandling.h"
+#include "Pythonic.h"
 
 #include <utility>
 #include <algorithm>
@@ -129,9 +130,9 @@ bool Venue::isWin(size_t score) const noexcept
 void Venue::setupInvariant() noexcept
 {
 	int16_t index = 0;
-	for (uint8_t row = 0; row < map.size(0); row++)
+	for (auto row : range<uint8_t>(map.size(0)))
 	{
-		for (uint8_t column = 0; column < map.size(1); column++)
+		for (auto column : range<uint8_t>(map.size(1)))
 		{
 			if (map[row][column].type == Element::Blank)
 			{
@@ -195,9 +196,9 @@ void Venue::createSnake()
 {
 	std::vector<BlankNodeGenInfo> blank_list;
 	auto& map = getCurrentMap();
-	for (uint8_t y = 0; y < map.size(0); y++)
+	for (auto y : range<uint8_t>(map.size(0)))
 	{
-		for (uint8_t x = 0; x < map.size(1); x++)
+		for (auto x : range<uint8_t>(map.size(1)))
 		{
 			auto& node = map[y][x];
 			if (node.type != Element::Blank)
@@ -208,7 +209,7 @@ void Venue::createSnake()
 			info.pos.y = y;
 
 			// calculate generate probability
-			for (size_t i = 0; i < std::size(info.GenConvolutionOffset); i++)
+			for (auto i : range(std::size(info.GenConvolutionOffset)))
 			{
 				auto offset = info.GenConvolutionOffset[i];
 				auto curr_pos = PosHandledOffset(info.pos, offset, map.size(0), map.size(1));
@@ -218,7 +219,7 @@ void Venue::createSnake()
 			info.gen_probability = ProbabilityNonlinearizer1(info.gen_probability);
 
 			// calculate initial direction probability
-			for (size_t i = 0; i < std::size(info.init_direct_probability); i++)
+			for (auto i : range(std::size(info.init_direct_probability)))
 			{
 				auto offset1 = info.InitDirectCalcOffset1[i];
 				auto offset2 = info.InitDirectCalcOffset2[i];
@@ -251,7 +252,7 @@ void Venue::createSnake()
 
 	// place initial snake body
 	addSnakeBody(init_direction, init_node.pos.x, init_node.pos.y);
-	for (size_t i = 0; i < SnakeIntendedInitLength - 1; i++)
+	for (auto _ : range(SnakeIntendedInitLength - 1))
 		addSnakeBody(-init_direction);
 }
 

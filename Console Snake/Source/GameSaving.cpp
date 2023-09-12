@@ -1,5 +1,6 @@
 ﻿#include "GameSaving.h"
 #include "ScopeGuard.h"
+#include "Pythonic.h"
 #include "Resource.h"
 #include "GlobalData.h"
 #include "ErrorHandling.h"
@@ -129,7 +130,7 @@ void GameSavingBase::convertFromSaveData() noexcept
 
 		Theme::ValueType theme_temp;
 		auto& elements = theme_temp.elements;
-		for (size_t i = 0; i < std::size(theme_temp.elements); i++)
+		for (auto i : range(std::size(theme_temp.elements)))
 		{
 			elements[i].facade.convertFrom(bin_data.setting.theme[i][0]);
 			elements[i].color.convertFrom(bin_data.setting.theme[i][1]);
@@ -137,7 +138,7 @@ void GameSavingBase::convertFromSaveData() noexcept
 		gs.theme.convertFrom(theme_temp);
 
 		wchar_t map_name[Map::NameMaxHalfWidth + 1] = {};
-		for (size_t i = 0; i < bin_data.setting.custom_map_count; i++)
+		for (auto i : range(bin_data.setting.custom_map_count))
 		{
 			std::copy_n(bin_data.setting.map_name[i], Map::NameMaxHalfWidth, map_name);
 			MapSet::AddCustomItem(bin_data.setting.map[i], map_name);
@@ -154,7 +155,7 @@ void GameSavingBase::convertFromSaveData() noexcept
 	wchar_t name[Rank::NameMaxLength + 1] = {};
 	wchar_t map_name[Map::NameMaxHalfWidth + 1] = {};
 	auto [rank, lock] = Rank::get().modifyRank();
-	for (size_t i = 0; i < Rank::RankCount; i++)
+	for (auto i : range(Rank::RankCount))
 	{
 		auto& save_item = bin_data.rank_list[i];
 		auto& rank_item = rank[i];
@@ -181,7 +182,7 @@ void GameSavingBase::convertToSaveData() noexcept
 
 		auto theme_temp = gs.theme.Value();
 		auto& elements = theme_temp.elements;
-		for (size_t i = 0; i < std::size(theme_temp.elements); i++)
+		for (auto i : range(std::size(theme_temp.elements)))
 		{
 			bin_data.setting.theme[i][0] = Convert{ elements[i].facade.Value() };
 			bin_data.setting.theme[i][1] = Convert{ elements[i].color.Value() };
@@ -189,7 +190,7 @@ void GameSavingBase::convertToSaveData() noexcept
 
 		MapSet map(MapSet::Mask_ - 1);
 		bin_data.setting.custom_map_count = Convert{ MapSet::GetCount() - MapSet::Mask_ };
-		for (size_t i = 0; i < bin_data.setting.custom_map_count; i++)
+		for (auto i : range(bin_data.setting.custom_map_count))
 		{
 			map.setNextValue();
 			bin_data.setting.map[i] = map.Value();
@@ -204,7 +205,7 @@ void GameSavingBase::convertToSaveData() noexcept
 	}
 	// rank data
 	auto [rank, lock] = Rank::get().getRank();
-	for (size_t i = 0; i < Rank::RankCount; i++)
+	for (auto i : range(Rank::RankCount))
 	{
 		auto& save_item = bin_data.rank_list[i];
 		auto& rank_item = rank[i];
