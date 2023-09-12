@@ -73,8 +73,8 @@ private:
 		}
 		else
 		{
-			assert((step_ > T{ 0 } && begin_ < end_ ||
-					step_ < T{ 0 } && begin_ > end_) && step_ != T{ 0 });
+			assert(step_ > T{ 0 } && begin_ <= end_ ||
+				   step_ < T{ 0 } && begin_ >= end_);
 		}
 	}
 	// [begin, end)
