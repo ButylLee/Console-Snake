@@ -11,6 +11,7 @@
 #include "Random.h"
 #include "ScopeGuard.h"
 #include "EncryptedString.h"
+#include "Pythonic.h"
 #include "Resource.h"
 #include "KeyMap.h"
 #include "GlobalData.h"
@@ -497,7 +498,7 @@ void CustomThemePage::generateRandomTheme()
 	color_candidate.erase(std::find(color_candidate.cbegin(),
 									color_candidate.cend(),
 									static_cast<int>(Color::Black)));
-	for (size_t i = 0; i < static_cast<size_t>(Element::Mask_); i++)
+	for (auto i : range<size_t>(Element::Mask_))
 	{
 		theme_temp[i].facade = static_cast<Facade::EnumTag>(GetRandom(0, static_cast<int>(Facade::Mask_) - 1));
 		size_t index = GetRandom(0, color_candidate.size() - 1);
@@ -590,10 +591,10 @@ void CustomMapPage::MapSelector::paint()
 	finally { canvas.setCursorOffset(0, 0); };
 	canvas.setColor(NormalColor);
 	canvas.setCursor(2, 0);
-	for (size_t i = 0; i < ViewSpan; i++)
+	for (auto i : range(ViewSpan))
 		print(L"  /------------\\ " + !!i);
 	canvas.setCursor(2, 2);
-	for (size_t i = 0; i < ViewSpan; i++)
+	for (auto i : range(ViewSpan))
 		print(L"  \\------------/ " + !!i);
 	assert(map.set.Index() == 0);
 	refreshMapList();
@@ -626,12 +627,12 @@ void CustomMapPage::MapSelector::refreshMapList()
 	finally { canvas.setCursorOffset(0, 0); };
 	canvas.setColor(NormalColor);
 	canvas.setCursor(2, 1);
-	for (size_t i = 0; i < ViewSpan; i++)
+	for (auto i : range(ViewSpan))
 		print(L"  |            | " + !!i);
 
 	MapSet set(view_begin);
 	canvas.setCursor(2, 1);
-	for (size_t i = 0; i < ViewSpan; i++)
+	for (auto i : range(ViewSpan))
 	{
 		if (set == map.set)
 			canvas.setColor(HighlightColor);
@@ -718,11 +719,11 @@ void CustomMapPage::MapViewer::paint() const
 	std::wstring line;
 	auto map_begin_pos = static_cast<unsigned short>((Size(Size::L).Value() - editing_map.size()) / 2);
 	auto iter = editing_map.iter_all().begin();
-	for (unsigned short row = 0; row < Size(Size::L).Value(); row++)
+	for (auto row : range<unsigned short>(Size(Size::L).Value()))
 	{
 		canvas.setCursor(0, row);
 		line.clear();
-		for (unsigned short column = 0; column < Size(Size::L).Value(); column++)
+		for (auto column : range<unsigned short>(Size(Size::L).Value()))
 		{
 			if (row >= map_begin_pos && column >= map_begin_pos &&
 				row < map_begin_pos + editing_map.size() &&

@@ -2,13 +2,13 @@
 #include "Canvas.h"
 #include "Console.h"
 #include "Pages.h"
-#include "GlobalData.h"
 #include "GameSaving.h"
-#include "EncryptedString.h"
-
 #include "WideIO.h"
-#include "Resource.h"
 #include "ErrorHandling.h"
+#include "EncryptedString.h"
+#include "Pythonic.h"
+#include "Resource.h"
+#include "GlobalData.h"
 
 #include "WinHeader.h"
 #include <clocale>
@@ -25,7 +25,7 @@ namespace {
 			return;
 
 		string cmd;
-		for (int i = 1; i < count; i++)
+		for (auto i : range(1, count))
 		{
 			cmd = commands[i];
 			// Command Options:

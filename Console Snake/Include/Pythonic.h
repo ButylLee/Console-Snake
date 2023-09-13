@@ -8,6 +8,7 @@
 #include <utility>
 #include <initializer_list>
 #include <iterator>
+#include <ranges>
 
 template<std::integral T>
 class range
@@ -35,19 +36,19 @@ public:
 		T step_;
 	};
 
-	template<std::integral V>
+	template<typename V>
 	constexpr range(V end) noexcept
 		:end_(static_cast<T>(end))
 	{
 		check();
 	}
-	template<std::integral U, std::integral V>
+	template<typename U, typename V>
 	constexpr range(U begin, V end) noexcept
 		:begin_(static_cast<T>(begin)), end_(static_cast<T>(end))
 	{
 		check();
 	}
-	template<std::integral U, std::integral V, std::integral W>
+	template<typename U, typename V, typename W>
 	constexpr range(U begin, V end, W step) noexcept
 		:begin_(static_cast<T>(begin)), end_(static_cast<T>(end)), step_(static_cast<T>(step))
 	{
@@ -83,14 +84,14 @@ private:
 	T step_ = T{ 1 };
 };
 
-template<std::integral V>
+template<typename V>
 range(V) -> range<V>;
-template<std::integral U, std::integral V>
+template<typename U, typename V>
 range(U, V) -> range<V>;
-template<std::integral U, std::integral V, std::integral W>
+template<typename U, typename V, typename W>
 range(U, V, W) -> range<V>;
 
-template<typename Container>
+template<std::ranges::sized_range Container>
 class enumerate
 {
 public:
@@ -142,7 +143,7 @@ public:
 		}
 
 	private:
-		size_t index_ = 0;
+		size_t index_;
 		Iter iter_;
 	};
 

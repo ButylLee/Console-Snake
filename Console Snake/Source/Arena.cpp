@@ -391,9 +391,9 @@ void Arena::paintVenue()
 {
 	canvas.setCursor(0, 0);
 	auto& map = getCurrentMap();
-	for (size_t index = 0; auto& node : map.iter_all())
+	for (auto&& [index, node] : enumerate(map.iter_all()))
 	{
-		if (not(GameSetting::get().old_console_host && index++ == map.total_size() - 1))
+		if (not(GameSetting::get().old_console_host && index == map.total_size() - 1))
 			paintElement(node.type);
 	}
 }
