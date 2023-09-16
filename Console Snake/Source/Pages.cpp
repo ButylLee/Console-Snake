@@ -46,11 +46,8 @@ std::unique_ptr<Page> Page::Create()
 ****************************************/
 void GamePage::run()
 {
-	Console::get().setTitle(~Token::title_gaming);
-	if (GameSetting::get().show_frame)
-		Console::get().setConsoleWindow(Console::UseFrame);
-	else
-		Console::get().setConsoleWindow(Console::NoFrame);
+	Console::get().setTitle(GameSetting::get().opening_pause ? ~Token::title_pausing : ~Token::title_gaming);
+	Console::get().setConsoleWindow(GameSetting::get().show_frame ? Console::UseFrame : Console::NoFrame);
 	auto width = GameSetting::get().map.size.Value();
 	auto height = GameSetting::get().map.size.Value();
 	canvas.setClientSize(width, height);
@@ -233,10 +230,14 @@ void SettingPage::run()
 				break;
 
 			case K_4:
+				GameSetting::get().opening_pause = !GameSetting::get().opening_pause;
+				break;
+
+			case K_5:
 				GameSetting::get().theme.setNextValue();
 				break;
 
-			case K_F4:
+			case K_F5:
 				GameData::get().selection = PageSelect::CustomThemePage;
 				{
 					auto page = Page::Create();
@@ -246,7 +247,7 @@ void SettingPage::run()
 				paintInterface();
 				break;
 
-			case K_5:
+			case K_6:
 				LocalizedStrings::setLang(
 					GameSetting::get().lang.setNextValue().Value()
 				);
@@ -262,14 +263,14 @@ void SettingPage::run()
 
 			case K_Esc:
 				GameData::get().selection = PageSelect::MenuPage;
-				// restore settings
+				// restore settings...
 				GameSetting::get() = setting_backup;
 				LocalizedStrings::setLang(setting_backup.lang.Value());
 				if (custom_theme_backup)
 					GameSetting::get().theme.SetCustomValue(*custom_theme_backup);
 				else
 					GameSetting::get().theme.ClearCustomValue();
-				// excluding custom maps
+				// ...excluding custom maps
 				return;
 		}
 	}
@@ -293,14 +294,16 @@ void SettingPage::paintInterface()
 	canvas.setCursor(baseX, baseY + 4);
 	print(~Token::setting_show_frame);
 	canvas.setCursor(baseX, baseY + 6);
-	print(~Token::setting_theme);
-	canvas.setCursor(baseX - 9, baseY + 6);
-	print(~Token::setting_customize_theme);
+	print(~Token::setting_opening_pause);
 	canvas.setCursor(baseX, baseY + 8);
+	print(~Token::setting_theme);
+	canvas.setCursor(baseX - 9, baseY + 8);
+	print(~Token::setting_customize_theme);
+	canvas.setCursor(baseX, baseY + 10);
 	print(~Token::setting_language);
-	canvas.setCursor(baseX - 2, baseY + 10);
+	canvas.setCursor(baseX - 2, baseY + 12);
 	print(~Token::setting_save);
-	canvas.setCursor(baseX - 1, baseY + 12);
+	canvas.setCursor(baseX - 1, baseY + 14);
 	print(~Token::setting_return);
 }
 
@@ -321,13 +324,18 @@ void SettingPage::paintCurOptions()
 
 	canvas.setCursor(baseX, baseY + 4);
 	print(GameSetting::get().show_frame
-		  ? ~Token::setting_show_frame_yes
-		  : ~Token::setting_show_frame_no);
+		  ? ~Token::setting_yes
+		  : ~Token::setting_no);
 
 	canvas.setCursor(baseX, baseY + 6);
-	print(~GameSetting::get().theme.Name());
+	print(GameSetting::get().opening_pause
+		  ? ~Token::setting_yes
+		  : ~Token::setting_no);
 
 	canvas.setCursor(baseX, baseY + 8);
+	print(~GameSetting::get().theme.Name());
+
+	canvas.setCursor(baseX, baseY + 10);
 	print(GameSetting::get().lang.Name());
 }
 

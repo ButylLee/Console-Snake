@@ -23,6 +23,7 @@ struct GameSettingMember
 	Map map;
 	Theme theme;
 	bool show_frame = false;
+	bool opening_pause = true;
 	// The old console host automatically Line Feed when printing the last character of line.
 	// The new console host doesn't have the same behavior and work whether print(L'\n') or not.
 	bool old_console_host = false;

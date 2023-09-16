@@ -11,7 +11,7 @@
 #include <cstddef>
 #include <cassert>
 
-#define GAME_VERSION "2.30"
+#define GAME_VERSION "2.31"
 
 namespace Resource {
 	inline constexpr const char* SaveFileName = "SnakeSaved.bin";
@@ -133,6 +133,7 @@ TOKEN_DEF(
 	setting_map_size,
 	setting_customize_map,
 	setting_show_frame,
+	setting_opening_pause,
 	setting_theme,
 	setting_customize_theme,
 	setting_language,
@@ -147,8 +148,8 @@ TOKEN_DEF(
 	setting_theme_C,
 	setting_theme_D,
 	setting_theme_E,
-	setting_show_frame_yes,
-	setting_show_frame_no,
+	setting_yes,
+	setting_no,
 	setting_reset_custom,
 
 	custom_theme_list_head,

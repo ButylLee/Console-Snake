@@ -19,7 +19,7 @@
 PlayGround::PlayGround(Canvas& canvas) :canvas(canvas), arena(canvas)
 {
 	GameData::get().score = 0;
-	game_status = GameStatus::Running;
+	game_status = GameSetting::get().opening_pause ? GameStatus::Pausing : GameStatus::Running;
 }
 
 void PlayGround::play()
@@ -61,14 +61,12 @@ void PlayGround::play()
 						if (game_status == GameStatus::Pausing)
 						{
 							game_status = GameStatus::Running;
-							if (GameSetting::get().show_frame)
-								Console::get().setTitle(~Token::title_gaming);
+							Console::get().setTitle(~Token::title_gaming);
 						}
 						else
 						{
 							game_status = GameStatus::Pausing;
-							if (GameSetting::get().show_frame)
-								Console::get().setTitle(~Token::title_pausing);
+							Console::get().setTitle(~Token::title_pausing);
 						}
 						break;
 
