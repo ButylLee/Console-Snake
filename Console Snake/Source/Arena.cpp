@@ -190,68 +190,157 @@ namespace
 	};
 	constexpr auto ProbabilityNonlinearizer1 = [](auto x) { return x * x; };
 	constexpr auto ProbabilityNonlinearizer2 = [](auto x) { return static_cast<decltype(x)>(std::pow(10, x)); };
+
+	struct SquareMapInfo
+	{
+		uint8_t margin_up = 0;
+		uint8_t margin_down = 0;
+		uint8_t margin_left = 0;
+		uint8_t margin_right = 0;
+	};
+	std::optional<SquareMapInfo> IsSquareMap(const DynArray<MapNode, 2>& map) noexcept
+	{
+		auto fn = [](auto map_slice, auto size) -> bool
+			{
+				for (auto i : range(size))
+					if (map_slice(i).type == Element::Blank)
+						return true;
+				return false;
+			};
+		auto slice_y = [&](auto y) { return [&, y](auto x) { return map[y][x]; }; };
+		auto slice_x = [&](auto x) { return [&, x](auto y) { return map[y][x]; }; };
+
+		SquareMapInfo info;
+		for (auto y : range(map.size(0)))
+		{
+			if (fn(slice_y(y), map.size(1)))
+				break;
+			info.margin_up++;
+		}
+		for (auto y : range(map.size(0) - 1, -1, -1))
+		{
+			if (fn(slice_y(y), map.size(1)))
+				break;
+			info.margin_down++;
+		}
+		for (auto x : range(map.size(1)))
+		{
+			if (fn(slice_x(x), map.size(0)))
+				break;
+			info.margin_left++;
+		}
+		for (auto x : range(map.size(1) - 1, -1, -1))
+		{
+			if (fn(slice_x(x), map.size(0)))
+				break;
+			info.margin_right++;
+		}
+
+		for (auto y : range(info.margin_left, map.size(0) - info.margin_right))
+		{
+			for (auto x : range(info.margin_up, map.size(1) - info.margin_down))
+			{
+				if (map[y][x].type != Element::Blank)
+					return {};
+			}
+		}
+		if (info.margin_up + info.margin_down + info.margin_left + info.margin_right == 0)
+			return {};
+		return info;
+	}
 }
 
 void Venue::createSnake()
 {
-	std::vector<BlankNodeGenInfo> blank_list;
-	auto& map = getCurrentMap();
-	for (auto y : range<uint8_t>(map.size(0)))
+	Direction init_direction;
+	uint8_t pos_x, pos_y;
+
+	if (auto square_info = IsSquareMap(map); !square_info.has_value()) // general algorithm
 	{
-		for (auto x : range<uint8_t>(map.size(1)))
+		std::vector<BlankNodeGenInfo> blank_list;
+		for (auto y : range<uint8_t>(map.size(0)))
 		{
-			auto& node = map[y][x];
-			if (node.type != Element::Blank)
-				continue;
-			BlankNodeGenInfo info;
-			// record Blank position
-			info.pos.x = x;
-			info.pos.y = y;
-
-			// calculate generate probability
-			for (auto i : range(std::size(info.GenConvolutionOffset)))
+			for (auto x : range<uint8_t>(map.size(1)))
 			{
-				auto offset = info.GenConvolutionOffset[i];
-				auto curr_pos = PosHandledOffset(info.pos, offset, map.size(0), map.size(1));
-				if (map[curr_pos.y][curr_pos.x].type == Element::Blank)
-					info.gen_probability++;
-			}
-			info.gen_probability = ProbabilityNonlinearizer1(info.gen_probability);
+				auto& node = map[y][x];
+				if (node.type != Element::Blank)
+					continue;
+				BlankNodeGenInfo info;
+				// record Blank position
+				info.pos.x = x;
+				info.pos.y = y;
 
-			// calculate initial direction probability
-			for (auto i : range(std::size(info.init_direct_probability)))
-			{
-				auto offset1 = info.InitDirectCalcOffset1[i];
-				auto offset2 = info.InitDirectCalcOffset2[i];
-				auto curr_pos1 = PosHandledOffset(info.pos, offset1, map.size(0), map.size(1));
-				auto curr_pos2 = PosHandledOffset(info.pos, offset2, map.size(0), map.size(1));
-				if (map[curr_pos1.y][curr_pos1.x].type == Element::Blank)
-					info.init_direct_probability[i]++;
-				if (map[curr_pos2.y][curr_pos2.x].type == Element::Blank)
-					info.init_direct_probability[i]++;
-			}
-			std::transform(std::begin(info.init_direct_probability),
-						   std::end(info.init_direct_probability),
-						   std::begin(info.init_direct_probability),
-						   ProbabilityNonlinearizer2);
+				// calculate generate probability
+				for (auto i : range(std::size(info.GenConvolutionOffset)))
+				{
+					auto offset = info.GenConvolutionOffset[i];
+					auto curr_pos = PosHandledOffset(info.pos, offset, map.size(0), map.size(1));
+					if (map[curr_pos.y][curr_pos.x].type == Element::Blank)
+						info.gen_probability++;
+				}
+				info.gen_probability = ProbabilityNonlinearizer1(info.gen_probability);
 
-			blank_list.push_back(std::move(info));
+				// calculate initial direction probability
+				for (auto i : range(std::size(info.init_direct_probability)))
+				{
+					auto offset1 = info.InitDirectCalcOffset1[i];
+					auto offset2 = info.InitDirectCalcOffset2[i];
+					auto curr_pos1 = PosHandledOffset(info.pos, offset1, map.size(0), map.size(1));
+					auto curr_pos2 = PosHandledOffset(info.pos, offset2, map.size(0), map.size(1));
+					if (map[curr_pos1.y][curr_pos1.x].type == Element::Blank)
+						info.init_direct_probability[i]++;
+					if (map[curr_pos2.y][curr_pos2.x].type == Element::Blank)
+						info.init_direct_probability[i]++;
+				}
+				std::transform(std::begin(info.init_direct_probability),
+							   std::end(info.init_direct_probability),
+							   std::begin(info.init_direct_probability),
+							   ProbabilityNonlinearizer2);
+
+				blank_list.push_back(std::move(info));
+			}
 		}
+		if (blank_list.size() == 0)
+			throw RuntimeException(L"Invalid Map.");
+
+		auto fn = [&](auto i) { return blank_list[static_cast<size_t>(i)].gen_probability; };
+		auto& init_node = blank_list[GetWeightedDiscreteRandom<size_t>(blank_list.size(), fn)];
+		init_direction = BlankNodeGenInfo::InitDirectMap[
+			GetWeightedDiscreteRandom<size_t>(std::begin(init_node.init_direct_probability),
+											  std::end(init_node.init_direct_probability)
+			)
+		];
+		pos_x = init_node.pos.x;
+		pos_y = init_node.pos.y;
 	}
-	if (blank_list.size() == 0)
-		throw RuntimeException(L"Invalid Map.");
+	else // specialized algorithm for square-type maps
+	{
+		auto y_range = map.size(0) - square_info->margin_up - square_info->margin_down;
+		auto x_range = map.size(1) - square_info->margin_left - square_info->margin_right;
+		if (y_range > map.size(0) || x_range > map.size(1) || y_range == 0 && x_range == 0)
+			throw RuntimeException(L"Invalid Map.");
+		pos_y = GetRandom(0, y_range);
+		pos_x = GetRandom(0, x_range);
 
-	// random snake initial node
-	auto fn = [&](auto i) { return blank_list[static_cast<size_t>(i)].gen_probability; };
-	auto& init_node = blank_list[GetWeightedDiscreteRandom<size_t>(blank_list.size(), fn)];
-	Direction init_direction = BlankNodeGenInfo::InitDirectMap[
-		GetWeightedDiscreteRandom<size_t>(std::begin(init_node.init_direct_probability),
-										  std::end(init_node.init_direct_probability)
-		)
-	];
+		if (bool select_x_axis = GetRandom(0, 1))
+		{
+			if (pos_x < x_range / 2)
+				init_direction = Direction::Right;
+			else
+				init_direction = Direction::Left;
+		}
+		else
+		{
+			if (pos_y < y_range / 2)
+				init_direction = Direction::Down;
+			else
+				init_direction = Direction::Up;
+		}
+		pos_x += square_info->margin_left;
+		pos_y += square_info->margin_up;
+	}
 
-	// place initial snake body
-	addSnakeBody(init_direction, init_node.pos.x, init_node.pos.y);
+	addSnakeBody(init_direction, pos_x, pos_y);
 	for (auto _ : range(SnakeIntendedInitLength - 1))
 		addSnakeBody(-init_direction);
 }
