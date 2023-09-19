@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <vector>
 #include <iterator>
+#include <ranges>
 #include <cassert>
 #include <cmath>
 
@@ -56,7 +57,7 @@ Venue::Venue(DynArray<MapNode, 2> map_)
 PosNode Venue::getNextPosition() const noexcept
 {
 	auto [x, y] = snake_body[snake_head_index];
-	nextPosition(x, y);
+	nextPosition(x, y, snake_direct);
 	return { x, y };
 }
 
@@ -102,7 +103,7 @@ void Venue::orderDirection(Direction input) noexcept
 PosNodeGroup Venue::updateFrame() noexcept
 {
 	auto [head_x, head_y] = snake_body[snake_head_index];
-	nextPosition(head_x, head_y);
+	nextPosition(head_x, head_y, snake_direct);
 
 	auto previous_type = map[head_y][head_x].type;
 	if (previous_type == Element::Barrier || previous_type == Element::Snake)
@@ -200,41 +201,30 @@ namespace
 	};
 	std::optional<SquareMapInfo> IsSquareMap(const DynArray<MapNode, 2>& map) noexcept
 	{
-		auto fn = [](auto map_slice, auto size) -> bool
+		auto g = [](auto map_slice, auto inner_range) -> bool
 			{
-				for (auto i : range(size))
+				for (auto i : inner_range)
 					if (map_slice(i).type == Element::Blank)
 						return true;
 				return false;
+			};
+		auto f = [&](auto slice_functor, auto outer_range, auto inner_range, auto& counter)
+			{
+				for (auto i : outer_range)
+				{
+					if (g(slice_functor(i), inner_range))
+						break;
+					counter++;
+				}
 			};
 		auto slice_y = [&](auto y) { return [&, y](auto x) { return map[y][x]; }; };
 		auto slice_x = [&](auto x) { return [&, x](auto y) { return map[y][x]; }; };
 
 		SquareMapInfo info;
-		for (auto y : range(map.size(0)))
-		{
-			if (fn(slice_y(y), map.size(1)))
-				break;
-			info.margin_up++;
-		}
-		for (auto y : range(map.size(0) - 1, -1, -1))
-		{
-			if (fn(slice_y(y), map.size(1)))
-				break;
-			info.margin_down++;
-		}
-		for (auto x : range(map.size(1)))
-		{
-			if (fn(slice_x(x), map.size(0)))
-				break;
-			info.margin_left++;
-		}
-		for (auto x : range(map.size(1) - 1, -1, -1))
-		{
-			if (fn(slice_x(x), map.size(0)))
-				break;
-			info.margin_right++;
-		}
+		f(slice_y, range(map.size(0)), range(map.size(1)), info.margin_up);
+		f(slice_y, range(map.size(0)) | std::views::reverse, range(map.size(1)), info.margin_down);
+		f(slice_x, range(map.size(1)), range(map.size(0)), info.margin_left);
+		f(slice_x, range(map.size(1)) | std::views::reverse, range(map.size(0)), info.margin_right);
 
 		for (auto y : range(info.margin_left, map.size(0) - info.margin_right))
 		{
@@ -317,10 +307,10 @@ void Venue::createSnake()
 	{
 		auto y_range = map.size(0) - square_info->margin_up - square_info->margin_down;
 		auto x_range = map.size(1) - square_info->margin_left - square_info->margin_right;
-		if (y_range > map.size(0) || x_range > map.size(1) || y_range == 0 && x_range == 0)
+		if (y_range > map.size(0) || x_range > map.size(1))
 			throw RuntimeException(L"Invalid Map.");
-		pos_y = GetRandom(0, y_range);
-		pos_x = GetRandom(0, x_range);
+		pos_y = GetRandom(0, y_range - 1);
+		pos_x = GetRandom(0, x_range - 1);
 
 		if (bool select_x_axis = GetRandom(0, 1))
 		{
@@ -350,6 +340,7 @@ void Venue::addSnakeBody(Direction head_direct, uint8_t head_x, uint8_t head_y) 
 	assert(snake_head_index == -1 && snake_tail_index == -1 &&
 		   snake_direct == Direction::None);
 	snake_direct = head_direct;
+	assert(map[head_y][head_x].type == Element::Blank);
 	map[head_y][head_x].type = Element::Snake;
 	snake_tail_index = snake_head_index = map[head_y][head_x].snake_index;
 	rebindData(snake_head_index, head_x, head_y);
@@ -362,17 +353,7 @@ void Venue::addSnakeBody(Direction tail_direct) noexcept
 	if (tail_direct == snake_direct)
 		return;
 	auto [tail_x, tail_y] = snake_body[snake_tail_index];
-	switch (+tail_direct)
-	{
-		case Direction::Up:
-			tail_y--; break;
-		case Direction::Down:
-			tail_y++; break;
-		case Direction::Left:
-			tail_x--; break;
-		case Direction::Right:
-			tail_x++; break;
-	}
+	nextPosition(tail_x, tail_y, tail_direct);
 	if (map[tail_y][tail_x].type != Element::Blank)
 		return;
 	map[tail_y][tail_x].type = Element::Snake;
@@ -405,11 +386,11 @@ void Venue::backwardIndex(int16_t& index) const noexcept
 		: index + 1;
 }
 
-void Venue::nextPosition(uint8_t& x, uint8_t& y) const noexcept
+void Venue::nextPosition(uint8_t& x, uint8_t& y, Direction direct) const noexcept
 {
 	uint8_t height = static_cast<uint8_t>(map.size(0));
 	uint8_t width = static_cast<uint8_t>(map.size(1));
-	switch (+snake_direct)
+	switch (+direct)
 	{
 		case Direction::Up:
 			y == 0 ? y = height - 1 : y--;

@@ -14,43 +14,49 @@ template<std::integral T>
 class range
 {
 public:
+	using difference_type = std::make_signed_t<T>;
+	using value_type = T;
+
 	class range_iterator
 	{
 	public:
-		constexpr range_iterator(T pos, T step) noexcept
-			:pos_(pos), step_(step)
+		using difference_type = range::difference_type;
+		using value_type = range::value_type;
+	public:
+		constexpr range_iterator() = default;
+		constexpr range_iterator(value_type pos, difference_type step) noexcept
+			: pos_(pos), step_(step)
 		{}
-		constexpr T operator*() const noexcept { return pos_; }
-		constexpr T operator++() noexcept { return pos_ += step_; }
-		constexpr T operator++(int) noexcept { return (pos_ += step_) - step_; }
+		constexpr value_type operator*() const noexcept { return pos_; }
+		constexpr range_iterator& operator++() noexcept { pos_ += step_; return *this; }
+		constexpr range_iterator operator++(int) noexcept { auto tmp = *this; ++*this; return tmp; }
+		constexpr range_iterator& operator--() noexcept { pos_ -= step_; return *this; }
+		constexpr range_iterator operator--(int) noexcept { auto tmp = *this; ++*this; return tmp; }
 		constexpr bool operator==(const range_iterator& rhs) const noexcept
 		{
 			return this->pos_ == rhs.pos_;
 		}
-		constexpr bool operator!=(const range_iterator& rhs) const noexcept
-		{
-			return !(*this == rhs);
-		}
 	private:
-		T pos_;
-		T step_;
+		value_type pos_ = value_type{ 0 };
+		difference_type step_ = difference_type{ 1 };
 	};
 
 	template<typename V>
 	constexpr range(V end) noexcept
-		:end_(static_cast<T>(end))
+		: end_(static_cast<value_type>(end))
 	{
 		check();
 	}
 	template<typename U, typename V>
 	constexpr range(U begin, V end) noexcept
-		:begin_(static_cast<T>(begin)), end_(static_cast<T>(end))
+		: begin_(static_cast<value_type>(begin)), end_(static_cast<value_type>(end))
 	{
 		check();
 	}
 	template<typename U, typename V, typename W>
 	constexpr range(U begin, V end, W step) noexcept
-		:begin_(static_cast<T>(begin)), end_(static_cast<T>(end)), step_(static_cast<T>(step))
+		: begin_(static_cast<value_type>(begin)), end_(static_cast<value_type>(end))
+		, step_(static_cast<difference_type>(step))
 	{
 		check();
 	}
@@ -68,20 +74,20 @@ private:
 	{
 		if (std::is_constant_evaluated())
 		{
-			if (step_ > T{ 0 } && begin_ > end_ ||
-				step_ < T{ 0 } && begin_ < end_ || step_ == T{ 0 })
+			if (step_ > difference_type{ 0 } && begin_ > end_ ||
+				step_ < difference_type{ 0 } && begin_ < end_ || step_ == difference_type{ 0 })
 				begin_ = end_;
 		}
 		else
 		{
-			assert(step_ > T{ 0 } && begin_ <= end_ ||
-				   step_ < T{ 0 } && begin_ >= end_);
+			assert(step_ > difference_type{ 0 } && begin_ <= end_ ||
+				   step_ < difference_type{ 0 } && begin_ >= end_);
 		}
 	}
 	// [begin, end)
-	T begin_ = T{ 0 };
-	T end_;
-	T step_ = T{ 1 };
+	value_type begin_ = value_type{ 0 };
+	value_type end_;
+	difference_type step_ = difference_type{ 1 };
 };
 
 template<typename V>
@@ -105,7 +111,7 @@ public:
 		{
 			template<typename T>
 			constexpr item_pair(size_t index, T&& value) noexcept
-				:index_(index), value_(std::forward<T>(value))
+				: index_(index), value_(std::forward<T>(value))
 			{}
 			size_t index_;
 			V value_;
@@ -115,7 +121,7 @@ public:
 
 	public:
 		constexpr enumerate_iterator(size_t index, Iter iter) noexcept
-			:index_(index), iter_(iter)
+			: index_(index), iter_(iter)
 		{}
 		constexpr auto operator*() const noexcept
 		{
@@ -150,11 +156,11 @@ public:
 public:
 	template<typename T>
 	constexpr enumerate(T&& container) noexcept
-		:container_(std::forward<T>(container))
+		: container_(std::forward<T>(container))
 	{}
 	template<typename T>
 	constexpr enumerate(std::initializer_list<T> container) noexcept
-		:container_(container)
+		: container_(container)
 	{}
 	constexpr auto begin() noexcept
 	{

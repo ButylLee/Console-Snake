@@ -94,7 +94,7 @@ private:
 	void rebindData(int16_t snake_index, int8_t map_x, int8_t map_y) noexcept;
 	void forwardIndex(int16_t& index) const noexcept;
 	void backwardIndex(int16_t& index) const noexcept;
-	void nextPosition(uint8_t& x, uint8_t& y) const noexcept;
+	void nextPosition(uint8_t& x, uint8_t& y, Direction) const noexcept;
 
 private:
 	// The invariant of this class is that ALL map nodes except barrier
