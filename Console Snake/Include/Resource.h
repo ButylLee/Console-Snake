@@ -476,7 +476,8 @@ public:
 				case L'\n':
 					continue;
 				case L'\0':
-					data[index] = std::byte{ byte };
+					if (index != CompressedSize)
+						data[index] = std::byte{ byte };
 					return;
 			}
 			if (++count == 8)
