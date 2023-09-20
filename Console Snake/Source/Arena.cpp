@@ -226,9 +226,9 @@ namespace
 		f(slice_x, range(map.size(1)), range(map.size(0)), info.margin_left);
 		f(slice_x, range(map.size(1)) | std::views::reverse, range(map.size(0)), info.margin_right);
 
-		for (auto y : range(info.margin_left, map.size(0) - info.margin_right))
+		for (auto y : range(info.margin_up, map.size(0) - info.margin_down))
 		{
-			for (auto x : range(info.margin_up, map.size(1) - info.margin_down))
+			for (auto x : range(info.margin_left, map.size(1) - info.margin_right))
 			{
 				if (map[y][x].type != Element::Blank)
 					return {};

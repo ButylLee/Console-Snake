@@ -28,7 +28,8 @@ private:
 private:
 	Canvas& canvas;
 	Arena arena;
-	std::atomic<GameStatus> game_status;
+	std::atomic<GameStatus> game_status = GameStatus::Running;
+	std::atomic<bool> opening_flag = false;
 };
 
 #endif // SNAKE_PLAYGROUND_HEADER_
