@@ -130,7 +130,7 @@ TOKEN_DEF(
 	menu_exit,
 
 	setting_speed,
-	setting_map_size,
+	setting_map,
 	setting_customize_map,
 	setting_show_frame,
 	setting_opening_pause,

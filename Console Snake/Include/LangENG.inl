@@ -16,7 +16,7 @@ L"3)  Rank",
 L"Esc)  Exit",
 
 L"1)  Speed: ",
-L"2)  Map Select: ",
+L"2,@)  Map Select: ",
 L"  [F2] Customize",
 L"3)  Show Frame: ",
 L"4)  Opening Pause: ",

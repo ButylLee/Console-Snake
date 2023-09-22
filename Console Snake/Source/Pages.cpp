@@ -210,7 +210,11 @@ void SettingPage::run()
 				break;
 
 			case K_2:
-				GameSetting::get().map.setNextValue();
+				GameSetting::get().map.set.setNextValue();
+				break;
+
+			case '@':
+				GameSetting::get().map.size.setNextValue();
 				break;
 
 			case K_F2:
@@ -287,9 +291,9 @@ void SettingPage::paintInterface()
 
 	canvas.setCursor(baseX, baseY);
 	print(~Token::setting_speed);
-	canvas.setCursor(baseX, baseY + 2);
-	print(~Token::setting_map_size);
-	canvas.setCursor(baseX - 9, baseY + 2);
+	canvas.setCursor(baseX - 1, baseY + 2);
+	print(~Token::setting_map);
+	canvas.setCursor(baseX - 10, baseY + 2);
 	print(~Token::setting_customize_map);
 	canvas.setCursor(baseX, baseY + 4);
 	print(~Token::setting_show_frame);
