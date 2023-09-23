@@ -309,8 +309,8 @@ void Venue::createSnake()
 		auto x_range = map.size(1) - square_info->margin_left - square_info->margin_right;
 		if (y_range > map.size(0) || x_range > map.size(1))
 			throw RuntimeException(L"Invalid Map.");
-		pos_y = GetRandom(0, y_range - 1);
-		pos_x = GetRandom(0, x_range - 1);
+		pos_y = static_cast<uint8_t>(GetRandom(0, y_range - 1));
+		pos_x = static_cast<uint8_t>(GetRandom(0, x_range - 1));
 
 		if (bool select_x_axis = GetRandom(0, 1))
 		{
