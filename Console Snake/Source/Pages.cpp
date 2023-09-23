@@ -1040,11 +1040,10 @@ void RankPage::paintInterface()
 	paintTitle(ShowVersion::No);
 
 	auto [baseX, baseY] = canvas.getClientSize();
-	canvas.setColor(Color::LightYellow);
-
 	if (auto [rank, lock] = Rank::get().getRank(); rank[0].score == 0)
 	{
 		canvas.setCursorCentered(~Token::rank_no_data, baseY * 2 / 3);
+		canvas.setColor(Color::LightYellow);
 		print(~Token::rank_no_data);
 		is_no_data = true;
 	}
@@ -1071,8 +1070,9 @@ void RankPage::paintInterface()
 			buffer += ::format(L"{:<{}} "_crypt, std::move(speed), 6);
 			buffer += ::format(L"{0:>{1}.{1}} - {2}"_crypt,
 							   item.map_name, Map::NameMaxHalfWidth, Size::GetNameFrom(item.size));
-
 			buffer = ::format(L"{:^{}}"_crypt, std::move(buffer), baseX * 2);
+
+			canvas.setColor(item.is_win ? Color::LightGreen : Color::LightYellow);
 			print(buffer);
 		}
 

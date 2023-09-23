@@ -140,7 +140,7 @@ private:
 		bool is_editing = false;
 	};
 	static constexpr Color NormalColor = Color::White, HighlightColor = Color::LightGreen;
-	static constexpr short CanvasOffsetX = 25, CanvasOffsetY = 10;
+	static constexpr short CanvasOffsetX = 25, CanvasOffsetY = 11;
 	static constexpr size_t NameMaxFullWidth = Map::NameMaxHalfWidth / 2;
 	enum struct EditorState { MapSelect, MapEdit, MapNaming };
 
