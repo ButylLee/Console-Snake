@@ -208,16 +208,16 @@ LANG_DEFAULT(en_US);
 MAKE_LOCALIZED_STRS
 {
 	{
-#include "LangENG.inl"
+#include "Langs/LangENG.inl"
 	},
 	{
-#include "LangCHS.inl"
+#include "Langs/LangCHS.inl"
 	},
 	{
-#include "LangCHT.inl"
+#include "Langs/LangCHT.inl"
 	},
 	{
-#include "LangJPN.inl"
+#include "Langs/LangJPN.inl"
 	}
 };
 

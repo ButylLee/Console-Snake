@@ -29,6 +29,7 @@
     <ClCompile Include="Source\Main.cpp" />
     <ClCompile Include="Source\PlayGround.cpp" />
     <ClCompile Include="Source\Rank.cpp" />
+    <ClCompile Include="Source\SoundPlayer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\Application.h" />
@@ -56,20 +57,30 @@
     <ClInclude Include="Include\Resource.h" />
     <ClInclude Include="Include\ScopeGuard.h" />
     <ClInclude Include="Include\Singleton.h" />
+    <ClInclude Include="Include\SoundPlayer.h" />
     <ClInclude Include="Include\Timer.h" />
     <ClInclude Include="Include\WideIO.h" />
     <ClInclude Include="Include\WinHeader.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Include\LangCHS.inl" />
-    <None Include="Include\LangCHT.inl" />
-    <None Include="Include\LangENG.inl" />
-    <None Include="Include\LangJPN.inl" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\..\cryptopp\cryptopp\cryptlib.vcxproj">
       <Project>{c39f4b46-6e89-4074-902e-ca57073044d2}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Include\Langs\LangCHS.inl" />
+    <None Include="Include\Langs\LangCHT.inl" />
+    <None Include="Include\Langs\LangENG.inl" />
+    <None Include="Include\Langs\LangJPN.inl" />
+    <None Include="Include\Sounds\SoundAbout.inl" />
+    <None Include="Include\Sounds\SoundCancel.inl" />
+    <None Include="Include\Sounds\SoundConfirm.inl" />
+    <None Include="Include\Sounds\SoundDead.inl" />
+    <None Include="Include\Sounds\SoundEntrance.inl" />
+    <None Include="Include\Sounds\SoundFood.inl" />
+    <None Include="Include\Sounds\SoundIntro.inl" />
+    <None Include="Include\Sounds\SoundSwitch.inl" />
+    <None Include="Include\Sounds\SoundWin.inl" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

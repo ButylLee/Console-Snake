@@ -4,6 +4,7 @@
 #include "Random.h"
 #include "ErrorHandling.h"
 #include "Pythonic.h"
+#include "SoundPlayer.h"
 
 #include <utility>
 #include <algorithm>
@@ -422,11 +423,13 @@ void Arena::updateFrame()
 	{
 		case 0: // dead
 			game_over = true;
+			SoundPlayer::get().play(isWin() ? Sounds::Win : Sounds::Dead);
 			break;
 		case 1: // food
 			paintElement(Element::Snake, nodes_updated.head_pos.x, nodes_updated.head_pos.y);
 			generateFood();
 			GameData::get().score++;
+			SoundPlayer::get().play(Sounds::Food);
 			break;
 		case 2: // move normally
 			paintElement(Element::Snake, nodes_updated.head_pos.x, nodes_updated.head_pos.y);

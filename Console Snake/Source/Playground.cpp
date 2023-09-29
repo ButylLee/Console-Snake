@@ -1,6 +1,7 @@
 ﻿#include "PlayGround.h"
 #include "Rank.h"
 #include "Console.h"
+#include "SoundPlayer.h"
 #include "GlobalData.h"
 #include "Resource.h"
 #include "WideIO.h"
@@ -72,6 +73,7 @@ void PlayGround::play()
 						{
 							game_status = GameStatus::Pausing;
 							Console::get().setTitle(~Token::title_pausing);
+							SoundPlayer::get().play(Sounds::Cancel);
 						}
 						break;
 

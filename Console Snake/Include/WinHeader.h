@@ -4,13 +4,15 @@
 
 /* Include this header file to include Windows.h */
 
-#define WIN32_LEAN_AND_MEAN
+//#define WIN32_LEAN_AND_MEAN
 #define NOSERVICE
 #define NOMCX
 #define NOIME
 #define NOMINMAX
 
 #include <Windows.h>
+
+#pragma comment(lib, "winmm.lib")
 
 // enable Windows Visual Style
 #pragma comment(linker, "\"/manifestdependency:type='win32' name='Microsoft.Windows.Common-Controls' \

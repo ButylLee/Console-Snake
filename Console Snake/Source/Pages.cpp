@@ -5,6 +5,7 @@
 #include "DemoGround.h"
 #include "Rank.h"
 #include "GameSaving.h"
+#include "SoundPlayer.h"
 
 #include "WideIO.h"
 #include "Timer.h"
@@ -105,7 +106,7 @@ void AboutPage::run()
 	int msg = MessageBoxW(Console::get().getConsoleHandle(),
 						  (~Token::about_text).c_str(),
 						  (~Token::about_caption).c_str(),
-						  MB_OK | MB_ICONINFORMATION);
+						  MB_OK);
 	if (msg != IDOK)
 		throw NativeException{};
 	GameData::get().selection = PageSelect::MenuPage;
@@ -147,17 +148,21 @@ void MenuPage::run()
 			case K_Enter:
 			case K_1:
 				GameData::get().selection = PageSelect::GamePage;
+				SoundPlayer::get().play(Sounds::Entrance);
 				return;
 			case K_2:
 				GameData::get().selection = PageSelect::SettingPage;
+				SoundPlayer::get().play(Sounds::Entrance);
 				return;
 			case K_3:
 				GameData::get().selection = PageSelect::RankPage;
+				SoundPlayer::get().play(Sounds::Entrance);
 				return;
 			case K_a:
 			case K_A:
 			case K_F1:
 				GameData::get().selection = PageSelect::AboutPage;
+				SoundPlayer::get().play(Sounds::About);
 				return;
 			case K_Ctrl_Home:
 				if (enter_demoground)
@@ -207,18 +212,22 @@ void SettingPage::run()
 		{
 			case K_1:
 				GameSetting::get().speed.setNextValue();
+				SoundPlayer::get().play(Sounds::Switch);
 				break;
 
 			case K_2:
 				GameSetting::get().map.set.setNextValue();
+				SoundPlayer::get().play(Sounds::Switch);
 				break;
 
 			case '@':
 				GameSetting::get().map.size.setNextValue();
+				SoundPlayer::get().play(Sounds::Switch);
 				break;
 
 			case K_F2:
 				GameData::get().selection = PageSelect::CustomMapPage;
+				SoundPlayer::get().play(Sounds::Entrance);
 				{
 					auto page = Page::Create();
 					page->run();
@@ -230,19 +239,25 @@ void SettingPage::run()
 
 			case K_3:
 				if (!GameSetting::get().old_console_host)
+				{
 					GameSetting::get().show_frame = !GameSetting::get().show_frame;
+					SoundPlayer::get().play(Sounds::Switch);
+				}
 				break;
 
 			case K_4:
 				GameSetting::get().opening_pause = !GameSetting::get().opening_pause;
+				SoundPlayer::get().play(Sounds::Switch);
 				break;
 
 			case K_5:
 				GameSetting::get().theme.setNextValue();
+				SoundPlayer::get().play(Sounds::Switch);
 				break;
 
 			case K_F5:
 				GameData::get().selection = PageSelect::CustomThemePage;
+				SoundPlayer::get().play(Sounds::Entrance);
 				{
 					auto page = Page::Create();
 					page->run();
@@ -258,11 +273,13 @@ void SettingPage::run()
 				Console::get().setTitle(~Token::console_title);
 				canvas.clear();
 				paintInterface();
+				SoundPlayer::get().play(Sounds::Switch);
 				break;
 
 			case K_Enter:
 				GameData::get().selection = PageSelect::MenuPage;
 				GameSaving::get().save();
+				SoundPlayer::get().play(Sounds::Confirm);
 				return;
 
 			case K_Esc:
@@ -275,6 +292,7 @@ void SettingPage::run()
 				else
 					GameSetting::get().theme.ClearCustomValue();
 				// ...excluding custom maps
+				SoundPlayer::get().play(Sounds::Cancel);
 				return;
 		}
 	}
@@ -367,33 +385,42 @@ void CustomThemePage::run()
 		{
 			case K_Q: case K_q:
 				theme_temp[Element::Blank].facade.setNextValue();
+				SoundPlayer::get().play(Sounds::Switch);
 				break;
 			case K_W: case K_w:
 				theme_temp[Element::Food].facade.setNextValue();
+				SoundPlayer::get().play(Sounds::Switch);
 				break;
 			case K_E: case K_e:
 				theme_temp[Element::Snake].facade.setNextValue();
+				SoundPlayer::get().play(Sounds::Switch);
 				break;
 			case K_R: case K_r:
 				theme_temp[Element::Barrier].facade.setNextValue();
+				SoundPlayer::get().play(Sounds::Switch);
 				break;
 
 			case K_A: case K_a:
 				theme_temp[Element::Blank].color.setNextValue();
+				SoundPlayer::get().play(Sounds::Switch);
 				break;
 			case K_S: case K_s:
 				theme_temp[Element::Food].color.setNextValue();
+				SoundPlayer::get().play(Sounds::Switch);
 				break;
 			case K_D: case K_d:
 				theme_temp[Element::Snake].color.setNextValue();
+				SoundPlayer::get().play(Sounds::Switch);
 				break;
 			case K_F: case K_f:
 				theme_temp[Element::Barrier].color.setNextValue();
+				SoundPlayer::get().play(Sounds::Switch);
 				break;
 
 			case K_Ctrl_Dd:
 				GameSetting::get().theme.ClearCustomValue();
 				GameData::get().selection = PageSelect::SettingPage;
+				SoundPlayer::get().play(Sounds::Confirm);
 				return;
 
 			case K_Enter:
@@ -402,6 +429,7 @@ void CustomThemePage::run()
 			case K_Esc:
 				GameSetting::get().theme.SetCustomValue(theme_temp);
 				GameData::get().selection = PageSelect::SettingPage;
+				SoundPlayer::get().play(Sounds::Entrance);
 				return;
 		}
 	}
@@ -794,10 +822,12 @@ void CustomMapPage::run()
 					case K_F1:
 						map_list.selectPrev();
 						map_viewer.changeMap(map_list.fetchSelected());
+						SoundPlayer::get().play(Sounds::Switch);
 						break;
 					case K_F2:
 						map_list.selectNext();
 						map_viewer.changeMap(map_list.fetchSelected());
+						SoundPlayer::get().play(Sounds::Switch);
 						break;
 					case K_F3:
 						if (MapSet::IsCustomItem(map.set))
@@ -807,6 +837,7 @@ void CustomMapPage::run()
 							canvas.setCursor(2, 2);
 							canvas.setColor(HighlightColor);
 							print(~Token::custom_map_edit_map);
+							SoundPlayer::get().play(Sounds::Entrance);
 
 							map_viewer.enterEditing();
 							editor_state = EditorState::MapEdit;
@@ -815,10 +846,14 @@ void CustomMapPage::run()
 					case K_F4:
 						map.size.setNextValue();
 						map_viewer.changeMap(map_list.fetchSelected());
+						SoundPlayer::get().play(Sounds::Switch);
 						break;
 					case K_F5:
 						if (MapSet::IsCustomItem(map.set) && map.set.Name() != MapSelector::TempMapSetName)
+						{
 							editor_state = EditorState::MapNaming;
+							SoundPlayer::get().play(Sounds::Entrance);
+						}
 						break;
 					case K_Delete:
 						if (MapSet::IsCustomItem(map.set) && map.set.Name() != MapSelector::TempMapSetName)
@@ -828,10 +863,16 @@ void CustomMapPage::run()
 							canvas.setCursor(11, 2);
 							canvas.setColor(Color::LightRed);
 							print(~Token::custom_map_delete_map_confirm);
+							SoundPlayer::get().play(Sounds::Entrance);
 							if (getwch() == K_Delete)
 							{
 								map_list.deleteSelected();
 								map_viewer.changeMap(map_list.fetchSelected());
+								SoundPlayer::get().play(Sounds::Confirm);
+							}
+							else
+							{
+								SoundPlayer::get().play(Sounds::Cancel);
 							}
 							canvas.setCursorOffset(CanvasOffsetX, CanvasOffsetY);
 							canvas.setCursor(11, 2);
@@ -841,6 +882,7 @@ void CustomMapPage::run()
 						break;
 					case K_Enter: case K_Esc:
 						GameData::get().selection = PageSelect::SettingPage;
+						SoundPlayer::get().play(Sounds::Entrance);
 						return;
 				}
 				break;
@@ -848,17 +890,29 @@ void CustomMapPage::run()
 				switch (getwch())
 				{
 					case K_UP: case K_W: case K_w:
-						map_viewer.moveSelected(MapViewer::Direction::Up); break;
+						map_viewer.moveSelected(MapViewer::Direction::Up);
+						SoundPlayer::get().play(Sounds::Entrance);
+						break;
 					case K_DOWN: case K_S: case K_s:
-						map_viewer.moveSelected(MapViewer::Direction::Down); break;
+						map_viewer.moveSelected(MapViewer::Direction::Down);
+						SoundPlayer::get().play(Sounds::Entrance);
+						break;
 					case K_LEFT: case K_A: case K_a:
-						map_viewer.moveSelected(MapViewer::Direction::Left); break;
+						map_viewer.moveSelected(MapViewer::Direction::Left);
+						SoundPlayer::get().play(Sounds::Entrance);
+						break;
 					case K_RIGHT: case K_D: case K_d:
-						map_viewer.moveSelected(MapViewer::Direction::Right); break;
+						map_viewer.moveSelected(MapViewer::Direction::Right);
+						SoundPlayer::get().play(Sounds::Entrance);
+						break;
 					case K_Space:
-						map_viewer.switchSelected(); break;
+						map_viewer.switchSelected();
+						SoundPlayer::get().play(Sounds::Switch);
+						break;
 					case K_Ctrl_Bb:
-						map_viewer.setAllBlank(); break;
+						map_viewer.setAllBlank();
+						SoundPlayer::get().play(Sounds::Switch);
+						break;
 					case K_Enter:
 						if (auto& map = map_viewer.exitEditing();
 							std::ranges::any_of(map.iter_all(), [](Element e) { return e == Element::Blank; }))
@@ -867,12 +921,14 @@ void CustomMapPage::run()
 							map_viewer.changeMap(map_list.fetchSelected());
 						paintInterface();
 						editor_state = EditorState::MapSelect;
+						SoundPlayer::get().play(Sounds::Confirm);
 						break;
 					case K_Esc:
 						map_viewer.exitEditing();
 						map_viewer.changeMap(map_list.fetchSelected());
 						paintInterface();
 						editor_state = EditorState::MapSelect;
+						SoundPlayer::get().play(Sounds::Cancel);
 						break;
 				}
 				break;
@@ -892,6 +948,7 @@ void CustomMapPage::run()
 				print(~Token::custom_map_rename);
 
 				editor_state = EditorState::MapSelect;
+				SoundPlayer::get().play(Sounds::Entrance);
 			}
 			break;
 		}
@@ -968,6 +1025,7 @@ void BeginPage::run()
 	(void)getwch();
 	*is_press = true;
 	GameData::get().selection = PageSelect::MenuPage;
+	SoundPlayer::get().play(Sounds::Intro);
 }
 
 void BeginPage::paintInterface()
@@ -1025,10 +1083,14 @@ void RankPage::run()
 					continue;
 				Rank::get().clearRank();
 				GameSaving::get().save();
-				[[fallthrough]];
+				GameData::get().selection = PageSelect::MenuPage;
+				SoundPlayer::get().play(Sounds::Confirm);
+				return;
+
 			case K_Enter:
 			case K_Esc:
 				GameData::get().selection = PageSelect::MenuPage;
+				SoundPlayer::get().play(Sounds::Entrance);
 				return;
 		}
 	}

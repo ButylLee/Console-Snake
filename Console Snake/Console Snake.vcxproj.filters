@@ -22,6 +22,12 @@
     <Filter Include="头文件\Resources">
       <UniqueIdentifier>{83834f95-1f58-42d9-8bb9-b225bb3ded8d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="头文件\Resources\Langs">
+      <UniqueIdentifier>{7bbeff71-1337-46c5-98c3-716c3f69b195}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\Resources\Sounds">
+      <UniqueIdentifier>{d4d0fa77-b4a4-46cd-bf27-20e39e813b88}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Main.cpp">
@@ -52,6 +58,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Source\DemoGround.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\SoundPlayer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -140,19 +149,49 @@
     <ClInclude Include="Include\Pythonic.h">
       <Filter>头文件\Import</Filter>
     </ClInclude>
+    <ClInclude Include="Include\SoundPlayer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Include\LangENG.inl">
-      <Filter>头文件\Resources</Filter>
+    <None Include="Include\Langs\LangCHS.inl">
+      <Filter>头文件\Resources\Langs</Filter>
     </None>
-    <None Include="Include\LangCHS.inl">
-      <Filter>头文件\Resources</Filter>
+    <None Include="Include\Langs\LangCHT.inl">
+      <Filter>头文件\Resources\Langs</Filter>
     </None>
-    <None Include="Include\LangCHT.inl">
-      <Filter>头文件\Resources</Filter>
+    <None Include="Include\Langs\LangENG.inl">
+      <Filter>头文件\Resources\Langs</Filter>
     </None>
-    <None Include="Include\LangJPN.inl">
-      <Filter>头文件\Resources</Filter>
+    <None Include="Include\Langs\LangJPN.inl">
+      <Filter>头文件\Resources\Langs</Filter>
+    </None>
+    <None Include="Include\Sounds\SoundAbout.inl">
+      <Filter>头文件\Resources\Sounds</Filter>
+    </None>
+    <None Include="Include\Sounds\SoundCancel.inl">
+      <Filter>头文件\Resources\Sounds</Filter>
+    </None>
+    <None Include="Include\Sounds\SoundConfirm.inl">
+      <Filter>头文件\Resources\Sounds</Filter>
+    </None>
+    <None Include="Include\Sounds\SoundDead.inl">
+      <Filter>头文件\Resources\Sounds</Filter>
+    </None>
+    <None Include="Include\Sounds\SoundFood.inl">
+      <Filter>头文件\Resources\Sounds</Filter>
+    </None>
+    <None Include="Include\Sounds\SoundIntro.inl">
+      <Filter>头文件\Resources\Sounds</Filter>
+    </None>
+    <None Include="Include\Sounds\SoundSwitch.inl">
+      <Filter>头文件\Resources\Sounds</Filter>
+    </None>
+    <None Include="Include\Sounds\SoundWin.inl">
+      <Filter>头文件\Resources\Sounds</Filter>
+    </None>
+    <None Include="Include\Sounds\SoundEntrance.inl">
+      <Filter>头文件\Resources\Sounds</Filter>
     </None>
   </ItemGroup>
 </Project>
