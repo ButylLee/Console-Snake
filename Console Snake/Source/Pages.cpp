@@ -435,6 +435,10 @@ void CustomThemePage::run()
 				GameData::get().selection = PageSelect::SettingPage;
 				SoundPlayer::get().play(Sounds::Confirm);
 				return;
+			case K_Ctrl_Rr:
+				generateRandomTheme();
+				SoundPlayer::get().play(Sounds::Cancel);
+				break;
 
 			case K_Enter:
 				GameSetting::get().theme = Theme::Custom;
@@ -462,7 +466,9 @@ void CustomThemePage::paintInterface()
 
 	canvas.setColor(Color::White);
 	canvas.setCursor(5, 30);
-	print(~Token::setting_reset_custom);
+	print(~Token::custom_theme_clear_custom);
+	canvas.setCursor(18, 30);
+	print(~Token::custom_theme_randomize);
 
 	canvas.setCursor(30, 14);
 	print(~Token::custom_theme_list_head);

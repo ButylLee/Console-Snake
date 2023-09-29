@@ -48,13 +48,14 @@ enum struct Token :size_t
 	setting_theme_E,
 	setting_yes,
 	setting_no,
-	setting_reset_custom,
 
 	custom_theme_list_head,
 	custom_theme_blank,
 	custom_theme_food,
 	custom_theme_snake,
 	custom_theme_barrier,
+	custom_theme_clear_custom,
+	custom_theme_randomize,
 
 	custom_map_prev,
 	custom_map_next,
