@@ -146,11 +146,13 @@ void GameSavingBase::convertFromSaveData() noexcept
 		}
 
 		gs.speed.convertFrom(bin_data.setting.speed);
-		gs.map.size.convertFrom(bin_data.setting.size);
+		gs.map.size.convertFrom(bin_data.setting.map_size);
 		gs.map.set = MapSet(bin_data.setting.map_select);
 		gs.lang.convertFrom(Convert{ bin_data.setting.lang });
 		LocalizedStrings::setLang(gs.lang.Value());
 		gs.show_frame = Convert{ bin_data.setting.show_frame };
+		gs.opening_pause = Convert{ bin_data.setting.opening_pause };
+		gs.mute = Convert{ bin_data.setting.mute };
 	}
 	// rank data
 	wchar_t name[Rank::NameMaxLength + 1] = {};
@@ -199,10 +201,12 @@ void GameSavingBase::convertToSaveData() noexcept
 		}
 
 		bin_data.setting.speed = Convert{ gs.speed.Value() };
-		bin_data.setting.size = Convert{ gs.map.size.Value() };
+		bin_data.setting.map_size = Convert{ gs.map.size.Value() };
 		bin_data.setting.map_select = Convert{ gs.map.set.Index() };
 		bin_data.setting.lang = Convert{ gs.lang.Value() };
 		bin_data.setting.show_frame = Convert{ gs.show_frame };
+		bin_data.setting.opening_pause = Convert{ gs.opening_pause };
+		bin_data.setting.mute = Convert{ gs.mute };
 	}
 	// rank data
 	auto [rank, lock] = Rank::get().getRank();

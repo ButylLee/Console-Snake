@@ -31,11 +31,13 @@ class GameSavingBase
 		wchar_t map_name[Map::MaxMapSetCount - MapSet::Mask_][Map::NameMaxHalfWidth] = {};
 		int16_t theme[static_cast<size_t>(Element::Mask_)][2] = {};
 		int16_t speed = 0;
-		int16_t size = 0;
+		int16_t map_size = 0;
 		uint8_t custom_map_count = 0;
 		uint8_t map_select = 0;
 		int8_t lang = 0;
 		int8_t show_frame = 0;
+		int8_t opening_pause = 0;
+		int8_t mute = 0;
 	};
 
 	struct RankSavingItem

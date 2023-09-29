@@ -34,6 +34,7 @@ enum struct Token :size_t
 	setting_theme,
 	setting_customize_theme,
 	setting_language,
+	setting_mute,
 	setting_save,
 	setting_return,
 	setting_speed_fast,

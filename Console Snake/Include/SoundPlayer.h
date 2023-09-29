@@ -24,10 +24,6 @@ protected:
 
 public:
 	void play(Sounds) noexcept;
-	void mute(bool) noexcept;
-
-private:
-	bool is_muted = false;
 };
 
 using SoundPlayer = ModuleRegister<SoundPlayerBase>;

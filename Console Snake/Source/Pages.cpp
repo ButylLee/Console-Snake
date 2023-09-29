@@ -277,6 +277,11 @@ void SettingPage::run()
 				SoundPlayer::get().play(Sounds::Switch);
 				break;
 
+			case K_7:
+				GameSetting::get().mute = !GameSetting::get().mute;
+				SoundPlayer::get().play(Sounds::Switch);
+				break;
+
 			case K_Enter:
 				GameData::get().selection = PageSelect::MenuPage;
 				GameSaving::get().save();
@@ -305,7 +310,7 @@ void SettingPage::paintInterface()
 
 	auto [baseX, baseY] = canvas.getClientSize();
 	baseX = baseX / 3 + 1;
-	baseY = baseY / 2 + 1;
+	baseY = baseY / 2;
 	canvas.setColor(Color::White);
 
 	canvas.setCursor(baseX, baseY);
@@ -324,9 +329,11 @@ void SettingPage::paintInterface()
 	print(~Token::setting_customize_theme);
 	canvas.setCursor(baseX, baseY + 10);
 	print(~Token::setting_language);
-	canvas.setCursor(baseX - 2, baseY + 12);
+	canvas.setCursor(baseX, baseY + 12);
+	print(~Token::setting_mute);
+	canvas.setCursor(baseX - 2, baseY + 14);
 	print(~Token::setting_save);
-	canvas.setCursor(baseX - 1, baseY + 14);
+	canvas.setCursor(baseX - 1, baseY + 16);
 	print(~Token::setting_return);
 }
 
@@ -334,7 +341,7 @@ void SettingPage::paintCurOptions()
 {
 	auto [baseX, baseY] = canvas.getClientSize();
 	baseX = baseX / 2 + 4;
-	baseY = baseY / 2 + 1;
+	baseY = baseY / 2;
 	canvas.setColor(Color::White);
 
 	canvas.setCursor(baseX, baseY);
@@ -360,6 +367,11 @@ void SettingPage::paintCurOptions()
 
 	canvas.setCursor(baseX, baseY + 10);
 	print(GameSetting::get().lang.Name());
+
+	canvas.setCursor(baseX, baseY + 12);
+	print(GameSetting::get().mute
+		  ? ~Token::setting_yes
+		  : ~Token::setting_no);
 }
 
 /***************************************

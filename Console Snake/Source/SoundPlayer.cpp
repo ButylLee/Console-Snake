@@ -1,5 +1,6 @@
 ﻿#include "SoundPlayer.h"
 #include "WinHeader.h"
+#include "GlobalData.h"
 #include <cassert>
 
 namespace
@@ -38,15 +39,10 @@ namespace
 
 void SoundPlayerBase::play(Sounds sound) noexcept
 {
-	if (is_muted)
+	if (GameSetting::get().mute)
 		return;
 	[[maybe_unused]] BOOL success;
 	success = PlaySoundW((LPCWSTR)SoundResource[static_cast<size_t>(sound)], NULL,
 						 SND_ASYNC | SND_MEMORY | SND_NODEFAULT);
 	assert(success);
-}
-
-void SoundPlayerBase::mute(bool is_mute) noexcept
-{
-	is_muted = is_mute;
 }
