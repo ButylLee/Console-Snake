@@ -63,6 +63,9 @@
     <ClCompile Include="Source\SoundPlayer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="Source\LocalizedStrings.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\Canvas.h">
@@ -88,9 +91,6 @@
     </ClInclude>
     <ClInclude Include="Include\ScopeGuard.h">
       <Filter>头文件\Import</Filter>
-    </ClInclude>
-    <ClInclude Include="Include\LocalizedStrings.h">
-      <Filter>头文件\Utility</Filter>
     </ClInclude>
     <ClInclude Include="Include\Singleton.h">
       <Filter>头文件\Utility</Filter>
@@ -150,6 +150,9 @@
       <Filter>头文件\Import</Filter>
     </ClInclude>
     <ClInclude Include="Include\SoundPlayer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\LocalizedStrings.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

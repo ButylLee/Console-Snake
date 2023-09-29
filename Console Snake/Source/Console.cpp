@@ -1,7 +1,7 @@
 ﻿#include "Console.h"
 #include "ErrorHandling.h"
 #include "WideIO.h"
-#include "Resource.h"
+#include "LocalizedStrings.h"
 #include "WinHeader.h"
 #include <utility>
 #include <cstdlib>

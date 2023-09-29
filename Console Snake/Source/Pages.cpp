@@ -10,13 +10,14 @@
 #include "WideIO.h"
 #include "Timer.h"
 #include "Random.h"
+#include "ErrorHandling.h"
+#include "LocalizedStrings.h"
 #include "ScopeGuard.h"
 #include "EncryptedString.h"
 #include "Pythonic.h"
 #include "Resource.h"
 #include "KeyMap.h"
 #include "GlobalData.h"
-#include "ErrorHandling.h"
 
 #include <thread>
 #include <atomic>

@@ -3,7 +3,7 @@
 #define SNAKE_ERRORHANDLING_HEADER_
 
 #include "WideIO.h"
-#include "Resource.h"
+#include "LocalizedStrings.h"
 #include <string_view>
 #include <stdexcept>
 #include <cstdlib>

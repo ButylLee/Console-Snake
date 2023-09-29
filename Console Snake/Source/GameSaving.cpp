@@ -5,6 +5,7 @@
 #include "GlobalData.h"
 #include "ErrorHandling.h"
 #include "WideIO.h"
+#include "LocalizedStrings.h"
 #include <algorithm>
 #include <fstream>
 #include <filesystem>

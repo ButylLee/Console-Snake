@@ -2,12 +2,13 @@
 #include "Rank.h"
 #include "Console.h"
 #include "SoundPlayer.h"
-#include "GlobalData.h"
-#include "Resource.h"
 #include "WideIO.h"
-#include "KeyMap.h"
-#include "ScopeGuard.h"
+#include "LocalizedStrings.h"
 #include "Timer.h"
+#include "Resource.h"
+#include "KeyMap.h"
+#include "GlobalData.h"
+#include "ScopeGuard.h"
 
 #include <thread>
 #include <atomic>

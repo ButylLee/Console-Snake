@@ -5,9 +5,9 @@
 #include "GameSaving.h"
 #include "WideIO.h"
 #include "ErrorHandling.h"
+#include "LocalizedStrings.h"
 #include "EncryptedString.h"
 #include "Pythonic.h"
-#include "Resource.h"
 #include "GlobalData.h"
 
 #include "WinHeader.h"
