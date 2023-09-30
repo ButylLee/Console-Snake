@@ -25,9 +25,17 @@ void Canvas::setCursor(short newX, short newY)
 	applyCursor();
 }
 
-void Canvas::setCursorOffset(short X, short Y) noexcept
+void Canvas::pushCursorOffset(short X, short Y) noexcept
 {
-	offset = { X, Y };
+	offset_stack.emplace(X, Y);
+	offset += offset_stack.top();
+}
+
+void Canvas::popCursorOffset() noexcept
+{
+	assert(!offset_stack.empty());
+	offset -= offset_stack.top();
+	offset_stack.pop();
 }
 
 void Canvas::setCursorCentered(std::wstring_view str, short newY)

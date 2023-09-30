@@ -6,6 +6,7 @@
 #include "WinHeader.h"
 #include "Interface.h"
 #include <string_view>
+#include <stack>
 
 struct Cursor
 {
@@ -20,10 +21,27 @@ public:
 			static_cast<SHORT>(y)
 		};
 	}
-	constexpr Cursor operator+(const Cursor& offset) const noexcept
+	constexpr Cursor& operator+=(const Cursor& offset) noexcept
 	{
-		return { static_cast<short>(this->x + offset.x), static_cast<short>(this->y + offset.y) };
+		this->x += offset.x;
+		this->y += offset.y;
+		return *this;
 	}
+	constexpr Cursor& operator-=(const Cursor& offset) noexcept
+	{
+		this->x -= offset.x;
+		this->y -= offset.y;
+		return *this;
+	}
+	friend constexpr Cursor operator+(Cursor lhs, const Cursor& rhs) noexcept
+	{
+		return lhs += rhs;
+	}
+	friend constexpr Cursor operator-(Cursor lhs, const Cursor& rhs) noexcept
+	{
+		return lhs -= rhs;
+	}
+
 public:
 	short x = 0;
 	short y = 0;
@@ -43,7 +61,8 @@ public:
 public:
 	void setColor(Color new_color);
 	void setCursor(short newX, short newY);
-	void setCursorOffset(short X, short Y) noexcept;
+	void pushCursorOffset(short X, short Y) noexcept;
+	void popCursorOffset() noexcept;
 	void setCursorCentered(std::wstring_view str, short newY);
 	void setClientSize(short width, short height) noexcept;
 	void setClientSize(ClientSize new_size) noexcept;
@@ -65,6 +84,7 @@ private:
 	Color color = Color::White;
 	Cursor cursor;
 	Cursor offset;
+	std::stack<Cursor> offset_stack;
 	ClientSize size = { 45, 35 };
 };
 

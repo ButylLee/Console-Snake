@@ -11,7 +11,7 @@
 #include <cstddef>
 #include <cassert>
 
-#define GAME_VERSION "2.35"
+#define GAME_VERSION "2.36"
 
 namespace Resource {
 	inline constexpr const char* SaveFileName = "SnakeSaved.bin";

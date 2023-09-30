@@ -91,7 +91,8 @@ void DemoPage::run()
 	auto [width2, height2] = canvas.getClientSize();
 	auto width1 = GameSetting::get().map.size.Value();
 	auto height1 = GameSetting::get().map.size.Value();
-	canvas.setCursorOffset((width2 - width1) / 2, (height2 - height1) / 2);
+	canvas.pushCursorOffset((width2 - width1) / 2, (height2 - height1) / 2);
+	finally { canvas.popCursorOffset(); };
 
 	DemoGround demoground(this->canvas);
 	demoground.show();
@@ -646,8 +647,7 @@ void CustomMapPage::MapSelector::deleteSelected()
 
 void CustomMapPage::MapSelector::paint()
 {
-	canvas.setCursorOffset(CanvasOffsetX, CanvasOffsetY);
-	finally { canvas.setCursorOffset(0, 0); };
+	canvas.pushCursorOffset(CanvasOffsetX, CanvasOffsetY);
 	canvas.setColor(NormalColor);
 	canvas.setCursor(2, 0);
 	for (auto i : range(ViewSpan))
@@ -656,12 +656,13 @@ void CustomMapPage::MapSelector::paint()
 	for (auto i : range(ViewSpan))
 		print(L"  \\------------/ " + !!i);
 	assert(map.set.Index() == 0);
+	canvas.popCursorOffset();
 	refreshMapList();
 }
 
 void CustomMapPage::MapSelector::renameCurrentMapSet()
 {
-	canvas.setCursorOffset(CanvasOffsetX, CanvasOffsetY);
+	canvas.pushCursorOffset(CanvasOffsetX, CanvasOffsetY);
 	canvas.setCursor(static_cast<short>(4 + 8 * (map.set.Index() - view_begin)), 1);
 	canvas.setColor(Color::LightYellow);
 	std::wstring name;
@@ -677,13 +678,14 @@ void CustomMapPage::MapSelector::renameCurrentMapSet()
 		name.resize(StrIndexOfFullWidthLength(name, NameMaxFullWidth));
 	if (!name.empty() && name != TempMapSetName)
 		MapSet::RenameCustomItem(map.set, std::move(name));
+	canvas.popCursorOffset();
 	refreshMapList();
 }
 
 void CustomMapPage::MapSelector::refreshMapList()
 {
-	canvas.setCursorOffset(CanvasOffsetX, CanvasOffsetY);
-	finally { canvas.setCursorOffset(0, 0); };
+	canvas.pushCursorOffset(CanvasOffsetX, CanvasOffsetY);
+	finally { canvas.popCursorOffset(); };
 	canvas.setColor(NormalColor);
 	canvas.setCursor(2, 1);
 	for (auto i : range(ViewSpan))
@@ -771,8 +773,8 @@ void CustomMapPage::MapViewer::setAllBlank()
 
 void CustomMapPage::MapViewer::paint() const
 {
-	canvas.setCursorOffset(CanvasOffsetX, CanvasOffsetY);
-	finally { canvas.setCursorOffset(0, 0); };
+	canvas.pushCursorOffset(CanvasOffsetX, CanvasOffsetY);
+	finally { canvas.popCursorOffset(); };
 	canvas.setColor(NormalColor);
 
 	std::wstring line;
@@ -806,8 +808,8 @@ void CustomMapPage::MapViewer::paint() const
 
 void CustomMapPage::MapViewer::paintSelectedPos(Color color) const
 {
-	canvas.setCursorOffset(CanvasOffsetX, CanvasOffsetY);
-	finally { canvas.setCursorOffset(0, 0); };
+	canvas.pushCursorOffset(CanvasOffsetX, CanvasOffsetY);
+	finally { canvas.popCursorOffset(); };
 	auto map_begin_pos = (Size(Size::L).Value() - editing_map.size()) / 2;
 	auto pos_x = static_cast<short>(map_begin_pos + x);
 	auto pos_y = static_cast<short>(map_begin_pos + y);
@@ -851,11 +853,11 @@ void CustomMapPage::run()
 					case K_F3:
 						if (MapSet::IsCustomItem(map.set))
 						{
-							finally { canvas.setCursorOffset(0, 0); };
-							canvas.setCursorOffset(CanvasOffsetX, CanvasOffsetY);
+							canvas.pushCursorOffset(CanvasOffsetX, CanvasOffsetY);
 							canvas.setCursor(2, 2);
 							canvas.setColor(HighlightColor);
 							print(~Token::custom_map_edit_map);
+							canvas.popCursorOffset();
 							SoundPlayer::get().play(Sounds::Entrance);
 
 							map_viewer.enterEditing();
@@ -877,11 +879,11 @@ void CustomMapPage::run()
 					case K_Delete:
 						if (MapSet::IsCustomItem(map.set) && map.set.Name() != MapSelector::TempMapSetName)
 						{
-							finally { canvas.setCursorOffset(0, 0); };
-							canvas.setCursorOffset(CanvasOffsetX, CanvasOffsetY);
+							canvas.pushCursorOffset(CanvasOffsetX, CanvasOffsetY);
 							canvas.setCursor(11, 2);
 							canvas.setColor(Color::LightRed);
 							print(~Token::custom_map_delete_map_confirm);
+							canvas.popCursorOffset();
 							SoundPlayer::get().play(Sounds::Entrance);
 							if (getwch() == K_Delete)
 							{
@@ -893,10 +895,11 @@ void CustomMapPage::run()
 							{
 								SoundPlayer::get().play(Sounds::Cancel);
 							}
-							canvas.setCursorOffset(CanvasOffsetX, CanvasOffsetY);
+							canvas.pushCursorOffset(CanvasOffsetX, CanvasOffsetY);
 							canvas.setCursor(11, 2);
 							canvas.setColor(NormalColor);
 							print(~Token::custom_map_delete_map);
+							canvas.popCursorOffset();
 						}
 						break;
 					case K_Enter: case K_Esc:
@@ -953,18 +956,19 @@ void CustomMapPage::run()
 				break;
 			case EditorState::MapNaming:
 			{
-				finally { canvas.setCursorOffset(0, 0); };
-				canvas.setCursorOffset(CanvasOffsetX, CanvasOffsetY);
+				canvas.pushCursorOffset(CanvasOffsetX, CanvasOffsetY);
 				canvas.setCursor(11, 4);
 				canvas.setColor(HighlightColor);
 				print(~Token::custom_map_rename);
+				canvas.popCursorOffset();
 
 				map_list.renameCurrentMapSet();
 				
-				canvas.setCursorOffset(CanvasOffsetX, CanvasOffsetY);
+				canvas.pushCursorOffset(CanvasOffsetX, CanvasOffsetY);
 				canvas.setCursor(11, 4);
 				canvas.setColor(NormalColor);
 				print(~Token::custom_map_rename);
+				canvas.popCursorOffset();
 
 				editor_state = EditorState::MapSelect;
 				SoundPlayer::get().play(Sounds::Entrance);
@@ -983,13 +987,12 @@ void CustomMapPage::paintInterface()
                / /___/ /_/ (__  ) /_/ /_/ / / / / / /  / /  / / /_/ / /_/ /
                \____/\__,_/____/\__/\____/_/ /_/ /_/  /_/  /_/\__,_/ .___/ 
                                                                   /_/      )title" + 1; // Slant
-	canvas.setCursorOffset(0, 0);
 	canvas.setCursor(0, 0);
 	canvas.setColor(Color::LightAqua);
 	print(custom_map_title);
 
-	canvas.setCursorOffset(CanvasOffsetX, CanvasOffsetY);
-	finally { canvas.setCursorOffset(0, 0); };
+	canvas.pushCursorOffset(CanvasOffsetX, CanvasOffsetY);
+	finally { canvas.popCursorOffset(); };
 	canvas.setColor(NormalColor);
 
 	canvas.setCursor(2, 0);
@@ -1022,8 +1025,8 @@ void CustomMapPage::paintInterface()
 void CustomMapPage::paintCurOptions()
 {
 	canvas.setColor(NormalColor);
-	canvas.setCursorOffset(CanvasOffsetX, CanvasOffsetY);
-	finally { canvas.setCursorOffset(0, 0); };
+	canvas.pushCursorOffset(CanvasOffsetX, CanvasOffsetY);
+	finally { canvas.popCursorOffset(); };
 
 	canvas.setCursor(11, 8);
 	print(~Token::custom_map_curr_size);
