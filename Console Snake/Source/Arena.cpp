@@ -26,12 +26,11 @@ namespace
 				std::transform(m.begin(), m.end(), map.iter_all().begin(),
 							   [](Element type)
 							   {
-								   MapNode node;
-								   node.type = type;
+								   MapNode node{ .type = type };
 								   return node;
 							   });
 			};
-		GameSetting::get().map.applyValue(f);
+		GameSetting::get().map.visitValue(f);
 		return map;
 	}
 
@@ -155,7 +154,7 @@ namespace
 		{
 			int8_t x;
 			int8_t y;
-			friend PosNode PosHandledOffset(PosNode pos, PosOffset offset, size_t size_y_, size_t size_x_) noexcept
+			friend PosNode OffsetPosManaged(PosNode pos, PosOffset offset, size_t size_y_, size_t size_x_) noexcept
 			{
 				int8_t x = pos.x + offset.x;
 				int8_t y = pos.y + offset.y;
@@ -265,7 +264,7 @@ void Venue::createSnake()
 				for (auto i : range(std::size(info.GenConvolutionOffset)))
 				{
 					auto offset = info.GenConvolutionOffset[i];
-					auto curr_pos = PosHandledOffset(info.pos, offset, map.size(0), map.size(1));
+					auto curr_pos = OffsetPosManaged(info.pos, offset, map.size(0), map.size(1));
 					if (map[curr_pos.y][curr_pos.x].type == Element::Blank)
 						info.gen_probability++;
 				}
@@ -276,8 +275,8 @@ void Venue::createSnake()
 				{
 					auto offset1 = info.InitDirectCalcOffset1[i];
 					auto offset2 = info.InitDirectCalcOffset2[i];
-					auto curr_pos1 = PosHandledOffset(info.pos, offset1, map.size(0), map.size(1));
-					auto curr_pos2 = PosHandledOffset(info.pos, offset2, map.size(0), map.size(1));
+					auto curr_pos1 = OffsetPosManaged(info.pos, offset1, map.size(0), map.size(1));
+					auto curr_pos2 = OffsetPosManaged(info.pos, offset2, map.size(0), map.size(1));
 					if (map[curr_pos1.y][curr_pos1.x].type == Element::Blank)
 						info.init_direct_probability[i]++;
 					if (map[curr_pos2.y][curr_pos2.x].type == Element::Blank)

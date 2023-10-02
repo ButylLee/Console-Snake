@@ -610,7 +610,7 @@ DynArray<Element, 2> CustomMapPage::MapSelector::fetchSelected()
 		assert(map_shape.total_size() == m.size());
 		std::copy(m.begin(), m.end(), map_shape.iter_all().begin());
 	};
-	map.applyValue(f);
+	map.visitValue(f);
 	return map_shape;
 }
 
@@ -622,7 +622,7 @@ void CustomMapPage::MapSelector::replaceSelected(const DynArray<Element, 2>& map
 		using type = std::remove_reference_t<decltype(m)>;
 		m = type(map_shape.iter_all().begin(), map_shape.iter_all().end());
 	};
-	map.applyCustomValue(f);
+	map.visitCustomValue(f);
 	if (map.set.Name() == TempMapSetName)
 	{
 		MapSet::RenameCustomItem(map.set, L"Unnamed"_crypt);

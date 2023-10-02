@@ -67,8 +67,7 @@ void ConsoleBase::moveToScreenCenter() noexcept
 	auto width = window.right - window.left;
 	auto height = window.bottom - window.top;
 
-	MONITORINFO info;
-	info.cbSize = sizeof(MONITORINFO);
+	MONITORINFO info{ .cbSize = sizeof(MONITORINFO) };
 	if (!GetMonitorInfoW(MonitorFromWindow(hConsole, MONITOR_DEFAULTTONULL), &info))
 		return;
 	RECT screen = info.rcWork;

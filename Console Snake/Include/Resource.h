@@ -596,7 +596,7 @@ struct Map // Proxy
 		if (size.setNextValue() == Size::S)
 			set.setNextValue();
 	}
-	void applyValue(auto&& f) const
+	void visitValue(auto&& f) const
 	{
 		switch (size.Index())
 		{
@@ -608,7 +608,7 @@ struct Map // Proxy
 				f(set.Value().map_large); break;
 		}
 	}
-	void applyCustomValue(auto&& f)
+	void visitCustomValue(auto&& f)
 	{
 		switch (size.Index())
 		{
