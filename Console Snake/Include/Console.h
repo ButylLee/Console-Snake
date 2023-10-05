@@ -4,6 +4,7 @@
 
 #include "Modules.h"
 #include "WinHeader.h"
+#include "Property.h"
 #include <string>
 
 class ConsoleBase
@@ -37,10 +38,6 @@ public:
 	void setCursorVisible(bool isVisible);
 	void moveToScreenCenter() noexcept;
 
-public:
-	HWND getConsoleHandle() const noexcept;
-	HANDLE getOutputHandle() const noexcept;
-
 private:
 	void setWindowAttribute(LONG_PTR args);
 
@@ -49,9 +46,12 @@ private:
 	HANDLE fetchOutputHandle() const;
 	HWND fetchConsoleHandle() const;
 
+public:
+	UsingProperty(ConsoleBase);
+	Property<HWND, Get> console_handle;
+	Property<HANDLE, Get> output_handle;
+
 private:
-	HWND hConsole;
-	HANDLE hOutput;
 	std::wstring title;
 };
 

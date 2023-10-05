@@ -10,8 +10,8 @@
 
 ConsoleBase::ConsoleBase() try
 {
-	hOutput = fetchOutputHandle();
-	hConsole = fetchConsoleHandle();
+	output_handle.value = fetchOutputHandle();
+	console_handle.value = fetchConsoleHandle();
 	// set initial window style
 	setWindowAttribute(WS_VISIBLE | WS_CAPTION | WS_SYSMENU |
 					   WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SIZEBOX);
@@ -52,17 +52,17 @@ void ConsoleBase::setConsoleWindow(HasFrame hasframe)
 void ConsoleBase::setCursorVisible(bool isVisible)
 {
 	CONSOLE_CURSOR_INFO cci;
-	if (!GetConsoleCursorInfo(hOutput, &cci))
+	if (!GetConsoleCursorInfo(output_handle.value, &cci))
 		throw NativeException{};
 	cci.bVisible = static_cast<BOOL>(isVisible);
-	if (!SetConsoleCursorInfo(hOutput, &cci))
+	if (!SetConsoleCursorInfo(output_handle.value, &cci))
 		throw NativeException{};
 }
 
 void ConsoleBase::moveToScreenCenter() noexcept
 {
 	RECT window;
-	if (!GetWindowRect(hConsole, &window))
+	if (!GetWindowRect(console_handle.value, &window))
 		return;
 	auto width = window.right - window.left;
 	auto height = window.bottom - window.top;
@@ -75,28 +75,18 @@ void ConsoleBase::moveToScreenCenter() noexcept
 	auto top = screen.top + (screen.bottom - screen.top - height) / 2;
 
 	// side effect: restore ConsoleWindow attributes
-	MoveWindow(hConsole, left, top, width, height, TRUE);
-}
-
-HWND ConsoleBase::getConsoleHandle() const noexcept
-{
-	return hConsole;
-}
-
-HANDLE ConsoleBase::getOutputHandle() const noexcept
-{
-	return hOutput;
+	MoveWindow(console_handle.value, left, top, width, height, TRUE);
 }
 
 void ConsoleBase::setWindowAttribute(LONG_PTR args)
 {
-	if (!SetWindowLongPtrW(hConsole, GWL_STYLE, args))
+	if (!SetWindowLongPtrW(console_handle.value, GWL_STYLE, args))
 		throw NativeException{};
 }
 
 LONG_PTR ConsoleBase::getWindowAttribute() const
 {
-	LONG_PTR win_att = GetWindowLongPtrW(hConsole, GWL_STYLE);
+	LONG_PTR win_att = GetWindowLongPtrW(console_handle.value, GWL_STYLE);
 	if (win_att == 0)
 		throw NativeException{};
 	return win_att;
@@ -125,6 +115,6 @@ void ungetwch(wint ch) noexcept
 	auto first = ch & mask;
 	auto second = ch >> half_bits & mask;
 	assert(first != 0);
-	PostMessageW(Console::get().getConsoleHandle(), WM_CHAR, first, 0);
-	PostMessageW(Console::get().getConsoleHandle(), WM_CHAR, second, 0);
+	PostMessageW(Console::get().console_handle, WM_CHAR, first, 0);
+	PostMessageW(Console::get().console_handle, WM_CHAR, second, 0);
 }
