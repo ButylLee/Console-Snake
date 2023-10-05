@@ -80,13 +80,13 @@ Color Canvas::getColor() const noexcept
 
 void Canvas::applyColor()
 {
-	if (!SetConsoleTextAttribute(Console::get().getOutputHandle(), static_cast<WORD>(color.Value())))
+	if (!SetConsoleTextAttribute(Console::get().output_handle, static_cast<WORD>(color.Value())))
 		throw NativeException{};
 }
 
 void Canvas::applyCursor()
 {
-	if (!SetConsoleCursorPosition(Console::get().getOutputHandle(), cursor + offset))
+	if (!SetConsoleCursorPosition(Console::get().output_handle, cursor + offset))
 		throw NativeException{};
 }
 

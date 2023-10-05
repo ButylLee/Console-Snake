@@ -105,7 +105,7 @@ void DemoPage::run()
 ****************************************/
 void AboutPage::run()
 {
-	int msg = MessageBoxW(Console::get().getConsoleHandle(),
+	int msg = MessageBoxW(Console::get().console_handle,
 						  (~Token::about_text).c_str(),
 						  (~Token::about_caption).c_str(),
 						  MB_OK);

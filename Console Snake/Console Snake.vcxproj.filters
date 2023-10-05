@@ -155,6 +155,9 @@
     <ClInclude Include="Include\LocalizedStrings.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Include\Property.h">
+      <Filter>头文件\Import</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Include\Langs\LangCHS.inl">
