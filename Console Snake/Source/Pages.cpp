@@ -349,6 +349,8 @@ void SettingPage::paintCurOptions()
 	print(~GameSetting::get().speed.Name());
 
 	canvas.setCursor(baseX, baseY + 2);
+	print(L"                    ");
+	canvas.setCursor(baseX, baseY + 2);
 	print(GameSetting::get().map.set.Name());
 	print(L" - ");
 	print(GameSetting::get().map.size.Name());
