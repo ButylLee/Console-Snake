@@ -73,7 +73,7 @@ void ungetwch(wint ch) noexcept;
 template<typename... TArgs>
 inline std::wstring format(std::wstring_view fmt, TArgs&&... args)
 {
-	return std::vformat(fmt, std::make_wformat_args(std::forward<TArgs>(args)...));
+	return std::vformat(fmt, std::make_wformat_args(args...));
 }
 
 /***************************************
