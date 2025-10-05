@@ -4,18 +4,23 @@
 
 #include <type_traits>
 
-template<typename Base>
-class GlobalResourceWrapper :public Base
+template<typename TBase>
+class GlobalResourceWrapper :public TBase
 {
+public:
+	using Base = TBase;
+
 public:
 	GlobalResourceWrapper() noexcept(std::is_nothrow_default_constructible_v<Base>)
 		:Base()
 	{
 		if (!instance) instance = this;
 	}
-	static Base& get() noexcept { return *instance; }
+
+	static GlobalResourceWrapper& get() noexcept { return *instance; }
+
 private:
-	inline static GlobalResourceWrapper* instance = nullptr;
+	static inline GlobalResourceWrapper* instance = nullptr;
 };
 
 #endif // SNAKE_GLOBALRESOURCEWRAPPER_HEADER_
